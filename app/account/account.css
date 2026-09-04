@@ -1,0 +1,38 @@
+/* ========================================================
+   ACCOUNT
+========================================================== */
+.account-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 768px) {
+  .account-tiles { grid-template-columns: 1fr; }
+}
+
+.account-tile {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 22px;
+  display: block;
+  transition: border-color 0.15s ease;
+}
+
+.account-tile:hover {
+  border-color: #111;
+}
+
+.order-row {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.order-row-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}

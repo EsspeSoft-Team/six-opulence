@@ -1,0 +1,646 @@
+/* =========================================
+   CUSTOMER REVIEWS
+========================================= */
+
+.customer-reviews-section {
+  position: relative;
+
+  width: 100%;
+
+  /*
+   * 8 slides.
+   *
+   * This gives the section enough vertical
+   * distance while each wheel controls exactly
+   * one slide.
+   */
+  height: 450vh;
+
+  background: #ffffff;
+
+  overflow: visible;
+  /* margin-top: 100px; */
+}
+
+/* =========================================
+   STICKY AREA
+========================================= */
+
+.customer-reviews-sticky {
+  position: sticky;
+
+  top: 0;
+
+  width: 100%;
+
+  height: 100vh;
+
+  display: flex;
+
+  align-items: center;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.customer-reviews-container {
+  width: calc(100% - 80px);
+
+  max-width: 1400px;
+
+  margin: 0 auto;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.customer-reviews-header {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(300px, 0.75fr);
+
+  align-items: end;
+
+  gap: 70px;
+
+  margin-bottom: 60px;
+}
+
+/* =========================================
+   LABEL
+========================================= */
+
+.customer-reviews-label {
+  display: block;
+
+  margin-bottom: 20px;
+
+  margin: 0 0 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+}
+
+/* =========================================
+   HEADING
+========================================= */
+
+.customer-reviews-title h2 {
+  margin: 0;
+
+  white-space: nowrap;
+
+  transform-origin: left center;
+}
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.customer-reviews-description {
+  width: 100%;
+
+  max-width: 450px;
+
+  padding-bottom: 3px;
+}
+
+.customer-reviews-description p {
+  margin: 0;
+}
+
+/* =========================================
+   SLIDER WINDOW
+========================================= */
+
+.customer-reviews-window {
+  width: 100%;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+/* =========================================
+   TRACK
+========================================= */
+
+.customer-reviews-track {
+  display: flex;
+
+  width: max-content;
+
+  align-items: stretch;
+
+  /*
+   * Important:
+   * transform is changed directly from JS.
+   */
+  will-change: transform;
+
+  transform: translate3d(0, 0, 0);
+
+  /*
+   * This creates the smooth slide.
+   */
+  transition: transform 0.65s cubic-bezier(0.77, 0, 0.175, 1);
+
+  backface-visibility: hidden;
+
+  transform-style: preserve-3d;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.customer-review-card {
+  width: 600px;
+
+  height: 345px;
+
+  flex: 0 0 600px;
+
+  margin-right: 16px;
+
+  display: grid;
+
+  grid-template-columns:
+    265px
+    335px;
+
+  overflow: hidden;
+
+  background: #f5f5f4;
+}
+
+/* =========================================
+   IMAGE
+========================================= */
+
+.customer-review-image {
+  width: 265px;
+
+  height: 345px;
+
+  overflow: hidden;
+
+  background: #eeeeec;
+}
+
+.customer-review-image img {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transform: translate3d(0, 0, 0);
+
+  backface-visibility: hidden;
+}
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.customer-review-content {
+  width: 100%;
+
+  height: 345px;
+
+  padding: 27px 27px 24px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  background: #f5f5f4;
+}
+
+/* =========================================
+   STARS
+========================================= */
+
+.customer-review-stars {
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 17px;
+
+  line-height: 1;
+
+  letter-spacing: 1px;
+
+  color: #f1c400;
+}
+
+/* =========================================
+   REVIEW
+========================================= */
+
+.customer-review-text {
+  max-width: 285px;
+
+  margin: 24px 0 0;
+
+  font-family: var(--font-body);
+
+  font-size: 18px;
+
+  font-weight: 400;
+
+  line-height: 1.42;
+
+  letter-spacing: -0.025em;
+
+  color: #171717;
+}
+
+/* =========================================
+   AUTHOR
+========================================= */
+
+.customer-review-author {
+  width: 100%;
+}
+
+.customer-review-line {
+  width: 100%;
+
+  height: 1px;
+
+  margin-bottom: 34px;
+
+  background: #d4d4d1;
+}
+
+.customer-review-name {
+  margin: 0 0 5px;
+
+  font-family: var(--font-display);
+
+  font-size: 18px;
+
+  font-weight: 500;
+
+  line-height: 1.2;
+
+  color: #171717;
+}
+
+.customer-review-type {
+  margin: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 15px;
+
+  font-weight: 400;
+
+  line-height: 1.3;
+
+  color: #777777;
+}
+
+/* =========================================
+   LARGE DESKTOP
+========================================= */
+
+@media (min-width: 1500px) {
+  .customer-reviews-container {
+    max-width: 1400px;
+  }
+
+  .customer-review-card {
+    width: 610px;
+
+    flex-basis: 610px;
+
+    grid-template-columns:
+      270px
+      340px;
+  }
+
+  .customer-review-image {
+    width: 270px;
+  }
+}
+
+/* =========================================
+   LAPTOP
+========================================= */
+
+@media (max-width: 1200px) {
+  .customer-reviews-container {
+    width: calc(100% - 50px);
+  }
+
+  .customer-reviews-header {
+    gap: 45px;
+
+    margin-bottom: 50px;
+  }
+
+  .customer-reviews-title h2 {
+    font-size: 52px;
+  }
+
+  .customer-review-card {
+    width: 560px;
+
+    flex-basis: 560px;
+
+    height: 325px;
+
+    grid-template-columns:
+      230px
+      330px;
+  }
+
+  .customer-review-image {
+    width: 230px;
+
+    height: 325px;
+  }
+
+  .customer-review-content {
+    height: 325px;
+
+    padding: 24px;
+  }
+
+  .customer-review-text {
+    font-size: 17px;
+
+    max-width: 275px;
+  }
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .customer-reviews-section {
+    height: 450vh;
+  }
+
+  .customer-reviews-sticky {
+    height: 100svh;
+  }
+
+  .customer-reviews-container {
+    width: calc(100% - 40px);
+  }
+
+  .customer-reviews-header {
+    grid-template-columns:
+      1fr
+      0.8fr;
+
+    gap: 30px;
+
+    margin-bottom: 42px;
+  }
+
+  .customer-reviews-title h2 {
+    font-size: 43px;
+  }
+
+  .customer-reviews-description {
+    max-width: 330px;
+  }
+
+  .customer-reviews-description p {
+    font-size: 13px;
+  }
+
+  .customer-review-card {
+    width: 520px;
+
+    flex-basis: 520px;
+
+    height: 305px;
+
+    grid-template-columns:
+      215px
+      305px;
+  }
+
+  .customer-review-image {
+    width: 215px;
+
+    height: 305px;
+  }
+
+  .customer-review-content {
+    height: 305px;
+
+    padding: 22px;
+  }
+
+  .customer-review-stars {
+    font-size: 14px;
+  }
+
+  .customer-review-text {
+    font-size: 16px;
+
+    max-width: 255px;
+  }
+
+  .customer-review-line {
+    margin-bottom: 22px;
+  }
+
+  .customer-review-name {
+    font-size: 15px;
+  }
+
+  .customer-review-type {
+    font-size: 13px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 767px) {
+  .customer-reviews-section {
+    height: 450vh;
+  }
+
+  .customer-reviews-sticky {
+    height: 100svh;
+  }
+
+  .customer-reviews-container {
+    width: calc(100% - 30px);
+  }
+
+  .customer-reviews-header {
+    display: block;
+
+    margin-bottom: 30px;
+  }
+
+  .customer-reviews-label {
+    margin-bottom: 14px;
+
+    font-size: 11px;
+  }
+
+  .customer-reviews-title h2 {
+    white-space: normal;
+
+    font-size: 38px;
+
+    line-height: 0.94;
+
+    letter-spacing: -0.045em;
+
+    transform: none;
+  }
+
+  .customer-reviews-description {
+    margin-top: 18px;
+
+    max-width: 100%;
+  }
+
+  .customer-reviews-description p {
+    font-size: 13px;
+
+    line-height: 1.55;
+  }
+
+  .customer-review-card {
+    width: calc(100vw - 30px);
+
+    flex-basis: calc(100vw - 30px);
+
+    height: 315px;
+
+    grid-template-columns:
+      43%
+      57%;
+
+    margin-right: 12px;
+  }
+
+  .customer-review-image {
+    width: 100%;
+
+    height: 315px;
+  }
+
+  .customer-review-content {
+    width: 100%;
+
+    height: 315px;
+
+    padding: 20px 17px;
+  }
+
+  .customer-review-stars {
+    font-size: 11px;
+
+    letter-spacing: 1px;
+  }
+
+  .customer-review-text {
+    max-width: 100%;
+
+    margin-top: 17px;
+
+    font-size: 15px;
+
+    line-height: 1.38;
+  }
+
+  .customer-review-line {
+    margin-bottom: 17px;
+  }
+
+  .customer-review-name {
+    font-size: 13px;
+  }
+
+  .customer-review-type {
+    font-size: 11px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+  .customer-reviews-title h2 {
+    font-size: 33px;
+  }
+
+  .customer-review-card {
+    width: calc(100vw - 30px);
+
+    flex-basis: calc(100vw - 30px);
+
+    height: 370px;
+
+    grid-template-columns: 1fr;
+  }
+
+  .customer-review-image {
+    width: 100%;
+
+    height: 175px;
+  }
+
+  .customer-review-content {
+    height: 195px;
+
+    padding: 17px 18px;
+  }
+
+  .customer-review-text {
+    font-size: 14px;
+
+    line-height: 1.35;
+
+    margin-top: 10px;
+  }
+
+  .customer-review-line {
+    margin-bottom: 13px;
+  }
+}
+.customer-reviews-track {
+  display: flex;
+  width: max-content;
+
+  will-change: transform;
+
+  transform: translate3d(0, 0, 0);
+
+  transition: none;
+
+  backface-visibility: hidden;
+}

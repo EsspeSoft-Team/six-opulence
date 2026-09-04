@@ -1,0 +1,15 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2b2b2b"/>
+      <stop offset="100%" stop-color="#161616"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#g)"/>
+  <g opacity="0.5" stroke="#f2f2f2" stroke-width="1.5" fill="none">
+    <path d="M 336.0 380.0 L 368.0 340.0 L 432.0 340.0 L 463.99999999999994 380.0 L 463.99999999999994 620.0 L 336.0 620.0 Z" />
+    <path d="M 368.0 340.0 C 368.0 300.0, 432.0 300.0, 432.0 340.0" />
+  </g>
+  <text x="50%" y="720.0" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="2" fill="#f2f2f2" text-anchor="middle" opacity="0.85">OPULENCE</text>
+  <text x="50%" y="744.0" font-family="Arial, sans-serif" font-size="14" fill="#f2f2f2" text-anchor="middle" opacity="0.5">PRODUCT PHOTO</text>
+</svg>

@@ -1,0 +1,238 @@
+/* =========================================================
+   FEATURE BAR
+========================================================= */
+
+.feature-bar {
+  width: 100%;
+  background: #faf8f3;
+  border-top: 1px solid #e8e3d9;
+  border-bottom: 1px solid #e8e3d9;
+}
+
+.feature-bar-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+
+  min-height: 116px;
+  padding: 24px 52px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+}
+
+/* =========================================================
+   ITEM
+========================================================= */
+
+.feature-bar-item {
+  position: relative;
+
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 42px;
+}
+
+.feature-bar-item:first-child {
+  padding-left: 0;
+}
+
+.feature-bar-item:last-child {
+  padding-right: 0;
+}
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.feature-bar-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #202020;
+}
+
+.feature-bar-icon svg {
+  width: 34px;
+  height: 34px;
+
+  display: block;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.feature-bar-content {
+  margin-left: 18px;
+}
+
+.feature-bar-title {
+  margin: 0 0 5px;
+
+  color: #171717;
+
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+}
+
+.feature-bar-desc {
+  max-width: 152px;
+
+  margin: 0;
+
+  color: #85827d;
+
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.feature-bar-divider {
+  position: absolute;
+
+  top: 50%;
+  right: 0;
+
+  width: 1px;
+  height: 52px;
+
+  background: #ded9cf;
+
+  transform: translateY(-50%);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .feature-bar-inner {
+    padding: 22px 30px;
+  }
+
+  .feature-bar-item {
+    padding: 0 22px;
+  }
+
+  .feature-bar-content {
+    margin-left: 13px;
+  }
+
+  .feature-bar-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .feature-bar-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .feature-bar-inner {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+
+    padding: 20px;
+  }
+
+  .feature-bar-item {
+    min-height: 72px;
+    padding: 14px 15px;
+  }
+
+  .feature-bar-item:nth-child(odd) {
+    padding-left: 0;
+  }
+
+  .feature-bar-item:nth-child(even) {
+    padding-right: 0;
+  }
+
+  .feature-bar-item:nth-child(2)::after,
+  .feature-bar-item:nth-child(4)::after {
+    display: none;
+  }
+
+  .feature-bar-item:nth-child(-n + 2) {
+    border-bottom: 1px solid #ded9cf;
+  }
+
+  .feature-bar-divider {
+    display: none;
+  }
+
+  .feature-bar-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .feature-bar-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .feature-bar-content {
+    margin-left: 11px;
+  }
+
+  .feature-bar-title {
+    font-size: 10px;
+  }
+
+  .feature-bar-desc {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .feature-bar-inner {
+    padding: 14px;
+  }
+
+  .feature-bar-item {
+    min-height: 76px;
+  }
+
+  .feature-bar-title {
+    font-size: 9px;
+    letter-spacing: 0.3px;
+  }
+
+  .feature-bar-desc {
+    font-size: 9px;
+  }
+}

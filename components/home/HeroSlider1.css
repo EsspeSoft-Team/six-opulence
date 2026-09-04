@@ -1,0 +1,699 @@
+/* ==========================================================
+   OPULENCE — PREMIUM HERO
+   ========================================================== */
+
+.hero-slider {
+  position: relative;
+
+  width: 100%;
+  height: min(760px, calc(100vh - 72px));
+
+  min-height: 620px;
+
+  overflow: hidden;
+
+  background: var(--color-dark);
+
+  color: var(--color-white);
+}
+
+/* ==========================================================
+   MEDIA
+   ========================================================== */
+
+.hero-media {
+  position: absolute;
+
+  inset: 0;
+
+  overflow: hidden;
+}
+
+.hero-media-slide {
+  position: absolute;
+
+  inset: 0;
+
+  opacity: 0;
+
+  transform: scale(1.045);
+
+  transition:
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 8s cubic-bezier(0.2, 0.65, 0.25, 1);
+
+  z-index: 0;
+}
+
+.hero-media-slide.is-active {
+  opacity: 1;
+
+  transform: scale(1);
+}
+
+/* ==========================================================
+   CINEMATIC OVERLAY
+   ========================================================== */
+
+.hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background: linear-gradient(
+    90deg,
+    rgba(12, 12, 12, 0.82) 0%,
+    rgba(12, 12, 12, 0.62) 22%,
+    rgba(12, 12, 12, 0.28) 48%,
+    rgba(12, 12, 12, 0.04) 78%,
+    rgba(12, 12, 12, 0) 100%
+  );
+}
+
+/* ==========================================================
+   BOTTOM FADE
+   ========================================================== */
+
+.hero-bottom-fade {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 2;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 55%,
+    rgba(0, 0, 0, 0.18) 76%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* ==========================================================
+   INNER
+   ========================================================== */
+
+.hero-inner {
+  position: relative;
+
+  z-index: 4;
+
+  width: 100%;
+
+  max-width: 1440px;
+
+  height: 100%;
+
+  margin: 0 auto;
+
+  padding: 0 64px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+}
+
+/* ==========================================================
+   VERTICAL BRAND
+   ========================================================== */
+
+.hero-vertical-brand {
+  position: absolute;
+
+  top: 50%;
+
+  left: 22px;
+
+  z-index: 5;
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+}
+
+.hero-vertical-brand span {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.38);
+
+  font-family: var(--font-body);
+
+  font-size: 8px;
+
+  font-weight: 500;
+
+  letter-spacing: 4px;
+
+  writing-mode: vertical-rl;
+
+  transform: rotate(180deg);
+}
+
+/* ==========================================================
+   MAIN CONTENT
+   ========================================================== */
+
+.hero-main {
+  max-width: 870px;
+
+  padding-top: clamp(120px, 20vh, 180px);
+}
+
+/* ==========================================================
+   EYEBROW
+   ========================================================== */
+
+.hero-eyebrow-wrap {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 22px;
+}
+
+.hero-eyebrow-line {
+  width: 30px;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.hero-eyebrow {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  line-height: 1.2;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2.8px;
+}
+
+/* ==========================================================
+   HEADING
+   ========================================================== */
+
+.hero-heading {
+  margin: 0;
+
+  max-width: 100%;
+
+  color: var(--color-white);
+
+  font-family: var(--font-heading);
+
+  font-size: clamp(52px, 6.2vw, 86px);
+
+  font-weight: 500;
+
+  line-height: 0.94;
+
+  letter-spacing: -0.045em;
+
+  text-transform: uppercase;
+}
+
+.hero-heading span {
+  display: block;
+}
+
+/* ==========================================================
+   DESCRIPTION
+   ========================================================== */
+
+.hero-description {
+  max-width: 390px;
+
+  margin: 27px 0 34px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-family: var(--font-body);
+
+  font-size: 12px;
+
+  font-weight: 400;
+
+  line-height: 1.7;
+}
+
+/* ==========================================================
+   ACTIONS
+   ========================================================== */
+
+.hero-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 28px;
+}
+
+/* ==========================================================
+   ACTION BASE
+   ========================================================== */
+
+.hero-action {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  min-height: 45px;
+
+  padding: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.1px;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.hero-action:hover {
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   PRIMARY ACTION
+   ========================================================== */
+
+.hero-action-primary {
+  padding: 0 20px;
+
+  background: var(--color-white);
+
+  color: var(--color-dark);
+
+  border: 1px solid var(--color-white);
+}
+
+.hero-action-primary:hover {
+  background: var(--color-off-white);
+
+  border-color: var(--color-off-white);
+}
+
+/* ==========================================================
+   SECONDARY ACTION
+   ========================================================== */
+
+.hero-action-secondary {
+  color: var(--color-white);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================================
+   ACTION ARROW
+   ========================================================== */
+
+.hero-action-arrow {
+  font-size: 14px;
+
+  line-height: 1;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.hero-action:hover .hero-action-arrow {
+  transform: translate(3px, -2px);
+}
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+
+.hero-footer {
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  padding-bottom: 28px;
+
+  padding-top: 17px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ==========================================================
+   DISCOVER
+   ========================================================== */
+
+.hero-discover {
+  display: grid;
+
+  grid-template-columns: auto auto auto;
+
+  align-items: center;
+
+  gap: 12px;
+
+  color: var(--color-white);
+
+  transition: opacity 0.2s ease;
+}
+
+.hero-discover:hover {
+  opacity: 0.72;
+}
+
+.hero-discover-label {
+  color: rgba(255, 255, 255, 0.42);
+
+  font-family: var(--font-body);
+
+  font-size: 8px;
+
+  font-weight: 500;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.6px;
+}
+
+.hero-discover-title {
+  font-family: var(--font-body);
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.2px;
+}
+
+.hero-discover-arrow {
+  font-size: 14px;
+
+  line-height: 1;
+
+  transition: transform 0.2s ease;
+}
+
+.hero-discover:hover .hero-discover-arrow {
+  transform: translateX(4px);
+}
+
+/* ==========================================================
+   CONTROLS
+   ========================================================== */
+
+.hero-controls {
+  display: flex;
+
+  align-items: center;
+
+  gap: 25px;
+}
+
+/* ==========================================================
+   COUNTER
+   ========================================================== */
+
+.hero-counter {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+
+  line-height: 1;
+}
+
+.hero-current {
+  color: var(--color-white);
+
+  font-weight: 500;
+}
+
+.hero-counter-line {
+  width: 22px;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hero-total {
+  color: rgba(255, 255, 255, 0.4);
+
+  font-weight: 400;
+}
+
+/* ==========================================================
+   PROGRESS
+   ========================================================== */
+
+.hero-progress {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.hero-progress-item {
+  position: relative;
+
+  width: 35px;
+
+  height: 2px;
+
+  padding: 0;
+
+  border: none;
+
+  background: rgba(255, 255, 255, 0.25);
+
+  overflow: hidden;
+
+  cursor: pointer;
+}
+
+.hero-progress-item span {
+  position: absolute;
+
+  inset: 0;
+
+  width: 0;
+
+  background: var(--color-white);
+}
+
+.hero-progress-item.is-active span {
+  width: 100%;
+
+  transition: width 6s linear;
+}
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 1100px) {
+  .hero-inner {
+    padding: 0 40px;
+  }
+
+  .hero-vertical-brand {
+    left: 12px;
+  }
+
+  .hero-heading {
+    font-size: clamp(48px, 7vw, 70px);
+  }
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .hero-slider {
+    height: 680px;
+
+    min-height: 600px;
+  }
+
+  .hero-inner {
+    padding: 0 20px;
+  }
+
+  .hero-vertical-brand {
+    display: none;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(12, 12, 12, 0.25) 0%,
+      rgba(12, 12, 12, 0.55) 55%,
+      rgba(12, 12, 12, 0.82) 100%
+    );
+  }
+
+  .hero-main {
+    padding-top: 150px;
+  }
+
+  .hero-eyebrow-wrap {
+    margin-bottom: 17px;
+  }
+
+  .hero-heading {
+    max-width: 480px;
+
+    font-size: clamp(42px, 11vw, 60px);
+
+    line-height: 0.96;
+  }
+
+  .hero-description {
+    max-width: 330px;
+
+    margin-top: 22px;
+
+    font-size: 11px;
+  }
+
+  .hero-actions {
+    gap: 20px;
+  }
+
+  .hero-action {
+    font-size: 8px;
+  }
+
+  .hero-action-primary {
+    padding: 0 16px;
+  }
+
+  .hero-footer {
+    padding-bottom: 20px;
+  }
+
+  .hero-discover-label {
+    display: none;
+  }
+
+  .hero-discover {
+    grid-template-columns: auto auto;
+
+    gap: 10px;
+  }
+
+  .hero-controls {
+    gap: 15px;
+  }
+
+  .hero-counter {
+    display: none;
+  }
+
+  .hero-progress-item {
+    width: 24px;
+  }
+}
+
+/* ==========================================================
+   SMALL MOBILE
+   ========================================================== */
+
+@media (max-width: 480px) {
+  .hero-slider {
+    height: 640px;
+
+    min-height: 580px;
+  }
+
+  .hero-inner {
+    padding: 0 16px;
+  }
+
+  .hero-main {
+    padding-top: 135px;
+  }
+
+  .hero-heading {
+    font-size: clamp(36px, 11vw, 50px);
+
+    letter-spacing: -0.035em;
+  }
+
+  .hero-description {
+    max-width: 300px;
+
+    font-size: 10px;
+
+    line-height: 1.6;
+  }
+
+  .hero-action-secondary {
+    display: none;
+  }
+
+  .hero-discover-title {
+    font-size: 8px;
+  }
+
+  .hero-discover-arrow {
+    font-size: 12px;
+  }
+
+  .hero-progress-item {
+    width: 19px;
+  }
+}
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-media-slide {
+    transform: none;
+
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-progress-item.is-active span {
+    transition: none;
+  }
+}

@@ -1,0 +1,546 @@
+/* ============================================================
+   PRODUCT CARD
+   ============================================================ */
+
+.product-card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ============================================================
+   IMAGE WRAPPER
+   ============================================================ */
+
+.product-card__image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #f1eee8;
+}
+
+/* ============================================================
+   IMAGE
+   ============================================================ */
+
+.product-card__image {
+  object-fit: cover;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-card:hover .product-card__image {
+  transform: scale(1.045);
+}
+
+/* ============================================================
+   PRODUCT LINK
+   ============================================================ */
+
+.product-card__image-link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  text-decoration: none;
+}
+
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+
+.product-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  background: rgba(0, 0, 0, 0.16);
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 350ms ease;
+}
+
+.product-card:hover .product-card__overlay {
+  opacity: 1;
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.product-card__actions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  transform: translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+/* ============================================================
+   ACTION BUTTON
+   ============================================================ */
+
+.product-card__action {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  outline: none;
+
+  background: #f8f6f1;
+  color: #171717;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  opacity: 0;
+
+  transform: translateY(14px);
+
+  pointer-events: none;
+
+  transition:
+    opacity 350ms ease,
+    transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 200ms ease,
+    color 200ms ease;
+}
+
+/* ============================================================
+   SHOW ON DESKTOP HOVER
+   ============================================================ */
+
+.product-card:hover .product-card__action {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ============================================================
+   STAGGER
+   ============================================================ */
+
+.product-card:hover .product-card__action--wishlist {
+  transition-delay: 40ms;
+}
+
+.product-card:hover .product-card__action--cart {
+  transition-delay: 100ms;
+}
+
+.product-card:hover .product-card__action--view {
+  transition-delay: 160ms;
+}
+
+/* ============================================================
+   ACTION HOVER
+   ============================================================ */
+
+.product-card__action:hover {
+  background: #171717;
+  color: #ffffff;
+}
+
+/* ============================================================
+   CART ADDED
+   ============================================================ */
+
+.product-card__action--cart.is-added {
+  background: #171717;
+  color: #ffffff;
+}
+
+/* ============================================================
+   WISHLIST ACTIVE
+   ============================================================ */
+
+.product-card__action--wishlist.is-active {
+  color: #171717;
+}
+
+.product-card__action--wishlist.is-active:hover {
+  color: #ffffff;
+}
+
+/* ============================================================
+   BADGE
+   ============================================================ */
+
+.product-card__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 6;
+
+  padding: 7px 10px;
+
+  background: #171717;
+  color: #ffffff;
+
+  font-family: "IvyPresto Display", "IvyPresto", serif;
+  font-size: 10px;
+  line-height: 1;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   PRODUCT INFO
+   ============================================================ */
+
+.product-card__info {
+  padding-top: 18px;
+  padding-bottom: 12px;
+
+  text-align: center;
+}
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+
+.product-card__title {
+  display: block;
+
+  color: #171717;
+
+  font-family: var(--font-display);
+
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 500;
+
+  text-decoration: none;
+
+  transition: opacity 200ms ease;
+}
+
+.product-card__title:hover {
+  opacity: 0.65;
+}
+
+/* ============================================================
+   PRICE
+   ============================================================ */
+
+.product-card__price {
+  margin-top: 8px;
+
+  color: #8b867d;
+
+  font-family: var(--font-display);
+
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+/* ============================================================
+   COLORS
+   ============================================================ */
+
+.product-card__colors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-top: 8px;
+}
+
+/* ============================================================
+   COLOR SWATCH
+   ============================================================ */
+
+.product-card__color {
+  position: relative;
+
+  width: 17px;
+  height: 17px;
+
+  padding: 0;
+
+  border: 1px solid rgba(23, 23, 23, 0.15);
+
+  border-radius: 50%;
+
+  outline: none;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease;
+}
+
+.product-card__color:hover {
+  transform: scale(1.15);
+}
+
+.product-card__color.is-selected {
+  border-color: #171717;
+}
+
+.product-card__color.is-selected::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -4px;
+
+  border: 1px solid #171717;
+
+  border-radius: 50%;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .product-card__action {
+    width: 52px;
+    height: 52px;
+  }
+
+  .product-card__title {
+    font-size: 20px;
+  }
+
+  .product-card__price {
+    font-size: 15px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .product-card {
+    width: 100%;
+  }
+
+  /* Image */
+
+  .product-card__image-wrap {
+    aspect-ratio: 3 / 4;
+  }
+
+  .product-card__image {
+    transition: transform 500ms ease;
+  }
+
+  /* ----------------------------------------------------------
+     MOBILE ACTIONS
+     Hidden on mobile
+     ---------------------------------------------------------- */
+
+  .product-card__actions {
+    gap: 7px;
+
+    pointer-events: none;
+  }
+
+  .product-card__action {
+    width: 46px;
+    height: 46px;
+
+    opacity: 0;
+
+    transform: translateY(14px);
+
+    pointer-events: none;
+  }
+
+  /* No dark overlay on mobile */
+
+  .product-card__overlay {
+    opacity: 0;
+  }
+
+  /* ----------------------------------------------------------
+     INFO
+     ---------------------------------------------------------- */
+
+  .product-card__info {
+    padding-top: 12px;
+    padding-bottom: 16px;
+
+    text-align: center;
+  }
+
+  /* ----------------------------------------------------------
+     TITLE
+     ---------------------------------------------------------- */
+
+  .product-card__title {
+    font-size: 18px;
+    line-height: 1.25;
+
+    padding: 0 4px;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+  }
+
+  /* ----------------------------------------------------------
+     PRICE
+     ---------------------------------------------------------- */
+
+  .product-card__price {
+    margin-top: 6px;
+    font-size: 14px;
+  }
+
+  /* ----------------------------------------------------------
+     COLORS
+     ---------------------------------------------------------- */
+
+  .product-card__colors {
+    gap: 7px;
+    margin-top: 8px;
+  }
+
+  .product-card__color {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ----------------------------------------------------------
+     BADGE
+     ---------------------------------------------------------- */
+
+  .product-card__badge {
+    top: 9px;
+    left: 9px;
+
+    padding: 6px 8px;
+
+    font-size: 8px;
+  }
+}
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .product-card__image-wrap {
+    aspect-ratio: 3 / 4;
+  }
+
+  /* Action size kept ready if enabled later */
+
+  .product-card__action {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-card__actions {
+    gap: 5px;
+  }
+
+  .product-card__action svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* Title */
+
+  .product-card__title {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  /* Price */
+
+  .product-card__price {
+    margin-top: 5px;
+    font-size: 13px;
+  }
+
+  /* Colors */
+
+  .product-card__colors {
+    gap: 6px;
+    margin-top: 7px;
+  }
+
+  .product-card__color {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Badge */
+
+  .product-card__badge {
+    top: 8px;
+    left: 8px;
+
+    padding: 5px 7px;
+
+    font-size: 7px;
+  }
+}
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 360px) {
+  .product-card__action {
+    width: 36px;
+    height: 36px;
+  }
+
+  .product-card__action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .product-card__actions {
+    gap: 4px;
+  }
+
+  .product-card__title {
+    font-size: 15px;
+  }
+
+  .product-card__price {
+    font-size: 12px;
+  }
+
+  .product-card__colors {
+    gap: 5px;
+  }
+
+  .product-card__color {
+    width: 14px;
+    height: 14px;
+  }
+}

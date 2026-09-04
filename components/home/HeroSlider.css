@@ -1,0 +1,491 @@
+/* =========================================================
+   HERO SLIDER
+========================================================= */
+
+.hero-slider {
+  position: relative;
+  width: 100%;
+  min-height: 780px;
+  overflow: hidden;
+  background: var(--white-color);
+  padding: 40px 0;
+}
+
+/* =========================================================
+   CENTER CONTENT
+========================================================= */
+
+.collage-center {
+  position: relative;
+  z-index: 5;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 70px;
+}
+
+/* ---------- Dot ---------- */
+
+.collage-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-dark-2);
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
+  animation-delay: 0.15s;
+}
+
+/* ---------- Heading ---------- */
+
+.collage-heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(56px, 8vw, 132px);
+  line-height: 1.05;
+  color: var(--color-text);
+  letter-spacing: -0.035em;
+}
+
+.collage-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(45px);
+  animation: heroTextRise 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.collage-line:nth-child(1) {
+  animation-delay: 0.35s;
+}
+
+.collage-line:nth-child(2) {
+  animation-delay: 0.58s;
+}
+
+/* ---------- Tagline ---------- */
+
+.collage-tagline {
+  margin: 28px 0 40px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--color-text);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroTaglineIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.9s;
+}
+
+/* ---------- Scroll Arrow ---------- */
+
+.collage-scroll-arrow {
+  display: inline-block;
+  font-size: 50px;
+  color: var(--color-text);
+  text-decoration: none;
+  opacity: 0;
+  animation:
+    heroArrowIn 0.9s ease forwards,
+    heroBounce 2.5s ease-in-out infinite;
+  animation-delay: 1.2s, 2.1s;
+}
+
+/* =========================================================
+   TEXT KEYFRAMES
+========================================================= */
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroTextRise {
+  0% {
+    opacity: 0;
+    transform: translateY(45px);
+  }
+  60% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroTaglineIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroArrowIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+/* =========================================================
+   SCATTERED IMAGES
+========================================================= */
+
+.collage-img {
+  position: absolute;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  clip-path: inset(100% 0 0 0);
+  transform: translateY(70px);
+  animation: collageImageReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes collageImageReveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(70px);
+  }
+  25% {
+    opacity: 0.25;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   IMAGE POSITIONS
+========================================================= */
+
+.collage-pos-1 {
+  top: 6%;
+  left: 16%;
+  width: 350px;
+  height: 250px;
+}
+
+.collage-pos-2 {
+  top: 4%;
+  right: 6%;
+  width: 480px;
+  height: 300px;
+}
+
+.collage-pos-3 {
+  top: 22%;
+  left: 8%;
+  width: 175px;
+  height: 210px;
+}
+
+.collage-pos-4 {
+  bottom: 9%;
+  left: 4%;
+  width: 440px;
+  height: 250px;
+}
+
+.collage-pos-5 {
+  bottom: 25%;
+  right: 4%;
+  width: 160px;
+  height: 200px;
+}
+
+.collage-pos-6 {
+  bottom: 7%;
+  right: 10%;
+  width: 300px;
+  height: 178px;
+}
+
+/* =========================================================
+   SEQUENTIAL IMAGE TIMING
+   (sped up — text finishes around ~1.9s, images now start
+   right after instead of waiting until ~1.8-3.55s)
+========================================================= */
+
+.collage-pos-1 {
+  animation-delay: 1s;
+}
+.collage-pos-2 {
+  animation-delay: 1.25s;
+}
+.collage-pos-3 {
+  animation-delay: 1.5s;
+}
+.collage-pos-4 {
+  animation-delay: 1.75s;
+}
+.collage-pos-5 {
+  animation-delay: 2s;
+}
+.collage-pos-6 {
+  animation-delay: 2.25s;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .collage-pos-1 {
+    width: 150px;
+    height: 190px;
+  }
+  .collage-pos-2 {
+    width: 220px;
+    height: 270px;
+  }
+  .collage-pos-4 {
+    width: 230px;
+    height: 200px;
+  }
+}
+
+/* =========================================================
+   SMALL DESKTOP / TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .hero-slider {
+    min-height: 640px;
+  }
+  .collage-center {
+    padding-top: 90px;
+  }
+  .collage-heading {
+    font-size: clamp(52px, 9vw, 82px);
+  }
+  .collage-tagline {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .hero-slider {
+    min-height: 640px;
+    padding: 30px 20px;
+  }
+  .collage-center {
+    width: 100%;
+    max-width: 100%;
+    padding-top: 100px;
+  }
+  .collage-heading {
+    font-size: clamp(46px, 13vw, 70px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+  }
+  .collage-tagline {
+    margin: 22px 0 32px;
+    font-size: 17px;
+  }
+  .collage-pos-1,
+  .collage-pos-3,
+  .collage-pos-5 {
+    display: none;
+  }
+  .collage-pos-2 {
+    width: 130px;
+    height: 160px;
+    top: 3%;
+    right: 3%;
+  }
+  .collage-pos-4 {
+    width: 140px;
+    height: 120px;
+    bottom: 4%;
+    left: 3%;
+  }
+  .collage-pos-6 {
+    width: 110px;
+    height: 100px;
+    bottom: 2%;
+    right: 3%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .hero-slider {
+    min-height: 590px;
+  }
+  .collage-center {
+    padding-top: 90px;
+  }
+  .collage-heading {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+  .collage-tagline {
+    font-size: 16px;
+    margin-top: 18px;
+  }
+  .collage-pos-2 {
+    width: 105px;
+    height: 130px;
+  }
+  .collage-pos-4 {
+    width: 120px;
+    height: 105px;
+  }
+  .collage-pos-6 {
+    width: 95px;
+    height: 85px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .collage-img,
+  .collage-line,
+  .collage-dot,
+  .collage-tagline,
+  .collage-scroll-arrow {
+    animation: none !important;
+    opacity: 1;
+    clip-path: none;
+    transform: none;
+  }
+}
+
+/* REPLACE .collage-dot and .collage-tagline rules, and ADD these new ones
+   to HeroSlider.css */
+
+/* ---------- Eyebrow (top label) ---------- */
+.collage-eyebrow-line {
+  display: block;
+  width: 1px;
+  height: 28px;
+  margin: 0 auto 14px auto;
+  background: var(--color-border-dark);
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
+  animation-delay: 0.05s;
+}
+
+.collage-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 20px 0;
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
+  animation-delay: 0.15s;
+}
+
+/* ---------- Tagline (small tracked caps line) ---------- */
+/* .collage-tagline {
+  margin: 24px 0 20px;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroTaglineIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.9s;
+} */
+
+/* ---------- Description paragraph ---------- */
+.collage-desc {
+  max-width: 520px;
+  margin: 0 auto 32px auto;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroTaglineIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 1.05s;
+}
+
+/* ---------- Bottom divider (before Explore) ---------- */
+.collage-divider-bottom {
+  display: block;
+  width: 1px;
+  height: 28px;
+  margin: 0 auto 20px auto;
+  background: var(--color-border-dark);
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
+  animation-delay: 1.15s;
+}
+
+/* ---------- Explore + arrow ---------- */
+.collage-scroll-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  opacity: 0;
+  animation: heroArrowIn 0.9s ease forwards;
+  animation-delay: 1.2s;
+}
+
+.collage-explore-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.collage-arrow-glyph {
+  display: inline-block;
+  font-size: 22px;
+  color: var(--color-text);
+  animation: heroBounce 2.5s ease-in-out infinite;
+  animation-delay: 2.1s;
+}

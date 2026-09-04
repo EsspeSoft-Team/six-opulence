@@ -1,0 +1,15 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#242220"/>
+      <stop offset="100%" stop-color="#0e0d0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g opacity="0.5" stroke="#f5f1ea" stroke-width="1.5" fill="none">
+    <path d="M 672.0 342.0 L 736.0 306.0 L 864.0 306.0 L 927.9999999999999 342.0 L 927.9999999999999 558.0 L 672.0 558.0 Z" />
+    <path d="M 736.0 306.0 C 736.0 270.0, 864.0 270.0, 864.0 306.0" />
+  </g>
+  <text x="50%" y="648.0" font-family="Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="2" fill="#f5f1ea" text-anchor="middle" opacity="0.85">ELEVATED CAPSULE</text>
+  <text x="50%" y="672.0" font-family="Arial, sans-serif" font-size="28" fill="#f5f1ea" text-anchor="middle" opacity="0.5">HERITAGE POLOS</text>
+</svg>

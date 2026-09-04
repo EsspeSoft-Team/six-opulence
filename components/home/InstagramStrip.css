@@ -1,0 +1,212 @@
+.instagram-strip {
+  padding: 100px 0px;
+  background: var(--color-bg);
+}
+
+/* ================= HEADING ================= */
+.instagram-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.instagram-small-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.instagram-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.instagram-icon {
+  width: clamp(28px, 4vw, 44px);
+  height: clamp(28px, 4vw, 44px);
+  flex-shrink: 0;
+}
+
+.instagram-arrows {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.instagram-arrow-btn {
+  width: 44px;
+  height: 44px;
+  /* border-radius: 50%; */
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+.instagram-arrow-btn:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* ================= SLIDING ROW ================= */
+.instagram-grid {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px; /* room for scrollbar on trackpads that show one */
+}
+/* hide scrollbar (Chrome/Safari + Firefox) */
+.instagram-grid::-webkit-scrollbar {
+  display: none;
+}
+.instagram-grid {
+  scrollbar-width: none;
+}
+
+.instagram-thumb {
+  position: relative;
+  display: block;
+  flex: 0 0 calc(25% - 18px); /* 4 visible per row on desktop, gap-aware */
+  min-width: 200px;
+  aspect-ratio: 123 / 160;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-border);
+  scroll-snap-align: start;
+}
+
+.instagram-image {
+  object-fit: cover;
+}
+
+.instagram-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 12, 12, 0.35);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.instagram-thumb:hover .instagram-thumb-overlay {
+  opacity: 1;
+}
+
+.instagram-overlay-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-white);
+  transform: translateY(4px) scale(0.9);
+  transition: transform 200ms ease;
+}
+.instagram-thumb:hover .instagram-overlay-icon {
+  transform: translateY(0) scale(1);
+}
+
+/* ================= Responsive ================= */
+@media (max-width: 960px) {
+  .instagram-thumb {
+    flex: 0 0 calc(50% - 12px);
+  }
+}
+
+@media (max-width: 520px) {
+  .instagram-strip {
+    padding: 40px 20px;
+  }
+  .instagram-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .instagram-grid {
+    gap: 12px;
+  }
+  .instagram-thumb {
+    flex: 0 0 65%;
+  }
+}
+
+/* ADD THIS to InstagramStrip.css */
+
+/* The <video> tag isn't a Next.js Image with `fill`, so it needs its own
+   absolute-fill sizing to match the image tiles exactly. */
+video.instagram-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.instagram-video-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(12, 12, 12, 0.55);
+  color: var(--color-white);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.instagram-title-icon {
+  width: clamp(28px, 4vw, 44px);
+  height: clamp(28px, 4vw, 44px);
+  object-fit: contain;
+  vertical-align: middle;
+  /* margin-right: 14px; */
+}
+
+/* REPLACE the existing .instagram-thumb rule in InstagramStrip.css with this */
+
+.instagram-thumb {
+  position: relative;
+  display: block;
+  flex: 0 0 calc((100% - 120px) / 6); /* 6 visible per row, 24px gap x 5 gaps = 120px */
+  min-width: 140px;
+  aspect-ratio: 123 / 160;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-border);
+  scroll-snap-align: start;
+}
+
+/* also update the responsive rules to match */
+@media (max-width: 960px) {
+  .instagram-thumb {
+    flex: 0 0 calc((100% - 24px) / 3); /* 3 visible on tablet */
+  }
+}
+
+@media (max-width: 520px) {
+  .instagram-thumb {
+    flex: 0 0 calc((100% - 12px) / 2); /* 2 visible on mobile */
+  }
+}

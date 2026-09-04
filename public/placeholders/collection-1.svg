@@ -1,0 +1,15 @@
+<svg width="700" height="900" viewBox="0 0 700 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#232323"/>
+      <stop offset="100%" stop-color="#0c0c0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="700" height="900" fill="url(#g)"/>
+  <g opacity="0.5" stroke="#f5f1ea" stroke-width="1.5" fill="none">
+    <path d="M 294.0 342.0 L 322.0 306.0 L 378.0 306.0 L 406.0 342.0 L 406.0 558.0 L 294.0 558.0 Z" />
+    <path d="M 322.0 306.0 C 322.0 270.0, 378.0 270.0, 378.0 306.0" />
+  </g>
+  <text x="50%" y="648.0" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="2" fill="#f5f1ea" text-anchor="middle" opacity="0.85">ELEVATED CAPSULE</text>
+  
+</svg>

@@ -1,0 +1,15 @@
+<svg width="900" height="1200" viewBox="0 0 900 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a4238"/>
+      <stop offset="100%" stop-color="#221e19"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#g)"/>
+  <g opacity="0.5" stroke="#f5f1ea" stroke-width="1.5" fill="none">
+    <path d="M 378.0 456.0 L 414.0 408.00000000000006 L 486.00000000000006 408.00000000000006 L 522.0 456.0 L 522.0 744.0 L 378.0 744.0 Z" />
+    <path d="M 414.0 408.00000000000006 C 414.0 360.0, 486.00000000000006 360.0, 486.00000000000006 408.00000000000006" />
+  </g>
+  <text x="50%" y="864.0" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="2" fill="#f5f1ea" text-anchor="middle" opacity="0.85">OPULENCE</text>
+  <text x="50%" y="888.0" font-family="Arial, sans-serif" font-size="16" fill="#f5f1ea" text-anchor="middle" opacity="0.5">JOIN THE CLUB</text>
+</svg>

@@ -1,0 +1,22 @@
+/* ========================================================
+   ADMIN
+========================================================== */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 768px) {
+  .admin-grid { grid-template-columns: 1fr; }
+}
+
+.admin-row {
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+}

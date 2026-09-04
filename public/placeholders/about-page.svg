@@ -1,0 +1,15 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3a332c"/>
+      <stop offset="100%" stop-color="#171310"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <g opacity="0.5" stroke="#f5f1ea" stroke-width="1.5" fill="none">
+    <path d="M 504.0 256.5 L 552.0 229.50000000000003 L 648.0 229.50000000000003 L 696.0 256.5 L 696.0 418.5 L 504.0 418.5 Z" />
+    <path d="M 552.0 229.50000000000003 C 552.0 202.5, 648.0 202.5, 648.0 229.50000000000003" />
+  </g>
+  <text x="50%" y="486.0" font-family="Arial, sans-serif" font-size="33" font-weight="700" letter-spacing="2" fill="#f5f1ea" text-anchor="middle" opacity="0.85">OPULENCE</text>
+  <text x="50%" y="510.0" font-family="Arial, sans-serif" font-size="21" fill="#f5f1ea" text-anchor="middle" opacity="0.5">CRAFTED WITH PURPOSE</text>
+</svg>
