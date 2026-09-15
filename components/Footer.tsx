@@ -225,7 +225,7 @@ export default function Footer() {
           OPULENCE
         </div> */}
         <div className="footer-large-logo">
-          <img src="/images/opulense-favicon.jpeg" alt="OPULENCE" />
+          <img src="/images/opulense-favicon.png" alt="OPULENCE" />
           <h3>Style. Substance. Self-Made.</h3>
         </div>
       </div>
