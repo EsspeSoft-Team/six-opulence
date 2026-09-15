@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 /* =========================================================
    ICONS
@@ -259,7 +261,7 @@ function InformationDrawer({
           <div className="drawer-top">
             <Link href="/" className="drawer-logo" onClick={onClose}>
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo-new-op.jpeg"
                 alt="OPULENCE"
                 className="drawer-logo-image"
               />
@@ -278,23 +280,24 @@ function InformationDrawer({
           <div className="drawer-divider" />
 
           <div className="drawer-socials">
-            <a href="#" onClick={onClose}>
-              <span className="social-icon">f</span>
+            <a href="#" onClick={onClose} aria-label="Facebook">
+              <span className="social-icon">
+                <FaFacebookF />
+              </span>
               <span>Facebook</span>
             </a>
 
-            <a href="#" onClick={onClose}>
-              <span className="social-icon twitter-icon">♥</span>
+            <a href="#" onClick={onClose} aria-label="Twitter">
+              <span className="social-icon twitter-icon">
+                <FaXTwitter />
+              </span>
               <span>Twitter</span>
             </a>
 
-            <a href="#" onClick={onClose}>
-              <span className="social-icon">◉</span>
-              <span>Dribbble</span>
-            </a>
-
-            <a href="#" onClick={onClose}>
-              <span className="social-icon instagram-icon">◎</span>
+            <a href="#" onClick={onClose} aria-label="Instagram">
+              <span className="social-icon ">
+                <FaInstagram />
+              </span>
               <span>Instagram</span>
             </a>
           </div>
@@ -366,7 +369,7 @@ function MobileMenuDrawer({
           <div className="mobile-menu-top">
             <Link href="/" className="mobile-drawer-logo" onClick={onClose}>
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo-new-op.jpeg"
                 alt="OPULENCE"
                 className="mobile-drawer-logo-image"
               />
@@ -464,7 +467,7 @@ function SearchDrawer({
           <div className="search-drawer-top">
             <Link href="/" className="search-drawer-logo" onClick={onClose}>
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo-new-op.jpeg"
                 alt="OPULENCE"
                 className="search-drawer-logo-image"
               />
@@ -572,37 +575,70 @@ export default function Header() {
   return (
     <>
       <header className="header">
+        {/* ================= LEFT CONTACT ================= */}
+        <div className="header-left-contact">
+          <span className="header-contact-icon" aria-hidden="true">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2
+                19.79 19.79 0 0 1-8.63-3.07
+                19.5 19.5 0 0 1-6-6
+                A19.79 19.79 0 0 1 2.12 4.18
+                2 2 0 0 1 5.11 2h3a2 2 0 0 1 2 1.72
+                12.84 12.84 0 0 0 .7 2.81
+                2 2 0 0 1-.45 2.11L9.09 9.91
+                a16 16 0 0 0 6 6l1.27-1.27
+                a2 2 0 0 1 2.11-.45
+                12.84 12.84 0 0 0 2.81.7
+                A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+          </span>
+          <a href="tel:18008334488">1800-833-4488</a>
+        </div>
+
         {/* ================= LOGO ================= */}
         <Link href="/" className="logo">
-          <img src="/images/logo.jpeg" alt="OPULENCE" className="logo-image" />
+          <img
+            src="/images/logo-new-op.jpeg"
+            alt="OPULENCE"
+            className="logo-image"
+          />
         </Link>
 
         {/* ================= DESKTOP NAV ================= */}
 
         <nav className="nav">
-          {/* <div className="nav-dropdown">
+          <div className="nav-dropdown">
             <button type="button" className="nav-dropdown-trigger">
               Shop
             </button>
 
             <div className="nav-dropdown-menu">
-              <Link href="/collections/elevated-capsule">Polo T-Shirts</Link>
+              <Link href="/collections/elevated-capsule">Polo</Link>
 
-              <Link href="/collections/graphic-tees">Graphic Tees</Link>
+              <Link href="/collections/graphic-tees"> T-Shirts</Link>
 
-              <Link href="/collections/oversized-fits">Oversized Fits</Link>
+              <Link href="/collections/oversized-fits">All</Link>
             </div>
-          </div> */}
+          </div>
 
-          <Link href="/new-arrivals">Shop</Link>
+          {/* <Link href="/new-arrivals">Shop</Link> */}
 
-          <Link href="/best-sellers">Best Seller</Link>
+          <Link href="/best-sellers">Exclusive</Link>
 
-          <Link href="/new-arrivals">New Arrivals</Link>
+          {/* <Link href="/new-arrivals">New Arrivals</Link>
 
           <Link href="/collections/elevated-capsule">Polo </Link>
 
-          <Link href="/collections/graphic-tees">T-Shirts</Link>
+          <Link href="/collections/graphic-tees">T-Shirts</Link> */}
 
           <Link href="/about">About Us</Link>
         </nav>

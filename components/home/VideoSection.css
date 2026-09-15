@@ -1,0 +1,344 @@
+/* =========================================================
+   OPULENCE VIDEO SECTION
+========================================================= */
+
+.opulence-video-section {
+  position: relative;
+  width: 100%;
+  height: 680px;
+  min-height: 680px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #111;
+}
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.opulence-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  display: block;
+}
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.opulence-video-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.48) 38%,
+    rgba(0, 0, 0, 0.18) 72%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.opulence-video-content {
+  position: relative;
+  z-index: 2;
+
+  width: min(100% - 100px, 1280px);
+  height: 100%;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 70px 0;
+}
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.opulence-video-eyebrow {
+  display: inline-block;
+
+  margin-bottom: 24px;
+
+  font-family: var(--font-body, Arial, sans-serif);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.opulence-video-content h2 {
+  max-width: 700px;
+
+  margin: 0;
+
+  font-family: var(--font-display, Georgia, "Times New Roman", serif);
+
+  font-size: clamp(48px, 6vw, 86px);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+
+  color: #fff;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.opulence-video-content p {
+  max-width: 430px;
+
+  margin: 30px 0 34px;
+
+  font-family: var(--font-body, Arial, sans-serif);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.75;
+
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.opulence-video-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+
+  min-width: 215px;
+  padding: 15px 17px 15px 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  color: #fff;
+  text-decoration: none;
+
+  font-family: var(--font-body, Arial, sans-serif);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s ease;
+}
+
+.opulence-video-button:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #111;
+
+  transform: translateY(-2px);
+}
+
+.opulence-video-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+
+  border: 1px solid currentColor;
+
+  font-size: 14px;
+  line-height: 1;
+
+  transition: transform 0.35s ease;
+}
+
+.opulence-video-button:hover .opulence-video-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* =========================================================
+   BOTTOM LABEL
+========================================================= */
+
+.opulence-video-bottom {
+  position: absolute;
+  z-index: 3;
+
+  left: 50px;
+  right: 50px;
+  bottom: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 16px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+
+  font-family: var(--font-body, Arial, sans-serif);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1024px) {
+  .opulence-video-section {
+    height: 600px;
+    min-height: 600px;
+  }
+
+  .opulence-video-content {
+    width: min(100% - 70px, 1180px);
+  }
+
+  .opulence-video-content h2 {
+    font-size: clamp(46px, 7vw, 72px);
+  }
+
+  .opulence-video-bottom {
+    left: 35px;
+    right: 35px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .opulence-video-section {
+    height: 560px;
+    min-height: 560px;
+  }
+
+  .opulence-video-bg {
+    object-position: 58% center;
+  }
+
+  .opulence-video-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.45) 42%,
+      rgba(0, 0, 0, 0.78) 100%
+    );
+  }
+
+  .opulence-video-content {
+    width: calc(100% - 40px);
+
+    padding: 45px 0 85px;
+
+    justify-content: flex-end;
+  }
+
+  .opulence-video-eyebrow {
+    margin-bottom: 17px;
+
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+
+  .opulence-video-content h2 {
+    max-width: 100%;
+
+    font-size: clamp(40px, 12vw, 58px);
+    line-height: 0.98;
+  }
+
+  .opulence-video-content p {
+    max-width: 340px;
+
+    margin: 20px 0 25px;
+
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .opulence-video-button {
+    min-width: 195px;
+
+    padding: 13px 14px 13px 17px;
+
+    font-size: 9px;
+  }
+
+  .opulence-video-arrow {
+    width: 23px;
+    height: 23px;
+
+    font-size: 12px;
+  }
+
+  .opulence-video-bottom {
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+
+    padding-top: 12px;
+
+    font-size: 8px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .opulence-video-section {
+    height: 520px;
+    min-height: 520px;
+  }
+
+  .opulence-video-content {
+    width: calc(100% - 32px);
+  }
+
+  .opulence-video-content h2 {
+    font-size: 42px;
+  }
+
+  .opulence-video-content p {
+    max-width: 300px;
+  }
+
+  .opulence-video-bottom {
+    left: 16px;
+    right: 16px;
+  }
+}

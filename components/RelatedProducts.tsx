@@ -8,13 +8,25 @@ export default async function RelatedProducts({
 }) {
   const related = await getRelatedProducts(productId);
 
-  if (!related || related.length === 0) return null;
+  // Kono related product na thakle section show korbe na
+  if (!related || related.length === 0) {
+    return null;
+  }
+
+  // Shudhu first 4 ta product show korbe
+  const productsToShow = related.slice(0, 4);
 
   return (
-    <section className="section" style={{ marginTop: 64 }}>
+    <section
+      className="section"
+      style={{
+        marginTop: 64,
+      }}
+    >
       <h2 className="section-title">You May Also Like</h2>
+
       <div className="grid grid-4">
-        {related.map((product: any) => (
+        {productsToShow.map((product: any) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

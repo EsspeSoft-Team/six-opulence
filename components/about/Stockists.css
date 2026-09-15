@@ -1,0 +1,487 @@
+/* =========================================================
+   STOCKISTS SECTION
+========================================================= */
+
+.section-stockists-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300vh;
+  background: #000;
+}
+
+/* =========================================================
+   STICKY SECTION
+========================================================= */
+
+.section-stockists {
+  position: sticky;
+  top: 80px;
+  width: 100%;
+  height: 100vh;
+  min-height: 960px;
+
+  padding: 4rem 5vw;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  background: #000;
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container-stockists {
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.stockists-content-wrapper {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* =========================================================
+   LEFT CONTENT
+========================================================= */
+
+.stockists-content-left {
+  width: 27%;
+  max-width: 300px;
+
+  flex-shrink: 0;
+}
+
+/* Intro wrapper */
+
+.stockists-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Common text */
+
+.stockists-b-m {
+  color: #fff;
+
+  font-family: inherit;
+
+  font-size: 1rem;
+  line-height: 1.35;
+
+  font-weight: 500;
+
+  letter-spacing: -0.02em;
+}
+
+/* Main heading */
+
+.stockists-intro-title {
+  max-width: 300px;
+
+  font-size: 60px;
+  line-height: 1;
+
+  font-weight: 500;
+  font-family: var(--font-display);
+}
+
+/* Description */
+
+.stockists-intro-description {
+  max-width: 275px;
+
+  font-size: 0.95rem;
+  line-height: 1.5;
+
+  font-weight: 400;
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+/* =========================================================
+   RIGHT SIDE
+========================================================= */
+
+.stockists-content-right {
+  position: relative;
+
+  width: 70%;
+  height: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+
+  gap: 20px;
+
+  overflow: visible;
+}
+
+/* =========================================================
+   CARD WRAPPER
+========================================================= */
+
+.stockists-item-wrapper {
+  position: relative;
+
+  width: 205px;
+  flex: 0 0 160px;
+
+  will-change: transform;
+
+  transform: translate3d(0, 0, 0);
+}
+
+/* =========================================================
+   INDIVIDUAL CARD
+========================================================= */
+
+.stockists-item {
+  width: 160px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 30px;
+
+  overflow: visible;
+}
+
+/* =========================================================
+   WHITE NUMBER BOX
+========================================================= */
+
+.stockists-origin {
+  position: relative;
+
+  width: 160px;
+
+  background: #f4f4f4;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding-top: 6px;
+  padding-bottom: 12px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CITY NAME
+========================================================= */
+
+.stockists-b-l {
+  position: relative;
+
+  z-index: 2;
+
+  padding-left: 10px;
+
+  color: #000;
+
+  font-family: inherit;
+
+  font-size: 1.2rem;
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: -0.04em;
+}
+
+/* =========================================================
+   NUMBER AREA
+========================================================= */
+
+.stockists-origin-number {
+  position: relative;
+
+  width: 100%;
+  height: 180px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   NUMBER SVG
+========================================================= */
+
+.stockists-vector {
+  display: block;
+
+  width: 185px;
+  height: 185px;
+
+  object-fit: contain;
+
+  object-position: center bottom;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   CARD TEXT
+========================================================= */
+
+.stockists-item-text-block {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.stockists-item-title {
+  color: #fff;
+
+  font-family: var(--font-body);
+
+  font-size: 1.15rem;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: -0.025em;
+}
+
+/* =========================================================
+   CAPTIONS
+========================================================= */
+
+.stockists-item-caption {
+  display: flex;
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.stockists-caption {
+  color: #fff;
+
+  opacity: 0.9;
+
+  font-family: var(--font-body);
+
+  font-size: 0.82rem;
+  line-height: 1.5;
+
+  font-weight: 400;
+}
+
+/* =========================================================
+   DESKTOP START POSITIONS
+   EXACT STAGGERED LOOK
+========================================================= */
+
+.stockists-card-1 {
+  transform: translate3d(0, -32%, 0);
+}
+
+.stockists-card-2 {
+  transform: translate3d(0, -10%, 0);
+}
+
+.stockists-card-3 {
+  transform: translate3d(0, -40%, 0);
+}
+
+.stockists-card-4 {
+  transform: translate3d(0, 25.5%, 0);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .section-stockists-wrapper {
+    height: 300vh;
+  }
+
+  .section-stockists {
+    padding: 3rem 3vw;
+  }
+
+  .stockists-content-left {
+    width: 24%;
+  }
+
+  .stockists-content-right {
+    width: 74%;
+    gap: 14px;
+  }
+
+  .stockists-item-wrapper,
+  .stockists-item,
+  .stockists-origin {
+    width: 180px;
+  }
+
+  .stockists-item-wrapper {
+    flex-basis: 180px;
+  }
+
+  .stockists-origin-number {
+    height: 155px;
+  }
+
+  .stockists-vector {
+    width: 155px;
+    height: 155px;
+  }
+
+  .stockists-item-title {
+    font-size: 1rem;
+  }
+
+  .stockists-caption {
+    font-size: 0.75rem;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+  .section-stockists-wrapper {
+    height: auto;
+  }
+
+  .section-stockists {
+    position: relative;
+
+    height: auto;
+    min-height: auto;
+
+    padding: 70px 20px;
+
+    overflow: visible;
+  }
+
+  .container-stockists {
+    height: auto;
+  }
+
+  .stockists-content-wrapper {
+    height: auto;
+
+    flex-direction: column;
+
+    gap: 60px;
+  }
+
+  /* LEFT */
+
+  .stockists-content-left {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .stockists-intro-title {
+    max-width: 100%;
+  }
+
+  .stockists-intro-description {
+    max-width: 100%;
+  }
+
+  /* RIGHT */
+
+  .stockists-content-right {
+    width: 100%;
+    height: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 50px 12px;
+  }
+
+  /* Cards become normal */
+
+  .stockists-item-wrapper,
+  .stockists-card-1,
+  .stockists-card-2,
+  .stockists-card-3,
+  .stockists-card-4 {
+    width: 100% !important;
+
+    flex: none;
+
+    transform: none !important;
+  }
+
+  .stockists-item {
+    width: 100%;
+  }
+
+  .stockists-origin {
+    width: 100%;
+  }
+
+  .stockists-origin-number {
+    height: 140px;
+  }
+
+  .stockists-vector {
+    width: 140px;
+    height: 140px;
+  }
+
+  .stockists-item-title {
+    font-size: 0.95rem;
+  }
+
+  .stockists-caption {
+    font-size: 0.72rem;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .stockists-content-right {
+    grid-template-columns: 1fr;
+  }
+
+  .stockists-origin-number {
+    height: 160px;
+  }
+
+  .stockists-vector {
+    width: 155px;
+    height: 155px;
+  }
+}

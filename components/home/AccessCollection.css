@@ -3,7 +3,7 @@
 
 .access-root {
   background: var(--color-dark-2);
-  margin-bottom: var(--section-gap);
+  /* margin-bottom: var(--section-gap); */
 }
 
 /* ---- Layout scaffolding ---- */
@@ -206,6 +206,13 @@
   }
   .access-card-image {
     height: 110px;
+  }
+  .access-card-image {
+    height: auto;
+  }
+  .access-root {
+    background: var(--color-dark-2);
+    margin-bottom: 0px !important;
   }
 }
 

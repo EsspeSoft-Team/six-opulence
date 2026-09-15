@@ -6,8 +6,7 @@
  * Demo / placeholder data with the same shape as the
  * Shopify Storefront API response.
  *
- * Product images are loaded from:
- *
+ * Product images:
  * public/images/
  *
  * Browser path:
@@ -16,11 +15,9 @@
  * ============================================================
  */
 
-/**
- * ============================================================
- * LOCAL PRODUCT IMAGES
- * ============================================================
- */
+/* ============================================================
+   LOCAL PRODUCT IMAGES
+============================================================ */
 
 const productImages: Record<string, string> = {
   "1": "/images/elio-mens-polo-olive_480x.webp",
@@ -36,39 +33,52 @@ const productImages: Record<string, string> = {
   "11": "/images/RR291142_480x.webp",
 };
 
-/**
- * ============================================================
- * FALLBACK IMAGE
- * ============================================================
+/*
+ * All available local images.
+ *
+ * Mock mode-e product detail page-e 10 image gallery
+ * create korar jonno ei images use hobe.
+ *
+ * Real Shopify connect korle Shopify-r nijer 10 images
+ * automatically use hobe.
  */
+const galleryImages = [
+  "/images/elio-mens-polo-olive_480x.webp",
+  "/images/GAEL-OLIVE_480x.webp",
+  "/images/POST-P-OLIVE.webp",
+  "/images/RR283327-1_480x.webp",
+  "/images/RR283557-1_480x.webp",
+  "/images/RR291142_480x.webp",
+  "/images/ove2.png",
+  "/images/pro.png",
+  "/images/RR291044.webp",
+  "/images/RR291142_480x.webp",
+];
+
+/* ============================================================
+   FALLBACK IMAGE
+============================================================ */
 
 const getProductImage = (id: string) => {
   return productImages[id] || "/images/RR291044.webp";
 };
 
-/**
- * ============================================================
- * SECTION IMAGES
- * ============================================================
- */
+/* ============================================================
+   SECTION IMAGES
+============================================================ */
 
 export const sectionImages = {
   heroSlides: [
     {
       eyebrow: "Premium Essentials",
-
       heading: "TIMELESS STYLE.\nMODERN EDGE.",
-
       subtext:
         "Polo T-Shirts and Oversized Graphic Tees, crafted for comfort, designed to stand out.",
-
       image: "/placeholders/hero-1.svg",
-
       primaryCta: {
         label: "Shop Polo T-Shirts",
         href: "/collections/elevated-capsule",
       },
-
       secondaryCta: {
         label: "Shop Graphic Tees",
         href: "/collections/graphic-tees",
@@ -77,19 +87,14 @@ export const sectionImages = {
 
     {
       eyebrow: "New Drop",
-
       heading: "LIMITED TO\n2,000 PIECES.",
-
       subtext:
         "11 designs. Once sold, never restocked. Own a piece of the collection.",
-
       image: "/placeholders/hero-2.svg",
-
       primaryCta: {
         label: "Shop New Arrivals",
         href: "/new-arrivals",
       },
-
       secondaryCta: {
         label: "Explore Collections",
         href: "/collections/elevated-capsule",
@@ -98,18 +103,13 @@ export const sectionImages = {
 
     {
       eyebrow: "Elevated Capsule",
-
       heading: "HERITAGE FIT.\nMODERN FABRIC.",
-
       subtext: "Our premium polo line — tailored for comfort, built to last.",
-
       image: "/placeholders/hero-3.svg",
-
       primaryCta: {
         label: "Shop Polos",
         href: "/collections/elevated-capsule",
       },
-
       secondaryCta: {
         label: "View Lookbook",
         href: "/about",
@@ -127,11 +127,9 @@ export const sectionImages = {
   instagram: [1, 2, 3, 4, 5].map((n) => `/placeholders/insta-${n}.svg`),
 };
 
-/**
- * ============================================================
- * PRODUCT TYPES
- * ============================================================
- */
+/* ============================================================
+   PRODUCT TYPES
+============================================================ */
 
 type ProductColor = {
   name: string;
@@ -145,19 +143,9 @@ type ProductSize = {
   availableForSale: boolean;
 };
 
-/**
- * ============================================================
- * DEFAULT COLORS
- * ============================================================
- *
- * IMPORTANT:
- * Same product image is intentionally used for
- * every color.
- *
- * Later real color images add korte chaile sudhu
- * image path change korlei hobe.
- * ============================================================
- */
+/* ============================================================
+   DEFAULT COLORS
+============================================================ */
 
 const getProductColors = (image: string): ProductColor[] => [
   {
@@ -165,19 +153,16 @@ const getProductColors = (image: string): ProductColor[] => [
     value: "#F5F5F2",
     image,
   },
-
   {
     name: "Black",
     value: "#171717",
     image,
   },
-
   {
     name: "Olive",
     value: "#68705A",
     image,
   },
-
   {
     name: "Navy",
     value: "#26384D",
@@ -185,11 +170,9 @@ const getProductColors = (image: string): ProductColor[] => [
   },
 ];
 
-/**
- * ============================================================
- * DEFAULT SIZES
- * ============================================================
- */
+/* ============================================================
+   DEFAULT SIZES
+============================================================ */
 
 const productSizes: ProductSize[] = [
   {
@@ -197,55 +180,75 @@ const productSizes: ProductSize[] = [
     value: "S",
     availableForSale: true,
   },
-
   {
     name: "Medium",
     value: "M",
     availableForSale: true,
   },
-
   {
     name: "Large",
     value: "L",
-    availableForSale: false,
+    availableForSale: true,
+  },
+  {
+    name: "Extra Large",
+    value: "XL",
+    availableForSale: true,
+  },
+  {
+    name: "XXL",
+    value: "XXL",
+    availableForSale: true,
   },
 ];
 
-/**
- * ============================================================
- * PRODUCT CREATOR
- * ============================================================
+/* ============================================================
+   CREATE 10 IMAGE GALLERY
+============================================================ */
+
+/*
+ * Product ID-r upor depend kore gallery rotate kora hocche.
+ *
+ * Example:
+ * Product 1:
+ * image 1 → galleryImages[0]
+ * image 2 → galleryImages[1]
+ * ...
+ *
+ * Product 2:
+ * gallery abar different position theke start korbe.
+ *
+ * Tai prottek PDP-te 10ta image thakbe.
  */
+function createProductGallery(id: string, title: string) {
+  const startIndex = (Number(id) - 1) % galleryImages.length;
+
+  return {
+    edges: Array.from({ length: 10 }, (_, index) => {
+      const imageIndex = (startIndex + index) % galleryImages.length;
+
+      return {
+        node: {
+          url: galleryImages[imageIndex],
+          altText: `${title} - Image ${index + 1}`,
+        },
+      };
+    }),
+  };
+}
+
+/* ============================================================
+   PRODUCT CREATOR
+============================================================ */
 
 function makeProduct(id: string, title: string, price: string, type: string) {
   const image = getProductImage(id);
 
-  /**
-   * Same image diye multiple colors
-   */
   const colors = getProductColors(image);
 
-  /**
-   * Create Color x Size variants
-   *
-   * Example:
-   *
-   * White / S
-   * White / M
-   * White / L
-   *
-   * Black / S
-   * Black / M
-   * Black / L
-   *
-   * Olive / S
-   * Olive / M
-   * Olive / L
-   *
-   * Navy / S
-   * Navy / M
-   * Navy / L
-   */
+  /* ----------------------------------------------------------
+     CREATE COLOR x SIZE VARIANTS
+  ---------------------------------------------------------- */
 
   const variants = colors.flatMap((color, colorIndex) =>
     productSizes.map((size) => ({
@@ -266,7 +269,6 @@ function makeProduct(id: string, title: string, price: string, type: string) {
             name: "Color",
             value: color.name,
           },
-
           {
             name: "Size",
             value: size.value,
@@ -281,44 +283,18 @@ function makeProduct(id: string, title: string, price: string, type: string) {
     })),
   );
 
+  /* ----------------------------------------------------------
+     PRODUCT
+  ---------------------------------------------------------- */
+
   return {
-    /**
-     * ========================================================
-     * SHOPIFY-LIKE PRODUCT ID
-     * ========================================================
-     */
-
     id: `gid://mock/Product/${id}`,
-
-    /**
-     * ========================================================
-     * PRODUCT TITLE
-     * ========================================================
-     */
 
     title,
 
-    /**
-     * ========================================================
-     * PRODUCT URL HANDLE
-     * ========================================================
-     */
-
     handle: title.toLowerCase().replace(/\s+/g, "-"),
 
-    /**
-     * ========================================================
-     * PRODUCT DESCRIPTION
-     * ========================================================
-     */
-
     description: `${title} — premium quality, limited edition piece from the Opulence collection.`,
-
-    /**
-     * ========================================================
-     * HTML DESCRIPTION
-     * ========================================================
-     */
 
     descriptionHtml: `
       <p>
@@ -329,33 +305,24 @@ function makeProduct(id: string, title: string, price: string, type: string) {
       </p>
     `,
 
-    /**
-     * ========================================================
-     * FEATURED IMAGE
-     * ========================================================
-     */
+    /* --------------------------------------------------------
+       FEATURED IMAGE
+    -------------------------------------------------------- */
 
     featuredImage: {
       url: image,
       altText: title,
     },
 
-    /**
-     * ========================================================
-     * COLOR OPTIONS
-     * ========================================================
-     *
-     * ProductCard ei field use kore color swatches show korte
-     * parbe.
-     */
+    /* --------------------------------------------------------
+       COLORS
+    -------------------------------------------------------- */
 
     colors,
 
-    /**
-     * ========================================================
-     * PRICE
-     * ========================================================
-     */
+    /* --------------------------------------------------------
+       PRICE
+    -------------------------------------------------------- */
 
     priceRange: {
       minVariantPrice: {
@@ -364,57 +331,39 @@ function makeProduct(id: string, title: string, price: string, type: string) {
       },
     },
 
-    /**
-     * ========================================================
-     * PRODUCT IMAGE GALLERY
-     * ========================================================
-     *
-     * Same image intentionally repeated because currently
-     * all color variants use the same image.
-     */
+    /* --------------------------------------------------------
+       10 IMAGE PRODUCT GALLERY
+    -------------------------------------------------------- */
 
-    images: {
-      edges: colors.map((color) => ({
-        node: {
-          url: color.image,
-          altText: `${title} - ${color.name}`,
-        },
-      })),
-    },
+    images: createProductGallery(id, title),
 
-    /**
-     * ========================================================
-     * PRODUCT VARIANTS
-     * ========================================================
-     */
+    /* --------------------------------------------------------
+       PRODUCT VARIANTS
+    -------------------------------------------------------- */
 
     variants: {
       edges: variants,
     },
 
-    /**
-     * ========================================================
-     * PRODUCT TYPE
-     * ========================================================
-     */
+    /* --------------------------------------------------------
+       PRODUCT TYPE
+    -------------------------------------------------------- */
 
     productType: type,
 
-    /**
-     * ========================================================
-     * MOCK INVENTORY
-     * ========================================================
-     */
+    /* --------------------------------------------------------
+       MOCK INVENTORY
+       Deterministic value use kora hoyeche,
+       jate hydration mismatch na hoy.
+    -------------------------------------------------------- */
 
-    totalInventory: Math.floor(Math.random() * 40) + 5,
+    totalInventory: 20 + Number(id),
   };
 }
 
-/**
- * ============================================================
- * MOCK PRODUCTS
- * ============================================================
- */
+/* ============================================================
+   MOCK PRODUCTS
+============================================================ */
 
 export const mockProducts = [
   makeProduct("1", "Shadow Graphic Tee", "4200", "Tee"),
@@ -440,11 +389,9 @@ export const mockProducts = [
   makeProduct("11", "Storm Oversized Tee", "4550", "Oversized Tee"),
 ];
 
-/**
- * ============================================================
- * MOCK COLLECTIONS
- * ============================================================
- */
+/* ============================================================
+   MOCK COLLECTIONS
+============================================================ */
 
 export const mockCollections = [
   {
@@ -517,11 +464,9 @@ export const mockCollections = [
   },
 ];
 
-/**
- * ============================================================
- * MOCK CUSTOMER
- * ============================================================
- */
+/* ============================================================
+   MOCK CUSTOMER
+============================================================ */
 
 export const mockCustomer = {
   id: "gid://mock/Customer/1",
@@ -575,11 +520,9 @@ export const mockCustomer = {
   },
 };
 
-/**
- * ============================================================
- * MOCK CART
- * ============================================================
- */
+/* ============================================================
+   MOCK CART
+============================================================ */
 
 export const mockCart = {
   id: "gid://mock/Cart/1",
@@ -600,16 +543,9 @@ export const mockCart = {
   },
 };
 
-/**
- * ============================================================
- * IN-MEMORY MOCK CART STORE
- * ============================================================
- *
- * Demo/session only.
- * Resets on page reload.
- *
- * Real Shopify connect korle eta use hobe na.
- */
+/* ============================================================
+   IN-MEMORY MOCK CART STORE
+============================================================ */
 
 export const mockCartStore: {
   lines: any[];
@@ -617,32 +553,30 @@ export const mockCartStore: {
   lines: [],
 };
 
-/**
- * ============================================================
- * ADD LINE TO CART
- * ============================================================
- */
+/* ============================================================
+   ADD LINE TO CART
+============================================================ */
 
 export function mockAddLineToCart(variantId: string, quantity: number) {
-  /**
-   * Find product
-   */
+  /* ----------------------------------------------------------
+     FIND PRODUCT
+  ---------------------------------------------------------- */
 
   const product = mockProducts.find((p) =>
     p.variants.edges.some((v) => v.node.id === variantId),
   );
 
-  /**
-   * Find variant
-   */
+  /* ----------------------------------------------------------
+     FIND VARIANT
+  ---------------------------------------------------------- */
 
   const variant = product?.variants.edges.find(
     (v) => v.node.id === variantId,
   )?.node;
 
-  /**
-   * Product / variant not found
-   */
+  /* ----------------------------------------------------------
+     PRODUCT / VARIANT NOT FOUND
+  ---------------------------------------------------------- */
 
   if (!product || !variant) {
     return {
@@ -650,24 +584,24 @@ export function mockAddLineToCart(variantId: string, quantity: number) {
     };
   }
 
-  /**
-   * Check existing cart line
-   */
+  /* ----------------------------------------------------------
+     CHECK EXISTING CART LINE
+  ---------------------------------------------------------- */
 
   const existing = mockCartStore.lines.find(
     (l) => l.merchandise.id === variantId,
   );
 
-  /**
-   * Existing product
-   */
+  /* ----------------------------------------------------------
+     EXISTING PRODUCT
+  ---------------------------------------------------------- */
 
   if (existing) {
     existing.quantity += quantity;
   } else {
-    /**
-     * New product
-     */
+    /* --------------------------------------------------------
+       NEW PRODUCT
+    -------------------------------------------------------- */
 
     mockCartStore.lines.push({
       id: `line-${variantId}`,
@@ -696,33 +630,27 @@ export function mockAddLineToCart(variantId: string, quantity: number) {
     });
   }
 
-  /**
-   * ========================================================
-   * CALCULATE TOTAL QUANTITY
-   * ========================================================
-   */
+  /* ----------------------------------------------------------
+     CALCULATE TOTAL QUANTITY
+  ---------------------------------------------------------- */
 
   const totalQuantity = mockCartStore.lines.reduce(
-    (sum, l) => sum + l.quantity,
+    (sum, line) => sum + line.quantity,
     0,
   );
 
-  /**
-   * ========================================================
-   * CALCULATE TOTAL AMOUNT
-   * ========================================================
-   */
+  /* ----------------------------------------------------------
+     CALCULATE TOTAL AMOUNT
+  ---------------------------------------------------------- */
 
   const totalAmount = mockCartStore.lines.reduce(
-    (sum, l) => sum + Number(l.merchandise.price.amount) * l.quantity,
+    (sum, line) => sum + Number(line.merchandise.price.amount) * line.quantity,
     0,
   );
 
-  /**
-   * ========================================================
-   * RETURN CART
-   * ========================================================
-   */
+  /* ----------------------------------------------------------
+     RETURN CART
+  ---------------------------------------------------------- */
 
   return {
     id: mockCart.id,
@@ -734,7 +662,6 @@ export function mockAddLineToCart(variantId: string, quantity: number) {
     cost: {
       totalAmount: {
         amount: String(totalAmount),
-
         currencyCode: "INR",
       },
     },
@@ -747,34 +674,32 @@ export function mockAddLineToCart(variantId: string, quantity: number) {
   };
 }
 
-/**
- * ============================================================
- * GET CART
- * ============================================================
- */
+/* ============================================================
+   GET CART
+============================================================ */
 
 export function mockGetCart() {
-  /**
-   * Calculate total quantity
-   */
+  /* ----------------------------------------------------------
+     CALCULATE TOTAL QUANTITY
+  ---------------------------------------------------------- */
 
   const totalQuantity = mockCartStore.lines.reduce(
-    (sum, l) => sum + l.quantity,
+    (sum, line) => sum + line.quantity,
     0,
   );
 
-  /**
-   * Calculate total amount
-   */
+  /* ----------------------------------------------------------
+     CALCULATE TOTAL AMOUNT
+  ---------------------------------------------------------- */
 
   const totalAmount = mockCartStore.lines.reduce(
-    (sum, l) => sum + Number(l.merchandise.price.amount) * l.quantity,
+    (sum, line) => sum + Number(line.merchandise.price.amount) * line.quantity,
     0,
   );
 
-  /**
-   * Return current cart
-   */
+  /* ----------------------------------------------------------
+     RETURN CURRENT CART
+  ---------------------------------------------------------- */
 
   return {
     id: mockCart.id,
@@ -786,7 +711,6 @@ export function mockGetCart() {
     cost: {
       totalAmount: {
         amount: String(totalAmount),
-
         currencyCode: "INR",
       },
     },

@@ -4,18 +4,18 @@ import { mockProducts } from "@/lib/mock-data";
 // import { Instagram, Facebook, Linkedin } from "lucide-react";
 
 const footerColumns = [
-  {
-    title: "Shop",
-    links: [
-      { label: "New Arrivals", href: "/new-arrivals" },
-      { label: "Graphic Tees", href: "/collections/graphic-tees" },
-      { label: "Oversized Fits", href: "/collections/oversized-fits" },
-      {
-        label: "Elevated Capsule (Polos)",
-        href: "/collections/elevated-capsule",
-      },
-    ],
-  },
+  // {
+  //   title: "Shop",
+  //   links: [
+  //     { label: "New Arrivals", href: "/new-arrivals" },
+  //     { label: "Graphic Tees", href: "/collections/graphic-tees" },
+  //     { label: "Oversized Fits", href: "/collections/oversized-fits" },
+  //     {
+  //       label: "Elevated Capsule (Polos)",
+  //       href: "/collections/elevated-capsule",
+  //     },
+  //   ],
+  // },
   {
     title: "Help",
     links: [
@@ -75,7 +75,7 @@ export default function Footer() {
             <div className="footer-columns">
               {footerColumns.map((column) => (
                 <div className="footer-column" key={column.title}>
-                  <p className="footer-column-title">{column.title}</p>
+                  {/* <p className="footer-column-title">{column.title}</p> */}
 
                   <div className="footer-links">
                     {column.links.map((link) => (
@@ -221,8 +221,12 @@ export default function Footer() {
             LARGE LOGO
             ============================================================ */}
 
-        <div className="footer-large-logo" aria-hidden="true">
+        {/* <div className="footer-large-logo" aria-hidden="true">
           OPULENCE
+        </div> */}
+        <div className="footer-large-logo">
+          <img src="/images/opulense-favicon.jpeg" alt="OPULENCE" />
+          <h3>Style. Substance. Self-Made.</h3>
         </div>
       </div>
     </footer>

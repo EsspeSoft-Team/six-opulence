@@ -8,7 +8,6 @@ import {
 import HeroSlider from "@/components/home/HeroSlider";
 import FeatureBar from "@/components/home/FeatureBar";
 // import DiscoverCollection from "@/components/home/DiscoverCollection";
-import OpulenceFashionHero from "@/components/home/OpulenceFashionHero";
 import BestSellers from "@/components/home/BestSellers";
 import DualBanner from "@/components/home/DualBanner";
 import AllProductsSection from "@/components/home/AllProductsSection";
@@ -20,6 +19,7 @@ import NewsletterBar from "@/components/home/NewsletterBar";
 import JewelryFeature from "@/components/home/JewelryFeature";
 import AccessCollection from "@/components/home/AccessCollection";
 import CustomerReviews from "@/components/home/CustomerReviews";
+import VideoSection from "@/components/home/VideoSection";
 
 export default async function HomePage() {
   const [
@@ -38,9 +38,7 @@ export default async function HomePage() {
     getProductsByType("Oversized Tee", 12),
   ]);
 
-  // Temporary best seller source:
-  // Shopify থেকে আলাদা best-seller query না থাকলে
-  // বর্তমানে allProducts-এর প্রথম 4টি product ব্যবহার করছি।
+  // Temporary best seller source
   const bestSellerProducts = allProducts.slice(0, 5);
 
   return (
@@ -48,20 +46,25 @@ export default async function HomePage() {
       {/* Hero */}
       <HeroSlider />
 
-      {/* Benefits / Features */}
-      <FeatureBar />
-
       {/* Existing sections */}
 
-      <OpulenceFashionHero />
+      <AboutSection />
 
-      {/* Collections */}
-      {/* <DiscoverCollection collections={collections} /> */}
-      {/* Scroll-synced world: location + piece, tied together */}
+      {/* 
+      <OpulenceFashionHero />
+      */}
+
+      {/* 
+      <DiscoverCollection collections={collections} />
+      */}
+
+      {/* Scroll-synced world */}
       <AccessCollection />
 
       {/* Best Sellers */}
-      {/* <BestSellers products={bestSellerProducts} /> */}
+      {/*
+      <BestSellers products={bestSellerProducts} />
+      */}
 
       {/* Product Categories */}
       <AllProductsSection
@@ -71,27 +74,30 @@ export default async function HomePage() {
         oversized={oversizedProducts}
       />
 
+      {/* <JewelryFeature /> */}
+
       {/* Dual Category Banner */}
       <DualBanner />
+      {/* Video Section */}
+      <VideoSection />
 
+      {/* 
       <JewelryFeature />
+      */}
 
-      {/* Stockists */}
+      {/* 
       <Stockists />
+      */}
 
-      {/* New Arrivals */}
-      {/* <NewArrivalsSection products={newArrivals} /> */}
+      {/* 
+      <NewArrivalsSection products={newArrivals} />
+      */}
 
-      {/* About */}
-      <AboutSection />
-
-      {/* testimoanial */}
+      {/* Testimonials */}
       <CustomerReviews />
+
       {/* Instagram */}
       <InstagramStrip />
-
-      {/* Newsletter */}
-      <NewsletterBar />
     </div>
   );
 }

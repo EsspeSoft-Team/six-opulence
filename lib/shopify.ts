@@ -46,7 +46,7 @@ export async function shopifyFetch<T>({
 }: ShopifyFetchParams): Promise<T> {
   if (!domain || !storefrontAccessToken) {
     throw new Error(
-      "Shopify env variables missing. .env.local file check koro (NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN, NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN)."
+      "Shopify env variables missing. .env.local file check koro (NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN, NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN).",
     );
   }
 
@@ -113,15 +113,40 @@ export async function getProducts(first = 12) {
 
 // Ekta single product handle diye fetch (product detail page-r jonno)
 export async function getProductByHandle(handle: string) {
-  if (USE_MOCK) return mockProducts.find((p) => p.handle === handle) || null;
+  /* ==========================================================
+     MOCK MODE
+     ========================================================== */
+
+  if (USE_MOCK) {
+    const product = mockProducts.find((p) => p.handle === handle);
+
+    if (!product) {
+      return null;
+    }
+
+    return {
+      ...product,
+
+      // Maximum 10 gallery images
+      images: {
+        edges: (product.images?.edges || []).slice(0, 10),
+      },
+    };
+  }
+
+  /* ==========================================================
+     REAL SHOPIFY
+     ========================================================== */
 
   const query = `
     query getProduct($handle: String!) {
       product(handle: $handle) {
         id
         title
+        handle
         description
         descriptionHtml
+
         images(first: 10) {
           edges {
             node {
@@ -130,19 +155,27 @@ export async function getProductByHandle(handle: string) {
             }
           }
         }
+
         variants(first: 25) {
           edges {
             node {
               id
               title
               availableForSale
+
               price {
                 amount
                 currencyCode
               }
+
               selectedOptions {
                 name
                 value
+              }
+
+              image {
+                url
+                altText
               }
             }
           }
@@ -151,9 +184,13 @@ export async function getProductByHandle(handle: string) {
     }
   `;
 
-  const data = await shopifyFetch<{ product: any }>({
+  const data = await shopifyFetch<{
+    product: any;
+  }>({
     query,
-    variables: { handle },
+    variables: {
+      handle,
+    },
   });
 
   return data.product;
@@ -272,7 +309,7 @@ export async function getNewArrivals(first = 12) {
 // (Shopify Storefront API-te "recommendations" query direct ache, seta use korchi)
 export async function getRelatedProducts(productId: string) {
   if (USE_MOCK) {
-    return mockProducts.filter((p) => p.id !== productId).slice(0, 4);
+    return mockProducts.filter((p) => p.id !== productId).slice(0, 10);
   }
 
   const query = `
@@ -311,7 +348,7 @@ export async function searchProducts(searchTerm: string, first = 20) {
       .filter(
         (p) =>
           p.title.toLowerCase().includes(term) ||
-          p.productType.toLowerCase().includes(term)
+          p.productType.toLowerCase().includes(term),
       )
       .slice(0, first);
   }
@@ -436,10 +473,13 @@ export async function customerRegister(
   email: string,
   password: string,
   firstName: string,
-  lastName: string
+  lastName: string,
 ) {
   if (USE_MOCK) {
-    return { customer: { id: "gid://mock/Customer/1", email }, customerUserErrors: [] };
+    return {
+      customer: { id: "gid://mock/Customer/1", email },
+      customerUserErrors: [],
+    };
   }
 
   const query = `
@@ -507,7 +547,10 @@ export async function customerLogout(accessToken: string) {
     }
   `;
 
-  await shopifyFetch({ query, variables: { customerAccessToken: accessToken } });
+  await shopifyFetch({
+    query,
+    variables: { customerAccessToken: accessToken },
+  });
 }
 
 export async function getCustomer(accessToken: string) {
@@ -626,7 +669,7 @@ export async function createCart() {
 export async function addToCart(
   cartId: string,
   variantId: string,
-  quantity: number = 1
+  quantity: number = 1,
 ) {
   if (USE_MOCK) return mockAddLineToCart(variantId, quantity);
 

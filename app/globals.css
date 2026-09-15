@@ -140,6 +140,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Favicon */
+link[rel="icon"] {
+  border-radius: 6px;
+}
+
 /* ==========================================================
    GLOBAL TYPOGRAPHY
    ----------------------------------------------------------
@@ -805,7 +810,7 @@ button {
   .container {
     padding-left: 16px;
     padding-right: 16px;
-    padding-bottom: 32px;
+    /* padding-bottom: 32px; */
   }
 
   .section {
@@ -925,4 +930,15 @@ title {
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.6;
+}
+
+.section-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+  margin-bottom: 40px;
 }

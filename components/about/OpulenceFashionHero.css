@@ -1,0 +1,901 @@
+.opulence-fashion-hero {
+  width: 100%;
+  background: #fff;
+  color: #111;
+  overflow: hidden;
+  padding: 90px 0px;
+}
+
+.opulence-fashion-grid {
+  width: 100%;
+  min-height: 100vh;
+
+  display: grid;
+  grid-template-columns: 27% 46% 27%;
+
+  gap: 0;
+
+  /* padding: 36px 38px 70px; */
+
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   LEFT
+===================================================== */
+
+.opulence-fashion-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding-right: 50px;
+
+  box-sizing: border-box;
+}
+
+.opulence-fashion-eyebrow {
+  margin-top: 3px;
+  margin-bottom: 27px;
+
+  font-size: 11px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: 0.01em;
+
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+}
+
+.opulence-fashion-left h1 {
+  margin: 0;
+
+  max-width: 390px;
+
+  font-size: clamp(38px, 3.15vw, 61px);
+
+  line-height: 0.99;
+
+  font-weight: 400;
+
+  letter-spacing: -0.055em;
+  font-family: var(--font-display);
+}
+
+.opulence-fashion-description {
+  max-width: 360px;
+
+  margin: 28px 0 0;
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+  font-weight: 400;
+
+  letter-spacing: -0.015em;
+
+  color: #555;
+  font-family: var(--font-body);
+}
+
+.opulence-fashion-shop-link {
+  display: inline-block;
+
+  margin-top: 48px;
+
+  color: #111;
+
+  text-decoration: underline;
+
+  text-underline-offset: 4px;
+
+  font-size: 12px;
+
+  line-height: 1;
+
+  font-weight: 700;
+
+  letter-spacing: -0.01em;
+}
+
+.opulence-fashion-left-image {
+  width: 100%;
+
+  max-width: 310px;
+
+  margin-top: 72px;
+
+  overflow: hidden;
+}
+
+.opulence-fashion-left-image img {
+  display: block;
+
+  width: 100%;
+
+  /* aspect-ratio: 1 / 1; */
+
+  object-fit: cover;
+
+  transition: transform 0.8s cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+.opulence-fashion-left-image:hover img {
+  transform: scale(1.025);
+}
+
+/* =====================================================
+   CENTER
+===================================================== */
+
+.opulence-fashion-center {
+  width: 100%;
+
+  /* padding: 0 18px; */
+
+  box-sizing: border-box;
+}
+
+.opulence-fashion-center-image {
+  width: 100%;
+
+  /* height: calc(100vh - 106px); */
+  height: 100%;
+
+  min-height: 650px;
+
+  overflow: hidden;
+}
+
+.opulence-fashion-center-image img {
+  display: block;
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  object-position: center center;
+
+  transition: transform 1s cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+.opulence-fashion-center-image:hover img {
+  transform: scale(1.025);
+}
+
+/* =====================================================
+   RIGHT
+===================================================== */
+
+.opulence-fashion-right {
+  display: flex;
+
+  flex-direction: column;
+
+  padding-left: 48px;
+
+  box-sizing: border-box;
+}
+
+.opulence-fashion-product {
+  width: 100%;
+}
+
+.opulence-fashion-product-image-wrap {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+}
+
+.opulence-fashion-product-image {
+  display: block;
+
+  width: 100%;
+
+  aspect-ratio: 1 / 1.02;
+
+  object-fit: cover;
+
+  transition: transform 0.8s cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+.opulence-fashion-product-image-wrap:hover .opulence-fashion-product-image {
+  transform: scale(1.025);
+}
+
+/* =====================================================
+   DISCOUNT
+===================================================== */
+
+.opulence-fashion-discount {
+  position: absolute;
+
+  top: 10px;
+
+  left: 10px;
+
+  z-index: 3;
+
+  padding: 4px 6px;
+
+  background: #fff;
+
+  font-size: 10px;
+
+  line-height: 1;
+
+  font-weight: 600;
+}
+
+/* =====================================================
+   PRODUCT ACTIONS
+===================================================== */
+
+.opulence-fashion-product-actions {
+  position: absolute;
+
+  top: 10px;
+
+  right: 10px;
+
+  z-index: 4;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.opulence-fashion-product-actions button {
+  width: 31px;
+
+  height: 31px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  color: #111;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.opulence-fashion-product-actions button:hover {
+  background: #111;
+
+  color: #fff;
+
+  transform: scale(1.05);
+}
+
+.opulence-fashion-product-actions svg {
+  width: 17px;
+
+  height: 17px;
+}
+
+/* =====================================================
+   PRODUCT DETAILS
+===================================================== */
+
+.opulence-fashion-product-category {
+  margin-top: 18px;
+
+  color: #999;
+
+  font-size: 10px;
+
+  line-height: 1;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  text-transform: uppercase;
+}
+
+.opulence-fashion-product-title {
+  margin: 12px 0 0;
+
+  font-size: 14px;
+
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  letter-spacing: -0.015em;
+
+  text-transform: uppercase;
+  font-family: var(--font-display);
+}
+
+.opulence-fashion-price {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 10px;
+
+  font-size: 13px;
+
+  line-height: 1;
+}
+
+.opulence-fashion-price span {
+  color: #111;
+}
+
+.opulence-fashion-price del {
+  color: #999;
+}
+
+/* =====================================================
+   TESTIMONIAL
+===================================================== */
+
+.opulence-fashion-testimonial {
+  display: block;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-top: 90px !important;
+
+  padding-bottom: 20px;
+}
+
+.opulence-fashion-testimonial-avatar {
+  width: 64px;
+
+  height: 64px;
+
+  flex: 0 0 64px;
+
+  overflow: hidden;
+}
+
+.opulence-fashion-testimonial-avatar img {
+  display: block;
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.opulence-fashion-testimonial-content {
+  padding-top: 2px;
+}
+
+.opulence-fashion-testimonial-content p {
+  max-width: 230px;
+
+  margin: 0 0 12px;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  font-weight: 400;
+
+  letter-spacing: -0.02em;
+}
+
+.opulence-fashion-testimonial-content strong {
+  display: block;
+
+  font-size: 12px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+}
+
+/* =====================================================
+   LARGE TABLET
+===================================================== */
+
+@media (max-width: 1200px) {
+  .opulence-fashion-grid {
+    grid-template-columns: 28% 44% 28%;
+
+    padding-left: 28px;
+
+    padding-right: 28px;
+  }
+
+  .opulence-fashion-left {
+    padding-right: 30px;
+  }
+
+  .opulence-fashion-right {
+    padding-left: 30px;
+  }
+
+  .opulence-fashion-center {
+    padding: 0 12px;
+  }
+
+  .opulence-fashion-left h1 {
+    font-size: clamp(34px, 3.3vw, 48px);
+  }
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+  .opulence-fashion-grid {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 35px 20px;
+
+    padding: 30px 25px 60px;
+  }
+
+  .opulence-fashion-center {
+    grid-column: 2;
+
+    grid-row: 1;
+
+    padding: 0;
+  }
+
+  .opulence-fashion-left {
+    grid-column: 1;
+
+    grid-row: 1;
+
+    padding-right: 10px;
+  }
+
+  .opulence-fashion-right {
+    grid-column: 1 / -1;
+
+    grid-row: 2;
+
+    padding-left: 0;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 30px;
+  }
+
+  .opulence-fashion-testimonial {
+    margin-top: 35px;
+  }
+
+  .opulence-fashion-center-image {
+    height: 650px;
+
+    min-height: 0;
+  }
+
+  .opulence-fashion-left-image {
+    margin-top: 50px;
+  }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+  .opulence-fashion-grid {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 25px 18px 50px;
+  }
+
+  .opulence-fashion-left {
+    padding-right: 0;
+  }
+
+  .opulence-fashion-eyebrow {
+    margin-bottom: 22px;
+  }
+
+  .opulence-fashion-left h1 {
+    max-width: 100%;
+
+    font-size: 42px;
+
+    line-height: 0.98;
+  }
+
+  .opulence-fashion-description {
+    max-width: 330px;
+
+    margin-top: 24px;
+
+    font-size: 13px;
+  }
+
+  .opulence-fashion-shop-link {
+    margin-top: 35px;
+  }
+
+  .opulence-fashion-left-image {
+    max-width: 100%;
+
+    margin-top: 45px;
+  }
+
+  .opulence-fashion-center {
+    padding: 0;
+  }
+
+  .opulence-fashion-center-image {
+    height: 600px;
+  }
+
+  .opulence-fashion-right {
+    display: flex;
+
+    padding-left: 0;
+  }
+
+  .opulence-fashion-product-image {
+    aspect-ratio: 1 / 1;
+  }
+
+  .opulence-fashion-testimonial {
+    margin-top: 60px;
+  }
+}
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 400px) {
+  .opulence-fashion-left h1 {
+    font-size: 36px;
+  }
+
+  .opulence-fashion-center-image {
+    height: 500px;
+  }
+
+  .opulence-fashion-testimonial-avatar {
+    width: 55px;
+
+    height: 55px;
+
+    flex-basis: 55px;
+  }
+}
+
+/* ============================================================
+   TESTIMONIAL
+   ============================================================ */
+
+.opulence-fashion-testimonial {
+  width: 100%;
+  margin-top: 32px;
+}
+
+/* ============================================================
+   IMAGE + CONTENT
+   ============================================================ */
+
+.opulence-fashion-testimonial-main {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 18px;
+}
+
+/* ============================================================
+   AVATAR
+   ============================================================ */
+
+.opulence-fashion-testimonial-avatar {
+  flex: 0 0 68px;
+
+  width: 68px;
+  height: 68px;
+
+  overflow: hidden;
+
+  background: #eeeae2;
+}
+
+.opulence-fashion-testimonial-avatar img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  animation: testimonialImageFade 450ms ease;
+}
+
+@keyframes testimonialImageFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+
+.opulence-fashion-testimonial-content {
+  flex: 1;
+
+  min-width: 0;
+
+  animation: testimonialContentFade 450ms ease;
+}
+
+@keyframes testimonialContentFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.opulence-fashion-testimonial-content p {
+  margin: 0;
+
+  max-width: 430px;
+
+  color: #17191a;
+
+  font-family: var(--font-body);
+
+  font-size: 12px;
+
+  line-height: 1.45;
+
+  font-weight: 400;
+}
+
+.opulence-fashion-testimonial-content strong {
+  display: block;
+
+  margin-top: 14px;
+
+  color: #17191a;
+
+  font-family: var(--font-body);
+
+  font-size: 12px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   CONTROLS
+   IMPORTANT:
+   নিচে থাকবে, image/content-এর পাশে নয়
+   ============================================================ */
+
+.opulence-fashion-testimonial-controls {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-top: 22px;
+}
+
+/* ============================================================
+   ARROWS
+   ============================================================ */
+
+.opulence-fashion-testimonial-arrow {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgba(23, 25, 26, 0.22);
+
+  background: transparent;
+
+  color: #17191a;
+
+  cursor: pointer;
+
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.opulence-fashion-testimonial-arrow:hover {
+  background: #17191a;
+
+  border-color: #17191a;
+
+  color: #ffffff;
+}
+
+.opulence-fashion-testimonial-arrow svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ============================================================
+   DOTS
+   ============================================================ */
+
+.opulence-fashion-testimonial-dots {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.opulence-fashion-testimonial-dots button {
+  width: 5px;
+  height: 5px;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #aaa69d;
+
+  cursor: pointer;
+
+  transition:
+    transform 200ms ease,
+    background 200ms ease;
+}
+
+.opulence-fashion-testimonial-dots button.active {
+  background: #17191a;
+
+  transform: scale(1.5);
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .opulence-fashion-testimonial-content p {
+    font-size: 15px;
+  }
+
+  .opulence-fashion-testimonial-avatar {
+    flex-basis: 62px;
+
+    width: 62px;
+    height: 62px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .opulence-fashion-testimonial {
+    margin-top: 28px;
+  }
+
+  .opulence-fashion-testimonial-main {
+    gap: 14px;
+  }
+
+  .opulence-fashion-testimonial-avatar {
+    flex: 0 0 58px;
+
+    width: 58px;
+    height: 58px;
+  }
+
+  .opulence-fashion-testimonial-content p {
+    font-size: 15px;
+
+    line-height: 1.4;
+  }
+
+  .opulence-fashion-testimonial-content strong {
+    margin-top: 10px;
+
+    font-size: 10px;
+  }
+
+  .opulence-fashion-testimonial-controls {
+    margin-top: 18px;
+
+    justify-content: flex-end;
+  }
+}
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .opulence-fashion-testimonial-main {
+    gap: 12px;
+  }
+
+  .opulence-fashion-testimonial-avatar {
+    flex: 0 0 52px;
+
+    width: 52px;
+    height: 52px;
+  }
+
+  .opulence-fashion-testimonial-content p {
+    font-size: 14px;
+  }
+
+  .opulence-fashion-testimonial-arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .opulence-fashion-testimonial-arrow svg {
+    width: 15px;
+    height: 15px;
+  }
+}
