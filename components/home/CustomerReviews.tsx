@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import "./CustomerReviews.css";
 
 interface Testimonial {
@@ -18,7 +18,6 @@ const testimonials: Testimonial[] = [
     name: "Avesh Karim",
     type: "Regular Customer",
   },
-
   {
     image: "/images/test1.avif",
     review:
@@ -26,7 +25,6 @@ const testimonials: Testimonial[] = [
     name: "Arif Mahmud",
     type: "Verified Customer",
   },
-
   {
     image: "/images/test2.avif",
     review:
@@ -34,7 +32,6 @@ const testimonials: Testimonial[] = [
     name: "Jonson Maltura",
     type: "Regular Customer",
   },
-
   {
     image: "/images/test.avif",
     review:
@@ -42,7 +39,6 @@ const testimonials: Testimonial[] = [
     name: "Imran Hossain",
     type: "Fashion Enthusiast",
   },
-
   {
     image: "/images/test1.avif",
     review:
@@ -50,7 +46,6 @@ const testimonials: Testimonial[] = [
     name: "Kushal Mendis",
     type: "Verified Customer",
   },
-
   {
     image: "/images/test2.avif",
     review:
@@ -58,7 +53,6 @@ const testimonials: Testimonial[] = [
     name: "Nikky Jon",
     type: "Fashion Enthusiast",
   },
-
   {
     image: "/images/test.avif",
     review:
@@ -66,7 +60,6 @@ const testimonials: Testimonial[] = [
     name: "Charlse Jonson",
     type: "Regular Customer",
   },
-
   {
     image: "/images/test1.avif",
     review:
@@ -77,125 +70,68 @@ const testimonials: Testimonial[] = [
 ];
 
 export default function CustomerReviews() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-
-    if (!section || !track) return;
-
-    let raf = 0;
-
-    const update = () => {
-      const sectionTop = section.offsetTop;
-
-      const sectionHeight = section.offsetHeight;
-
-      const viewportHeight = window.innerHeight;
-
-      const scrollableDistance = sectionHeight - viewportHeight;
-
-      if (scrollableDistance <= 0) return;
-
-      const currentScroll = window.scrollY - sectionTop;
-
-      const progress = currentScroll / scrollableDistance;
-
-      const clampedProgress = Math.max(0, Math.min(1, progress));
-
-      const maxTranslate = track.scrollWidth - track.parentElement!.clientWidth;
-
-      const x = maxTranslate * clampedProgress;
-
-      track.style.transform = `translate3d(${-x}px, 0, 0)`;
-
-      raf = 0;
-    };
-
-    const onScroll = () => {
-      if (raf) return;
-
-      raf = requestAnimationFrame(update);
-    };
-
-    const onResize = () => {
-      update();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    window.addEventListener("resize", onResize);
-
-    update();
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-
-      window.removeEventListener("resize", onResize);
-
-      if (raf) {
-        cancelAnimationFrame(raf);
-      }
-    };
-  }, []);
+  /*
+   * Duplicate the testimonials so the marquee
+   * can loop continuously without a visible gap.
+   */
+  const marqueeItems = [...testimonials, ...testimonials];
 
   return (
-    <section ref={sectionRef} className="customer-reviews-section">
-      <div className="customer-reviews-sticky">
-        <div className="container">
-          {/* HEADER */}
+    <section className="customer-reviews-section">
+      <div className="customer-reviews-container">
+        {/* HEADER */}
+        <div className="customer-reviews-header">
+          <div className="customer-reviews-title">
+            <span className="customer-reviews-label">TESTIMONIAL</span>
 
-          <div className="customer-reviews-header">
-            <div className="customer-reviews-title">
-              <span className="customer-reviews-label">TESTIMONIAL</span>
-
-              <h2 className="title">What Our Customers Saying </h2>
-            </div>
-
-            <div className="customer-reviews-description">
-              <p className="para">
-                Read genuine reviews from customers who trust our brand for
-                quality, style, reliable service, and value.
-              </p>
-            </div>
+            <h2 className="title">What Our Customers Saying</h2>
           </div>
 
-          {/* SLIDER */}
+          <div className="customer-reviews-description">
+            <p className="para">
+              Read genuine reviews from customers who trust our brand for
+              quality, style, reliable service, and value.
+            </p>
+          </div>
+        </div>
 
-          <div className="customer-reviews-window">
-            <div ref={trackRef} className="customer-reviews-track">
-              {testimonials.map((testimonial, index) => (
-                <article className="customer-review-card" key={index}>
-                  <div className="customer-review-image">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      loading={index === 0 ? "eager" : "lazy"}
-                    />
+        {/* MARQUEE */}
+        <div className="customer-reviews-window">
+          <div className="customer-reviews-track">
+            {marqueeItems.map((testimonial, index) => (
+              <article
+                className="customer-review-card"
+                key={`${testimonial.name}-${index}`}
+              >
+                {/* IMAGE */}
+                <div className="customer-review-image">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    loading={index < 2 ? "eager" : "lazy"}
+                  />
+                </div>
+
+                {/* CONTENT */}
+                <div className="customer-review-content">
+                  <div>
+                    <div className="customer-review-stars">★ ★ ★ ★ ★</div>
+
+                    <p className="customer-review-text">
+                      “{testimonial.review}”
+                    </p>
                   </div>
 
-                  <div className="customer-review-content">
-                    <div>
-                      <div className="customer-review-stars">★ ★ ★ ★ ★</div>
+                  <div className="customer-review-author">
+                    <div className="customer-review-line" />
 
-                      <p className="customer-review-text">
-                        “{testimonial.review}”
-                      </p>
-                    </div>
+                    <p className="customer-review-name">{testimonial.name}</p>
 
-                    <div className="customer-review-author">
-                      <div className="customer-review-line" />
-
-                      <p className="customer-review-name">{testimonial.name}</p>
-
-                      <p className="customer-review-type">{testimonial.type}</p>
-                    </div>
+                    <p className="customer-review-type">{testimonial.type}</p>
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </div>
