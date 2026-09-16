@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
+
 import "./globals.css";
 
 import { CartProvider } from "@/lib/cart-context";
 import { AuthProvider } from "@/lib/auth-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
 
-import Header from "@/components/Header";
-import NewsletterBar from "@/components/home/NewsletterBar";
-import FeatureBar from "@/components/home/FeatureBar";
-import Footer from "@/components/Footer";
+import LayoutContent from "./LayoutContent";
 
 export const metadata: Metadata = {
   title: "Opulence — Limited Edition Menswear",
@@ -24,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -40,21 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>
-              <Header />
-
-              <main>{children}</main>
-
-              {/* =========================
-                  GLOBAL FOOTER AREA
-              ========================= */}
-
-              <div className="global-footer-area">
-                <NewsletterBar />
-
-                <FeatureBar />
-
-                <Footer />
-              </div>
+              <LayoutContent>{children}</LayoutContent>
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

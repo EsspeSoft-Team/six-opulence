@@ -32,7 +32,7 @@ const stockists = [
     paragraphs: [
       "Strength has never needed to announce itself.",
       "It exists in posture. In presence. In the quiet certainty of a man who knows what he stands for.",
-      "Fashion becomes an extension of that strength — structured, considered and confident without demanding attention.",
+      "Fashion becomes an extension of that strength - structured, considered and confident without demanding attention.",
       "True strength is felt before it is seen.",
     ],
   },
@@ -49,7 +49,7 @@ const stockists = [
     paragraphs: [
       "Fame is not simply being seen.",
       "It is leaving something behind that remains long after you have left the room.",
-      "In fashion, that becomes identity — a silhouette, a detail, a presence that people remember without needing a name attached to it.",
+      "In fashion, that becomes identity - a silhouette, a detail, a presence that people remember without needing a name attached to it.",
       "To be noticed is momentary. To be remembered is opulence.",
     ],
   },
@@ -83,7 +83,7 @@ const stockists = [
     paragraphs: [
       "The more you know, the less you need to prove.",
       "Knowledge changes how a man sees materials, craftsmanship, proportion, history and the world around him.",
-      "Fashion becomes more than appearance. It becomes discernment — knowing why something deserves to be worn.",
+      "Fashion becomes more than appearance. It becomes discernment - knowing why something deserves to be worn.",
       "Because taste begins where awareness deepens.",
     ],
   },
@@ -105,10 +105,10 @@ const stockists = [
     ],
   },
 ];
+
 export default function Stockists() {
   const wrapperRef = useRef(null);
   const sectionRef = useRef(null);
-  const contentWrapperRef = useRef(null);
 
   const itemRefs = useRef([]);
 
@@ -120,27 +120,17 @@ export default function Stockists() {
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const section = sectionRef.current;
-    const contentWrapper = contentWrapperRef.current;
 
-    if (!wrapper || !section || !contentWrapper) {
+    if (!wrapper || !section) {
       return;
     }
 
-    /*
-    ============================================
-    GET SCROLL PROGRESS
-    ============================================
-    */
+    /* =========================================================
+       GET SCROLL PROGRESS
+    ========================================================= */
 
     const updateTargetProgress = () => {
       const wrapperRect = wrapper.getBoundingClientRect();
-
-      /*
-       IMPORTANT:
-
-       Progress is calculated from the OUTER
-       wrapper, not the sticky section.
-      */
 
       const totalScroll = wrapper.offsetHeight - window.innerHeight;
 
@@ -158,36 +148,21 @@ export default function Stockists() {
       targetProgress.current = progress;
     };
 
-    /*
-    ============================================
-    SMOOTH ANIMATION LOOP
-    ============================================
-    */
+    /* =========================================================
+       ANIMATION
+    ========================================================= */
 
     const animate = () => {
-      /*
-       * Lower value = slower
-       *
-       * 0.06 = very smooth
-       * 0.08 = smooth
-       * 0.12 = faster
-       */
-
       currentProgress.current +=
         (targetProgress.current - currentProgress.current) * 0.075;
 
       const progress = currentProgress.current;
 
-      /*
-      ============================================
-      PHASE 1
-      CARDS CONVERGE
-      ============================================
-      
-      0 -> 60%
-
-      This is intentionally slower.
-      */
+      /* =========================================================
+         CARD MOVEMENT
+         
+         0 -> 60%
+      ========================================================= */
 
       const settleStart = 0;
       const settleEnd = 0.6;
@@ -196,22 +171,18 @@ export default function Stockists() {
 
       settleProgress = Math.max(0, Math.min(1, settleProgress));
 
-      /*
-       * Ease Out Cubic
-       */
-
       const eased = 1 - Math.pow(1 - settleProgress, 3);
 
-      /*
-      ============================================
-      MOVE EACH CARD
-      ============================================
-      */
+      /* =========================================================
+         MOVE CARDS
+      ========================================================= */
 
       stockists.forEach((item, index) => {
         const element = itemRefs.current[index];
 
-        if (!element) return;
+        if (!element) {
+          return;
+        }
 
         const offset =
           item.startOffset + (item.endOffset - item.startOffset) * eased;
@@ -219,17 +190,12 @@ export default function Stockists() {
         element.style.transform = `translate3d(0, ${offset}%, 0)`;
       });
 
-      /*
-      ============================================
-      BLACK -> WHITE
-      ============================================
-
-      Start at 72%
-      End at 86%
-
-      So there is a proper hold before
-      the colour transition.
-      */
+      /* =========================================================
+         LIGHT -> BLACK
+         
+         START: 72%
+         END:   86%
+      ========================================================= */
 
       const transitionStart = 0.72;
       const transitionEnd = 0.86;
@@ -243,62 +209,120 @@ export default function Stockists() {
 
       transitionProgress = Math.max(0, Math.min(1, transitionProgress));
 
-      /*
-       * Smooth transition
-       */
+      /* =========================================================
+         SMOOTH EASING
+      ========================================================= */
 
       const transitionEase = 1 - Math.pow(1 - transitionProgress, 3);
 
-      /*
-      ============================================
-      BACKGROUND
-      ============================================
-      */
+      /* =========================================================
+         BACKGROUND
+         
+         WHITE -> BLACK
+      ========================================================= */
 
-      const value = Math.round(transitionEase * 255);
+      const value = Math.round(255 - transitionEase * 255);
 
       section.style.backgroundColor = `rgb(${value}, ${value}, ${value})`;
 
-      /*
-      ============================================
-      TEXT INVERSION
-      ============================================
-      */
+      /* =========================================================
+         LEFT INTRO TEXT
+         
+         BLACK -> WHITE
+         
+         ONLY TEXT CHANGES.
+         
+         NO FILTER.
+         NO CARD COLOUR CHANGE.
+      ========================================================= */
 
-      contentWrapper.style.filter = `invert(${Math.round(
-        transitionEase * 100,
-      )}%)`;
+      const introTitle = section.querySelector(".stockists-intro-title");
+
+      const introDescription = section.querySelector(
+        ".stockists-intro-description",
+      );
+
+      const introColor = transitionEase >= 0.5 ? "#ffffff" : "#111111";
+
+      if (introTitle) {
+        introTitle.style.color = introColor;
+      }
+
+      if (introDescription) {
+        introDescription.style.color = introColor;
+      }
+
+      /* =========================================================
+         CITY NAMES
+         
+         Keep city names black.
+      ========================================================= */
+
+      const cityNames = section.querySelectorAll(".stockists-b-l");
+
+      cityNames.forEach((city) => {
+        city.style.color = "#000000";
+      });
+
+      /* =========================================================
+         CARD TEXT
+         
+         ALWAYS WHITE
+         
+         IMPORTANT:
+         We do NOT invert the content wrapper.
+         Therefore card backgrounds remain
+         exactly as defined in CSS.
+      ========================================================= */
+
+      const cardTitles = section.querySelectorAll(".stockists-item-title");
+
+      const captions = section.querySelectorAll(".stockists-caption");
+
+      cardTitles.forEach((title) => {
+        title.style.color = "#ffffff";
+      });
+
+      captions.forEach((caption) => {
+        caption.style.color = "#ffffff";
+      });
+
+      /* =========================================================
+         NEXT FRAME
+      ========================================================= */
 
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    /*
-    ============================================
-    INITIAL
-    ============================================
-    */
+    /* =========================================================
+       INITIAL
+    ========================================================= */
 
     updateTargetProgress();
 
-    /*
-    Set initial positions immediately
-    */
+    /* =========================================================
+       INITIAL CARD POSITIONS
+    ========================================================= */
 
     stockists.forEach((item, index) => {
       const element = itemRefs.current[index];
 
-      if (!element) return;
+      if (!element) {
+        return;
+      }
 
       element.style.transform = `translate3d(0, ${item.startOffset}%, 0)`;
     });
 
+    /* =========================================================
+       START
+    ========================================================= */
+
     rafRef.current = requestAnimationFrame(animate);
 
-    /*
-    ============================================
-    EVENTS
-    ============================================
-    */
+    /* =========================================================
+       EVENTS
+    ========================================================= */
 
     window.addEventListener("scroll", updateTargetProgress, {
       passive: true,
@@ -306,11 +330,9 @@ export default function Stockists() {
 
     window.addEventListener("resize", updateTargetProgress);
 
-    /*
-    ============================================
-    CLEANUP
-    ============================================
-    */
+    /* =========================================================
+       CLEANUP
+    ========================================================= */
 
     return () => {
       window.removeEventListener("scroll", updateTargetProgress);
@@ -327,8 +349,10 @@ export default function Stockists() {
     <div id="Stockists" ref={wrapperRef} className="section-stockists-wrapper">
       <section ref={sectionRef} className="section-stockists">
         <div className="container-stockists">
-          <div ref={contentWrapperRef} className="stockists-content-wrapper">
-            {/* LEFT SIDE */}
+          <div className="stockists-content-wrapper">
+            {/* =====================================================
+                LEFT CONTENT
+            ===================================================== */}
 
             <div className="stockists-content-left">
               <div className="stockists-intro">
@@ -342,7 +366,9 @@ export default function Stockists() {
               </div>
             </div>
 
-            {/* RIGHT SIDE */}
+            {/* =====================================================
+                RIGHT CONTENT
+            ===================================================== */}
 
             <div className="stockists-content-right">
               {stockists.map((item, index) => (
@@ -354,7 +380,9 @@ export default function Stockists() {
                   className={`stockists-item-wrapper ${item.key}`}
                 >
                   <div className="stockists-item">
-                    {/* CITY / NUMBER */}
+                    {/* =================================================
+                          CITY / NUMBER
+                      ================================================= */}
 
                     <div className="stockists-origin">
                       <div className="stockists-b-l" aria-label={item.city}>
@@ -374,7 +402,9 @@ export default function Stockists() {
                       </div>
                     </div>
 
-                    {/* TEXT */}
+                    {/* =================================================
+                          CARD TEXT
+                      ================================================= */}
 
                     <div className="stockists-item-text-block">
                       <div className="stockists-b-m stockists-item-title">

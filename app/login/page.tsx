@@ -11,71 +11,171 @@ import { useAuth } from "@/lib/auth-context";
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setError("");
     setLoading(true);
-    const result = await login(email, password);
-    setLoading(false);
 
-    if (result.success) {
-      router.push("/account");
-    } else {
-      setError(result.error || "Login failed. Check your credentials.");
+    try {
+      const result = await login(email, password);
+
+      if (result.success) {
+        router.push("/account");
+      } else {
+        setError(result.error || "Login failed. Check your credentials.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="auth-split">
-      <div className="auth-image">
-        <Image
-          src="/placeholders/auth-1.svg"
-          alt=""
-          fill
-          style={{ objectFit: "cover" }}
-        />
-        <div className="auth-image-overlay">
-          <p className="hero-eyebrow">Opulence</p>
-          <h2>WELCOME BACK.</h2>
+    <main className="auth-page">
+      <div className="auth-split">
+        {/* =====================================================
+            LEFT IMAGE
+        ===================================================== */}
+
+        <div className="auth-image">
+          <Image
+            src="/images/b6.png"
+            alt="Opulence"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 52vw"
+            style={{
+              objectFit: "cover",
+            }}
+          />
+
+          <div className="auth-image-overlay">
+            <div className="auth-image-content">
+              <p className="hero-eyebrow">OPULENCE</p>
+
+              <h2>
+                WELCOME
+                <br />
+                BACK.
+              </h2>
+
+              <div className="auth-image-line" />
+
+              <p className="auth-image-caption">Your collection awaits.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            RIGHT FORM
+        ===================================================== */}
+
+        <div className="auth-form-panel">
+          <div className="auth-form-inner">
+            {/* Brand */}
+
+            <div className="auth-brand">OPULENCE</div>
+
+            {/* Heading */}
+
+            <div className="auth-heading">
+              <p className="section-eyebrow">SIGN IN</p>
+
+              <h1 className="auth-title">
+                Sign In To
+                <br />
+                Your Account
+              </h1>
+
+              <p className="auth-description">
+                Enter your details to access your Opulence account.
+              </p>
+            </div>
+
+            {/* Form */}
+
+            <form onSubmit={handleSubmit} className="form auth-form">
+              {/* Email */}
+
+              <div className="auth-field">
+                <label htmlFor="email">Email Address</label>
+
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              {/* Password */}
+
+              <div className="auth-field">
+                <div className="auth-label-row">
+                  <label htmlFor="password">Password</label>
+
+                  <Link href="/forgot-password" className="forgot-password">
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              {/* Error */}
+
+              {error && <div className="error-text">{error}</div>}
+
+              {/* Submit */}
+
+              <button
+                type="submit"
+                className="btn btn-solid auth-submit"
+                disabled={loading}
+              >
+                <span>{loading ? "LOGGING IN..." : "LOGIN"}</span>
+
+                {!loading && <span className="auth-submit-arrow">→</span>}
+              </button>
+            </form>
+
+            {/* Register */}
+
+            <div className="auth-register">
+              <span>Don't have an account?</span>
+
+              <Link href="/register">Create one</Link>
+            </div>
+
+            {/* Bottom detail */}
+
+            <div className="auth-bottom">
+              <span>OPULENCE</span>
+
+              <span>LIMITED EDITION MENSWEAR</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="auth-form-panel">
-        <div className="auth-form-inner">
-          <p className="section-eyebrow">Login</p>
-          <h1 className="auth-title">Sign In To Your Account</h1>
-
-          <form onSubmit={handleSubmit} className="form" style={{ marginTop: 32 }}>
-            <input
-              type="email"
-              placeholder="Email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {error && <p className="error-text">{error}</p>}
-            <button type="submit" className="btn btn-solid" disabled={loading} style={{ width: "100%" }}>
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
-
-          <p className="muted-link">
-            Don't have an account? <Link href="/register">Create one</Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

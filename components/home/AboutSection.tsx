@@ -27,7 +27,7 @@ export default function AboutSection() {
 
           <div className="about-section__line" />
 
-          <div className="about-section__values">
+          {/* <div className="about-section__values">
             <div className="about-section__value">
               <span>01</span>
               <h3>STYLE</h3>
@@ -45,7 +45,7 @@ export default function AboutSection() {
               <h3>SELF-MADE</h3>
               <p>For those who build their own identity and their own path.</p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

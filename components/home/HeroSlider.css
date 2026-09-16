@@ -31,7 +31,7 @@
 /* Small Mobile */
 @media (max-width: 480px) {
   .hero-slider {
-    height: 640px;
-    min-height: 580px;
+    height: 450px;
+    min-height: 450px;
   }
 }

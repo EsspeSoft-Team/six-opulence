@@ -253,6 +253,8 @@
   flex-direction: column;
 
   gap: 18px;
+  background-color: red;
+  padding: 8px 6px;
 }
 
 /* =========================================================

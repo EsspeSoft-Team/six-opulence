@@ -6,7 +6,7 @@
   position: relative;
   width: 100%;
   height: 300vh;
-  background: #000;
+  background: var(--color-white);
 }
 
 /* =========================================================
@@ -26,7 +26,7 @@
 
   overflow: hidden;
 
-  background: #000;
+  background: var(--color-white);
 }
 
 /* =========================================================
@@ -251,8 +251,38 @@
 .stockists-item-text-block {
   display: flex;
   flex-direction: column;
-
   gap: 18px;
+  padding: 10px 6px;
+}
+
+/* 1 */
+.stockists-item-wrapper:nth-child(1) .stockists-item-text-block {
+  background-color: #a28251;
+}
+
+/* 2 */
+.stockists-item-wrapper:nth-child(2) .stockists-item-text-block {
+  background-color: #693a26;
+}
+
+/* 3 */
+.stockists-item-wrapper:nth-child(3) .stockists-item-text-block {
+  background-color: #441d1e;
+}
+
+/* 4 */
+.stockists-item-wrapper:nth-child(4) .stockists-item-text-block {
+  background-color: #a18051;
+}
+
+/* 5 */
+.stockists-item-wrapper:nth-child(5) .stockists-item-text-block {
+  background-color: #222c3a;
+}
+
+/* 6 */
+.stockists-item-wrapper:nth-child(6) .stockists-item-text-block {
+  background-color: #1f1812;
 }
 
 /* =========================================================

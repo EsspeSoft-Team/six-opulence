@@ -9,12 +9,11 @@ export default function AboutPage() {
     <main className="about-page">
       <AboutBanner />
       <AboutSection />
+      <Stockists />
 
       <OpulenceFashionHero />
 
-      <Stockists />
-
-      <JewelryFeature />
+      {/* <JewelryFeature /> */}
     </main>
   );
 }

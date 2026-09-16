@@ -236,7 +236,6 @@ function ProfileDropdown() {
 
 /* =========================================================
    INFORMATION DRAWER
-   DESKTOP 6-DOT BUTTON
 ========================================================= */
 
 function InformationDrawer({
@@ -295,7 +294,7 @@ function InformationDrawer({
             </a>
 
             <a href="#" onClick={onClose} aria-label="Instagram">
-              <span className="social-icon ">
+              <span className="social-icon">
                 <FaInstagram />
               </span>
               <span>Instagram</span>
@@ -423,7 +422,6 @@ function MobileMenuDrawer({
 
 /* =========================================================
    SEARCH DRAWER
-   OPENS FROM TOP
 ========================================================= */
 
 function SearchDrawer({
@@ -518,9 +516,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  /*
-   * Prevent body scroll when any drawer is open
-   */
+  /* =====================================================
+     BODY SCROLL
+  ===================================================== */
+
   useEffect(() => {
     const drawerOpen = infoOpen || mobileMenuOpen || searchOpen;
 
@@ -535,9 +534,10 @@ export default function Header() {
     };
   }, [infoOpen, mobileMenuOpen, searchOpen]);
 
-  /*
-   * ESC closes all drawers
-   */
+  /* =====================================================
+     ESC
+  ===================================================== */
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key !== "Escape") return;
@@ -553,6 +553,10 @@ export default function Header() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  /* =====================================================
+     OPEN FUNCTIONS
+  ===================================================== */
 
   function openSearch() {
     setInfoOpen(false);
@@ -572,136 +576,195 @@ export default function Header() {
     setMobileMenuOpen(true);
   }
 
+  /* =====================================================
+     RETURN
+  ===================================================== */
+
   return (
     <>
       <header className="header">
-        {/* ================= LEFT CONTACT ================= */}
-        <div className="header-left-contact">
-          <span className="header-contact-icon" aria-hidden="true">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-            >
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2
-                19.79 19.79 0 0 1-8.63-3.07
-                19.5 19.5 0 0 1-6-6
-                A19.79 19.79 0 0 1 2.12 4.18
-                2 2 0 0 1 5.11 2h3a2 2 0 0 1 2 1.72
-                12.84 12.84 0 0 0 .7 2.81
-                2 2 0 0 1-.45 2.11L9.09 9.91
-                a16 16 0 0 0 6 6l1.27-1.27
-                a2 2 0 0 1 2.11-.45
-                12.84 12.84 0 0 0 2.81.7
-                A2 2 0 0 1 22 16.92z"
-              />
-            </svg>
-          </span>
-          <a href="tel:18008334488">1800-833-4488</a>
-        </div>
+        {/* =================================================
+            TOP BAR
+        ================================================= */}
 
-        {/* ================= LOGO ================= */}
-        <Link href="/" className="logo">
-          <img
-            src="/images/logo-new-op.jpeg"
-            alt="OPULENCE"
-            className="logo-image"
-          />
-        </Link>
+        <div className="top-header">
+          {/* LEFT MARQUEE */}
 
-        {/* ================= DESKTOP NAV ================= */}
+          <div className="top-header-left">
+            <div className="top-marquee">
+              <div className="top-marquee-track">
+                <span>Elevated essentials. Made to last.</span>
 
-        <nav className="nav">
-          <div className="nav-dropdown">
-            <button type="button" className="nav-dropdown-trigger">
-              Shop
-            </button>
+                <span>•</span>
 
-            <div className="nav-dropdown-menu">
-              <Link href="/collections/elevated-capsule">Polo</Link>
+                <span>Discover the latest collection.</span>
 
-              <Link href="/collections/graphic-tees"> T-Shirts</Link>
+                <span>•</span>
 
-              <Link href="/collections/oversized-fits">All</Link>
+                <span>Elevated essentials. Made to last.</span>
+
+                <span>•</span>
+
+                <span>Discover the latest collection.</span>
+              </div>
             </div>
           </div>
 
-          {/* <Link href="/new-arrivals">Shop</Link> */}
+          {/* RIGHT PHONE */}
 
-          <Link href="/best-sellers">Exclusive</Link>
+          <div className="top-header-right">
+            <a href="tel:18008334488">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2
+                  19.79 19.79 0 0 1-8.63-3.07
+                  19.5 19.5 0 0 1-6-6
+                  A19.79 19.79 0 0 1 2.12 4.18
+                  2 2 0 0 1 5.11 2h3a2 2 0 0 1 2 1.72
+                  12.84 12.84 0 0 0 .7 2.81
+                  2 2 0 0 1-.45 2.11L9.09 9.91
+                  a16 16 0 0 0 6 6l1.27-1.27
+                  a2 2 0 0 1 2.11-.45
+                  12.84 12.84 0 0 0 2.81.7
+                  A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
 
-          {/* <Link href="/new-arrivals">New Arrivals</Link>
+              <span>1800-833-4488</span>
+            </a>
+          </div>
+        </div>
 
-          <Link href="/collections/elevated-capsule">Polo </Link>
+        {/* =================================================
+            MAIN HEADER
+        ================================================= */}
 
-          <Link href="/collections/graphic-tees">T-Shirts</Link> */}
+        <div className="main-header">
+          {/* LEFT NAV */}
 
-          <Link href="/about">About Us</Link>
-        </nav>
+          <nav className="nav">
+            <div className="nav-dropdown">
+              <button type="button" className="nav-dropdown-trigger">
+                Shop
+              </button>
 
-        {/* ================= HEADER ACTIONS ================= */}
+              <div className="nav-dropdown-menu">
+                <Link href="/collections/elevated-capsule">Polo</Link>
 
-        <div className="header-icons">
-          {/* Search */}
-          <button
-            type="button"
-            className="header-icon-btn"
-            aria-label="Search"
-            onClick={openSearch}
-          >
-            <SearchIcon />
-          </button>
+                <Link href="/collections/graphic-tees">T-Shirts</Link>
 
-          {/* Profile */}
-          <ProfileDropdown />
+                <Link href="/collections/oversized-fits">All</Link>
+              </div>
+            </div>
 
-          {/* Wishlist */}
-          <Link
-            href="/wishlist"
-            className="header-icon-btn"
-            aria-label="Wishlist"
-          >
-            <HeartIcon />
+            <Link href="/best-sellers">Exclusive</Link>
 
-            {wishlistCount > 0 && (
-              <span className="header-badge">{wishlistCount}</span>
-            )}
+            <Link href="/about">About Us</Link>
+          </nav>
+
+          {/* CENTER LOGO */}
+
+          <Link href="/" className="logo">
+            <img
+              src="/images/logo-new-op.jpeg"
+              alt="OPULENCE"
+              className="logo-image"
+            />
           </Link>
 
-          {/* Cart */}
-          <Link href="/cart" className="header-icon-btn" aria-label="Cart">
-            <BagIcon />
+          {/* RIGHT ACTIONS */}
 
-            {cartCount > 0 && <span className="header-badge">{cartCount}</span>}
-          </Link>
+          <div className="header-icons">
+            {/* SEARCH */}
 
-          {/* Desktop 6 DOT */}
-          <button
-            type="button"
-            className="header-grid-btn"
-            aria-label="More information"
-            onClick={openInfo}
-          >
-            <GridIcon />
-          </button>
+            <button
+              type="button"
+              className="header-action"
+              aria-label="Search"
+              onClick={openSearch}
+            >
+              <span className="header-action-icon">
+                <SearchIcon />
+              </span>
 
-          {/* Mobile Menu */}
-          <button
-            type="button"
-            className="header-mobile-menu-btn"
-            aria-label="Open menu"
-            onClick={openMobileMenu}
-          >
-            <MenuIcon />
-          </button>
+              <span>Search</span>
+            </button>
+
+            {/* ACCOUNT */}
+
+            <div className="header-profile-action">
+              <ProfileDropdown />
+
+              <span>Account</span>
+            </div>
+
+            {/* WISHLIST */}
+
+            <Link
+              href="/wishlist"
+              className="header-action"
+              aria-label="Wishlist"
+            >
+              <span className="header-action-icon">
+                <HeartIcon />
+
+                {wishlistCount > 0 && (
+                  <span className="header-badge">{wishlistCount}</span>
+                )}
+              </span>
+
+              <span>Wishlist</span>
+            </Link>
+
+            {/* CART */}
+
+            <Link href="/cart" className="header-action" aria-label="Cart">
+              <span className="header-action-icon">
+                <BagIcon />
+
+                {cartCount > 0 && (
+                  <span className="header-badge">{cartCount}</span>
+                )}
+              </span>
+
+              <span>Cart</span>
+            </Link>
+
+            {/* SIX DOT */}
+
+            <button
+              type="button"
+              className="header-grid-btn"
+              aria-label="More information"
+              onClick={openInfo}
+            >
+              <GridIcon />
+            </button>
+
+            {/* MOBILE MENU */}
+
+            <button
+              type="button"
+              className="header-mobile-menu-btn"
+              aria-label="Open menu"
+              onClick={openMobileMenu}
+            >
+              <MenuIcon />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* ================= DRAWERS ================= */}
+      {/* ===================================================
+          DRAWERS
+      =================================================== */}
 
       <InformationDrawer open={infoOpen} onClose={() => setInfoOpen(false)} />
 
