@@ -225,9 +225,9 @@
 .auth-form-inner .section-eyebrow {
   margin: 0 0 18px;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 
   line-height: 1;
@@ -266,9 +266,9 @@
 
   margin: 22px 0 0;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 
-  font-size: 12px;
+  font-size: 14px;
 
   line-height: 1.65;
 
@@ -298,7 +298,7 @@
 
   flex-direction: column;
 
-  gap: 9px;
+  gap: 12px;
 }
 
 /* ========================================================
@@ -306,9 +306,9 @@
 ======================================================== */
 
 .auth-field label {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-display);
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 
   letter-spacing: 1.6px;
@@ -337,7 +337,7 @@
 
 .auth-field input {
   width: 100%;
-  height: 58px;
+  height: 50px;
 
   padding: 0 17px;
 
@@ -384,9 +384,9 @@
 ======================================================== */
 
 .forgot-password {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 
-  font-size: 9px;
+  font-size: 12px;
 
   letter-spacing: 0.5px;
 
@@ -436,7 +436,7 @@
   justify-content: space-between;
 
   width: 100% !important;
-  height: 58px;
+  height: 52px;
 
   margin-top: 3px;
 
@@ -544,9 +544,9 @@
 
   margin-top: 25px;
 
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 
-  font-size: 11px;
+  font-size: 12px;
 
   color: #777;
 }
@@ -853,8 +853,8 @@
   background: #ffffff;
   color: #111111;
 
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 9px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;

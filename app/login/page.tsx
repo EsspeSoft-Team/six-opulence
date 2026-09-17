@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+
 import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
@@ -14,6 +15,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +45,7 @@ export default function LoginPage() {
       <div className="auth-split">
         {/* =====================================================
             LEFT IMAGE
-        ===================================================== */}
+        ====================================================== */}
 
         <div className="auth-image">
           <Image
@@ -76,15 +78,15 @@ export default function LoginPage() {
 
         {/* =====================================================
             RIGHT FORM
-        ===================================================== */}
+        ====================================================== */}
 
         <div className="auth-form-panel">
           <div className="auth-form-inner">
-            {/* Brand */}
+            {/* BRAND */}
 
             <div className="auth-brand">OPULENCE</div>
 
-            {/* Heading */}
+            {/* HEADING */}
 
             <div className="auth-heading">
               <p className="section-eyebrow">SIGN IN</p>
@@ -100,10 +102,10 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Form */}
+            {/* LOGIN FORM */}
 
             <form onSubmit={handleSubmit} className="form auth-form">
-              {/* Email */}
+              {/* EMAIL */}
 
               <div className="auth-field">
                 <label htmlFor="email">Email Address</label>
@@ -119,7 +121,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Password */}
+              {/* PASSWORD */}
 
               <div className="auth-field">
                 <div className="auth-label-row">
@@ -141,11 +143,11 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Error */}
+              {/* ERROR */}
 
               {error && <div className="error-text">{error}</div>}
 
-              {/* Submit */}
+              {/* SUBMIT BUTTON */}
 
               <button
                 type="submit"
@@ -158,7 +160,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Register */}
+            {/* REGISTER */}
 
             <div className="auth-register">
               <span>Don't have an account?</span>
@@ -166,7 +168,7 @@ export default function LoginPage() {
               <Link href="/register">Create one</Link>
             </div>
 
-            {/* Bottom detail */}
+            {/* BOTTOM DETAIL */}
 
             <div className="auth-bottom">
               <span>OPULENCE</span>
