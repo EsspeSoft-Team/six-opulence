@@ -1,0 +1,248 @@
+/* =========================================================
+   EXCLUSIVE PAGE
+========================================================= */
+
+.exclusive-page {
+  width: 100%;
+  background: var(--color-white);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+/* Main container */
+.exclusive-page .container {
+  width: calc(100% - 120px);
+  max-width: 1500px;
+  margin: 0 auto;
+  padding-top: 72px;
+  padding-bottom: 100px;
+}
+
+/* =========================================================
+   EXCLUSIVE HEADER
+========================================================= */
+
+.exclusive-header {
+  width: 100%;
+  margin-bottom: 52px;
+}
+
+.exclusive-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+
+  color: var(--color-text-muted);
+}
+
+.exclusive-page .section-title {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5vw, 72px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -1.5px;
+
+  color: var(--color-text);
+}
+
+.exclusive-subtitle {
+  max-width: 460px;
+  margin: 22px 0 0;
+
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   PRODUCT GRID
+========================================================= */
+
+.exclusive-page .grid {
+  width: 100%;
+  display: grid;
+  align-items: start;
+}
+
+.exclusive-page .grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 26px;
+  row-gap: 58px;
+}
+
+/* Product item */
+.exclusive-page .grid-4 > * {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Product images */
+.exclusive-page .grid-4 img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.exclusive-empty {
+  width: 100%;
+  min-height: 420px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.exclusive-empty p {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+
+  color: var(--color-text);
+}
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1600px) {
+  .exclusive-page .container {
+    width: calc(100% - 150px);
+    max-width: 1540px;
+  }
+
+  .exclusive-page .grid-4 {
+    column-gap: 30px;
+    row-gap: 64px;
+  }
+}
+
+/* =========================================================
+   1200px
+========================================================= */
+
+@media (max-width: 1200px) {
+  .exclusive-page .container {
+    width: calc(100% - 80px);
+    padding-top: 60px;
+  }
+
+  .exclusive-page .grid-4 {
+    column-gap: 20px;
+    row-gap: 48px;
+  }
+
+  .exclusive-page .section-title {
+    font-size: 58px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .exclusive-page .container {
+    width: calc(100% - 48px);
+    padding-top: 52px;
+    padding-bottom: 80px;
+  }
+
+  .exclusive-header {
+    margin-bottom: 40px;
+  }
+
+  .exclusive-page .grid-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 42px;
+  }
+
+  .exclusive-page .section-title {
+    font-size: 52px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .exclusive-page .container {
+    width: calc(100% - 28px);
+    padding-top: 38px;
+    padding-bottom: 60px;
+  }
+
+  .exclusive-header {
+    margin-bottom: 30px;
+  }
+
+  .exclusive-eyebrow {
+    margin-bottom: 7px;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+  }
+
+  .exclusive-page .section-title {
+    font-size: 44px;
+    line-height: 0.95;
+    letter-spacing: -1px;
+  }
+
+  .exclusive-subtitle {
+    max-width: 320px;
+    margin-top: 16px;
+
+    font-size: 10px;
+    line-height: 1.6;
+  }
+
+  .exclusive-page .grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 10px;
+    row-gap: 34px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .exclusive-page .container {
+    width: calc(100% - 20px);
+    padding-top: 32px;
+  }
+
+  .exclusive-page .section-title {
+    font-size: 40px;
+  }
+
+  .exclusive-subtitle {
+    font-size: 9px;
+  }
+
+  .exclusive-page .grid-4 {
+    column-gap: 8px;
+    row-gap: 28px;
+  }
+}

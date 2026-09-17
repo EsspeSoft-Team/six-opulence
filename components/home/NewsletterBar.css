@@ -61,7 +61,7 @@
 .newsletter-bar-inner {
   position: relative;
   z-index: 2;
-  width: min(100% - 100px, 1180px);
+  width: min(100% - 100px, 1280px);
   min-height: 600px;
   margin: 0 auto;
   padding: 70px 0 30px;

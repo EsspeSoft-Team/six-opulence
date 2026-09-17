@@ -1,0 +1,874 @@
+/* =========================================================
+   OPULENCE SHOP CATALOG
+   FULL RESPONSIVE CSS
+========================================================= */
+
+/* =========================================================
+   MAIN SECTION
+========================================================= */
+
+.catalog-section {
+  width: 100%;
+  min-height: 100vh;
+
+  background: var(--color-white);
+  color: var(--color-text);
+
+  font-family: var(--font-body);
+}
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.catalog-container {
+  width: calc(100% - 128px);
+  max-width: 1500px;
+
+  margin: 0 auto;
+}
+
+/* =========================================================
+   MAIN LAYOUT
+   LEFT SIDEBAR + RIGHT PRODUCTS
+========================================================= */
+
+.catalog-layout {
+  display: grid;
+
+  grid-template-columns:
+    205px
+    minmax(0, 1fr);
+
+  column-gap: 106px;
+
+  align-items: start;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.catalog-sidebar {
+  width: 100%;
+
+  position: sticky;
+  top: 25px;
+
+  align-self: start;
+}
+
+/* =========================================================
+   SIDEBAR TITLE
+========================================================= */
+
+.sidebar-title {
+  width: 100%;
+
+  padding-bottom: 19px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-title span {
+  display: block;
+
+  font-family: var(--font-body);
+
+  font-size: 10px;
+  font-weight: 500;
+
+  line-height: 1.4;
+
+  letter-spacing: 1.8px;
+
+  color: var(--color-text);
+}
+
+/* =========================================================
+   SIDEBAR BLOCK
+========================================================= */
+
+.sidebar-block {
+  width: 100%;
+
+  padding: 25px 0;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* =========================================================
+   SIDEBAR HEADING
+========================================================= */
+
+.sidebar-heading {
+  margin-bottom: 19px;
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1.4;
+
+  letter-spacing: 1.5px;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   CATEGORY LIST
+========================================================= */
+
+.category-list {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+/* =========================================================
+   CATEGORY LINK
+========================================================= */
+
+.category-list a {
+  width: 100%;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 12px;
+  font-weight: 400;
+
+  line-height: 1.4;
+
+  color: var(--color-text-muted);
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+}
+
+.category-list a:hover {
+  color: var(--color-text);
+}
+
+/* ACTIVE CATEGORY */
+
+.category-list a.active {
+  padding-left: 13px;
+
+  color: var(--color-text);
+}
+
+.category-list a.active::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  width: 6px;
+  height: 1px;
+
+  background: var(--color-text);
+
+  transform: translateY(-50%);
+}
+
+/* CATEGORY ARROW */
+
+.category-list a span:last-child {
+  opacity: 0;
+
+  font-size: 12px;
+
+  color: var(--color-text);
+
+  transform: translateX(-5px);
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.category-list a:hover span:last-child,
+.category-list a.active span:last-child {
+  opacity: 1;
+
+  transform: translateX(0);
+}
+
+/* =========================================================
+   FILTER BLOCK
+========================================================= */
+
+.filters-block {
+  padding-top: 25px;
+  padding-bottom: 0;
+
+  border-bottom: 0;
+}
+
+/* =========================================================
+   FILTER HEADING
+========================================================= */
+
+.filters-block .sidebar-heading {
+  margin-bottom: 0;
+
+  padding-bottom: 19px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* =========================================================
+   FILTER ITEM
+========================================================= */
+
+.filter-item {
+  width: 100%;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* =========================================================
+   FILTER BUTTON
+========================================================= */
+
+.filter-item > button {
+  width: 100%;
+  height: 53px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  letter-spacing: 1.4px;
+
+  color: var(--color-text);
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.filter-item > button:hover {
+  color: var(--color-dark);
+}
+
+/* =========================================================
+   FILTER PLUS
+========================================================= */
+
+.filter-plus {
+  width: 14px;
+  height: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 14px;
+  font-weight: 300;
+
+  line-height: 1;
+
+  color: var(--color-text-muted);
+
+  transition:
+    transform 0.25s ease,
+    color 0.2s ease;
+}
+
+/* OPEN */
+
+.filter-plus.rotate {
+  transform: rotate(45deg);
+
+  color: var(--color-text);
+}
+
+/* =========================================================
+   FILTER CONTENT
+========================================================= */
+
+.filter-content {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 11px;
+
+  padding: 0 0 18px;
+}
+
+/* =========================================================
+   FILTER OPTION
+========================================================= */
+
+.filter-content span {
+  display: block;
+
+  font-family: var(--font-body);
+
+  font-size: 11px;
+  font-weight: 400;
+
+  line-height: 1.5;
+
+  color: var(--color-text-muted);
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+}
+
+.filter-content span:hover {
+  padding-left: 3px;
+
+  color: var(--color-text);
+}
+
+/* =========================================================
+   RIGHT PRODUCT AREA
+========================================================= */
+
+.catalog-main {
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.catalog-toolbar {
+  width: 100%;
+
+  min-height: 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 31px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* =========================================================
+   PRODUCT COUNT
+========================================================= */
+
+.catalog-count {
+  display: flex;
+  align-items: baseline;
+
+  gap: 15px;
+
+  flex-shrink: 0;
+}
+
+.catalog-count strong {
+  font-family: var(--font-display);
+
+  font-size: 27px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  letter-spacing: -0.6px;
+
+  color: var(--color-text);
+}
+
+.catalog-count span {
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  letter-spacing: 1.1px;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   SORT AREA
+========================================================= */
+
+.catalog-sort {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-left: auto;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   SORT LABEL
+========================================================= */
+
+.catalog-sort label {
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1;
+
+  letter-spacing: 1.2px;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   SORT SELECT
+========================================================= */
+
+.catalog-sort select {
+  width: 130px;
+  height: 34px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  outline: none;
+
+  background: var(--color-white);
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 400;
+
+  color: var(--color-text);
+
+  cursor: pointer;
+
+  transition: border-color 0.2s ease;
+}
+
+.catalog-sort select:hover {
+  border-color: var(--color-text-muted);
+}
+
+.catalog-sort select:focus {
+  border-color: var(--color-text);
+}
+
+/* =========================================================
+   PRODUCT GRID
+   DESKTOP = 3
+========================================================= */
+
+.catalog-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  column-gap: 25px;
+  row-gap: 48px;
+
+  align-items: start;
+}
+
+/* =========================================================
+   PRODUCT GRID CHILD
+========================================================= */
+
+.catalog-grid > * {
+  width: 100%;
+  min-width: 0;
+}
+
+/* =========================================================
+   PRODUCT CARD IMAGE SAFETY
+========================================================= */
+
+.catalog-grid img {
+  display: block;
+
+  max-width: 100%;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.catalog-empty {
+  width: 100%;
+  min-height: 400px;
+
+  grid-column: 1 / -1;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 18px;
+
+  text-align: center;
+}
+
+.catalog-empty p {
+  margin: 0;
+
+  font-family: var(--font-display);
+
+  font-size: 28px;
+  font-weight: 400;
+
+  color: var(--color-text);
+}
+
+.catalog-empty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 0 24px;
+
+  border: 1px solid var(--color-text);
+
+  font-family: var(--font-body);
+
+  font-size: 9px;
+  font-weight: 500;
+
+  letter-spacing: 1.2px;
+
+  color: var(--color-text);
+
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.catalog-empty a:hover {
+  background: var(--color-text);
+
+  color: var(--color-white);
+}
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1500px) {
+  .catalog-container {
+    width: calc(100% - 130px);
+
+    max-width: 1540px;
+  }
+
+  .catalog-layout {
+    grid-template-columns:
+      205px
+      minmax(0, 1fr);
+
+    column-gap: 110px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    column-gap: 27px;
+    row-gap: 52px;
+  }
+}
+
+/* =========================================================
+   LAPTOP
+========================================================= */
+
+@media (max-width: 1200px) {
+  .catalog-container {
+    width: calc(100% - 70px);
+  }
+
+  .catalog-layout {
+    grid-template-columns:
+      190px
+      minmax(0, 1fr);
+
+    column-gap: 55px;
+  }
+
+  .catalog-grid {
+    column-gap: 18px;
+  }
+
+  .catalog-count strong {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .catalog-container {
+    width: calc(100% - 40px);
+  }
+
+  .catalog-layout {
+    grid-template-columns:
+      170px
+      minmax(0, 1fr);
+
+    column-gap: 30px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 14px;
+    row-gap: 38px;
+  }
+
+  .catalog-sort select {
+    width: 115px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .catalog-container {
+    width: calc(100% - 28px);
+  }
+
+  /* -----------------------------------------
+     LAYOUT
+  ----------------------------------------- */
+
+  .catalog-layout {
+    display: block;
+  }
+
+  /* -----------------------------------------
+     SIDEBAR
+  ----------------------------------------- */
+
+  .catalog-sidebar {
+    position: static;
+
+    width: 100%;
+
+    margin-bottom: 24px;
+  }
+
+  /* -----------------------------------------
+     SHOP TITLE
+  ----------------------------------------- */
+
+  .sidebar-title {
+    display: none;
+  }
+
+  /* -----------------------------------------
+     CATEGORY
+  ----------------------------------------- */
+
+  .sidebar-block:not(.filters-block) {
+    padding: 0;
+
+    border: 0;
+  }
+
+  .sidebar-block:not(.filters-block) .sidebar-heading {
+    display: none;
+  }
+
+  .category-list {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 0;
+
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .category-list a {
+    min-height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 4px;
+
+    text-align: center;
+
+    font-size: 9px;
+
+    letter-spacing: 0.4px;
+
+    text-transform: uppercase;
+  }
+
+  .category-list a.active {
+    padding-left: 4px;
+  }
+
+  .category-list a.active::before {
+    display: none;
+  }
+
+  .category-list a span:last-child {
+    display: none;
+  }
+
+  /* -----------------------------------------
+     FILTER
+  ----------------------------------------- */
+
+  .filters-block {
+    display: none;
+  }
+
+  /* -----------------------------------------
+     TOOLBAR
+  ----------------------------------------- */
+
+  .catalog-toolbar {
+    min-height: 49px;
+
+    gap: 8px;
+
+    margin-bottom: 20px;
+  }
+
+  .catalog-count {
+    gap: 7px;
+  }
+
+  .catalog-count strong {
+    font-size: 20px;
+  }
+
+  .catalog-count span {
+    font-size: 8px;
+
+    letter-spacing: 0.8px;
+  }
+
+  /* -----------------------------------------
+     SORT
+  ----------------------------------------- */
+
+  .catalog-sort {
+    gap: 5px;
+  }
+
+  .catalog-sort label {
+    display: none;
+  }
+
+  .catalog-sort select {
+    width: 92px;
+    height: 30px;
+
+    padding: 0 6px;
+
+    font-size: 8px;
+  }
+
+  /* -----------------------------------------
+     PRODUCTS
+  ----------------------------------------- */
+
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 9px;
+    row-gap: 32px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .catalog-container {
+    width: calc(100% - 20px);
+  }
+
+  .catalog-count strong {
+    font-size: 18px;
+  }
+
+  .catalog-count span {
+    display: none;
+  }
+
+  .catalog-sort select {
+    width: 82px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 7px;
+    row-gap: 28px;
+  }
+}

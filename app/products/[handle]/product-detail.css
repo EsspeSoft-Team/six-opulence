@@ -67,7 +67,7 @@
 
   background: #f0f0ee;
 
-  border-radius: 8px;
+  /* border-radius: 8px; */
 
   overflow: hidden;
 }
@@ -417,6 +417,10 @@
   font-size: 12px;
 
   cursor: pointer;
+}
+.pdp-add-bag button:hover {
+  background-color: var(--color-dark);
+  color: var(--color-white);
 }
 
 /* ========================================================
@@ -790,5 +794,455 @@
     aspect-ratio: 4 / 5;
 
     scroll-snap-align: start;
+  }
+}
+
+/* =========================================================
+   PRODUCT OPTIONS
+========================================================= */
+
+.pdp-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 28px;
+}
+
+.pdp-icon-button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #dedede;
+  background: #fff;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pdp-icon-button:hover {
+  border-color: #111;
+}
+
+.pdp-icon-button.wishlist-active {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+/* =========================================================
+   SIZE
+========================================================= */
+
+.pdp-size-section {
+  margin-bottom: 24px;
+}
+
+.pdp-size-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.size-chart-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #111;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pdp-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.pdp-size {
+  min-width: 58px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d8d8d8;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdp-size:hover {
+  border-color: #111;
+}
+
+.pdp-size.active {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.pdp-size.disabled {
+  background: #f7f7f7;
+  color: #aaa;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   COLOR
+========================================================= */
+
+.pdp-color-section {
+  margin-bottom: 26px;
+}
+
+.pdp-color-header {
+  margin-bottom: 14px;
+  color: #111;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pdp-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pdp-color {
+  min-height: 42px;
+  padding: 7px 13px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #111;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pdp-color:hover {
+  border-color: #111;
+}
+
+.pdp-color.active {
+  border-color: #111;
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+.pdp-color.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdp-color-dot {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: block;
+}
+
+/* =========================================================
+   BUY NOW
+========================================================= */
+
+/* .pdp-buy-now {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 10px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pdp-buy-now:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+} */
+
+.pdp-buy-now:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   ADD TO CART
+========================================================= */
+
+.pdp-add-bag {
+  width: 100%;
+}
+
+.pdp-add-bag .btn {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pdp-add-bag .btn:hover:not(:disabled) {
+  background: #fff;
+  color: #111;
+}
+
+.pdp-add-bag .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   COUPON
+========================================================= */
+
+.pdp-copy {
+  cursor: pointer;
+}
+
+.pdp-copy.copied small {
+  font-size: 0;
+}
+
+.pdp-copy.copied small::after {
+  content: "COPIED";
+  font-size: 11px;
+}
+
+/* =========================================================
+   DELIVERY
+========================================================= */
+
+.pdp-delivery-message {
+  margin: 9px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SIZE CHART
+========================================================= */
+
+.size-chart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.size-chart-modal {
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 35px;
+  background: #fff;
+}
+
+.size-chart-modal h3 {
+  margin: 0 0 25px;
+  color: #111;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.size-chart-close {
+  position: absolute;
+  top: 12px;
+  right: 17px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.size-chart-table {
+  width: 100%;
+  border-top: 1px solid #ddd;
+}
+
+.size-chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #ddd;
+}
+
+.size-chart-row span {
+  padding: 13px 10px;
+  font-size: 13px;
+}
+
+.size-chart-head {
+  font-weight: 600;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .pdp-top-actions {
+    margin-top: 15px;
+    margin-bottom: 22px;
+  }
+
+  .pdp-icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pdp-size-section {
+    margin-bottom: 20px;
+  }
+
+  .pdp-sizes {
+    gap: 7px;
+  }
+
+  .pdp-size {
+    min-width: 52px;
+    height: 42px;
+    padding: 0 12px;
+  }
+
+  .pdp-colors {
+    gap: 7px;
+  }
+
+  .pdp-color {
+    padding: 7px 10px;
+  }
+
+  .size-chart-modal {
+    padding: 28px 20px;
+  }
+}
+
+/* =========================================================
+   QUANTITY SELECTOR
+   ========================================================= */
+
+.pdp-quantity-section {
+  width: 100%;
+  margin-top: 28px !important;
+  margin-bottom: 28px !important;
+}
+
+.pdp-quantity-section > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pdp-quantity-section > div > span:first-child {
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+}
+
+.pdp-quantity {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 126px;
+  height: 44px;
+  border: 1px solid #d8d8d8 !important;
+  background: #fff;
+  overflow: hidden;
+}
+
+.pdp-quantity button {
+  width: 40px !important;
+  height: 42px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #111 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 17px !important;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.pdp-quantity button:hover {
+  opacity: 0.55;
+}
+
+.pdp-quantity button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.pdp-quantity > span {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 42px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px !important;
+  font-weight: 400;
+  color: #111;
+  border-left: 1px solid #ededed;
+  border-right: 1px solid #ededed;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .pdp-quantity-section {
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .pdp-quantity {
+    width: 116px;
+    height: 42px;
+  }
+
+  .pdp-quantity button {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 40px !important;
+  }
+
+  .pdp-quantity > span {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 40px;
   }
 }

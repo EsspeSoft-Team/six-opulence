@@ -5,14 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 
-type TabKey = "all" | "polo" | "graphic" | "oversized";
-
-const tabs: { key: TabKey; label: string }[] = [
-  { key: "all", label: "All Products" },
-  { key: "polo", label: "Polo T-Shirts" },
-  { key: "graphic", label: "Graphic Tees" },
-  { key: "oversized", label: "Oversized Tees" },
-];
+type TabKey = "all" | "polo" | "t-shirt";
 
 type Product = {
   id?: string;
@@ -30,27 +23,38 @@ type Product = {
   }[];
 };
 
+const tabs: { key: TabKey; label: string }[] = [
+  {
+    key: "all",
+    label: "ALL PRODUCTS",
+  },
+  {
+    key: "polo",
+    label: "POLO",
+  },
+  {
+    key: "t-shirt",
+    label: "T-SHIRT",
+  },
+];
+
 export default function AllProductsSection({
   all = [],
   polo = [],
-  graphic = [],
-  oversized = [],
+  tshirt = [],
 }: {
   all?: Product[];
   polo?: Product[];
-  graphic?: Product[];
-  oversized?: Product[];
+  tshirt?: Product[];
 }) {
   const [activeTab, setActiveTab] = useState<TabKey>("all");
 
   const productsByTab: Record<TabKey, Product[]> = {
     all: all || [],
     polo: polo || [],
-    graphic: graphic || [],
-    oversized: oversized || [],
+    "t-shirt": tshirt || [],
   };
 
-  // Maximum 8 products per tab
   const activeProducts = (productsByTab[activeTab] || [])
     .filter((product): product is Product => Boolean(product))
     .slice(0, 8);
@@ -58,8 +62,7 @@ export default function AllProductsSection({
   return (
     <section className="all-products-section">
       <div className="container">
-        {/* ================= HEADER ================= */}
-
+        {/* Section Header */}
         <div className="section-header-centered">
           <p className="section-eyebrow">Shop</p>
 
@@ -70,8 +73,7 @@ export default function AllProductsSection({
           </p>
         </div>
 
-        {/* ================= TABS ================= */}
-
+        {/* Product Tabs */}
         <div className="product-tabs">
           {tabs.map((tab) => (
             <button
@@ -85,8 +87,7 @@ export default function AllProductsSection({
           ))}
         </div>
 
-        {/* ================= PRODUCTS ================= */}
-
+        {/* Products */}
         {activeProducts.length === 0 ? (
           <div className="all-products-empty">
             <p>No products in this category yet.</p>
@@ -108,10 +109,9 @@ export default function AllProductsSection({
           </div>
         )}
 
-        {/* ================= VIEW ALL ================= */}
-
+        {/* View All */}
         <div className="all-products-view-all">
-          <Link href="/new-arrivals" className="all-products-button">
+          <Link href="/collections/all" className="all-products-button">
             <span>View All Products</span>
             <span className="all-products-button-arrow">→</span>
           </Link>

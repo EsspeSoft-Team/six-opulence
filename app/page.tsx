@@ -7,7 +7,9 @@ import {
 
 import HeroSlider from "@/components/home/HeroSlider";
 import FeatureBar from "@/components/home/FeatureBar";
+
 // import DiscoverCollection from "@/components/home/DiscoverCollection";
+
 import BestSellers from "@/components/home/BestSellers";
 import DualBanner from "@/components/home/DualBanner";
 import AllProductsSection from "@/components/home/AllProductsSection";
@@ -38,6 +40,9 @@ export default async function HomePage() {
     getProductsByType("Oversized Tee", 12),
   ]);
 
+  // T-Shirt products
+  const tshirtProducts = graphicProducts;
+
   // Temporary best seller source
   const bestSellerProducts = allProducts.slice(0, 5);
 
@@ -47,14 +52,13 @@ export default async function HomePage() {
       <HeroSlider />
 
       {/* Existing sections */}
-
       <AboutSection />
 
       {/* 
       <OpulenceFashionHero />
       */}
 
-      {/* 
+      {/*
       <DiscoverCollection collections={collections} />
       */}
 
@@ -70,26 +74,29 @@ export default async function HomePage() {
       <AllProductsSection
         all={allProducts}
         polo={poloProducts}
-        graphic={graphicProducts}
-        oversized={oversizedProducts}
+        tshirt={tshirtProducts}
       />
 
-      {/* <JewelryFeature /> */}
-
-      {/* Dual Category Banner */}
-      <DualBanner />
-      {/* Video Section */}
-      <VideoSection />
-
-      {/* 
+      {/* Jewelry Feature */}
+      {/*
       <JewelryFeature />
       */}
 
-      {/* 
+      {/* Dual Category Banner */}
+      <DualBanner />
+
+      {/* Video Section */}
+      <VideoSection />
+
+      {/*
+      <JewelryFeature />
+      */}
+
+      {/*
       <Stockists />
       */}
 
-      {/* 
+      {/*
       <NewArrivalsSection products={newArrivals} />
       */}
 

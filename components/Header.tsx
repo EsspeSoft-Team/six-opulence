@@ -326,23 +326,23 @@ function MobileMenuDrawer({
   const menuItems = [
     {
       number: "01",
-      label: "New Arrivals",
-      href: "/new-arrivals",
+      label: "All Products",
+      href: "/collections/all",
     },
     {
       number: "02",
-      label: "Polo T-Shirts",
-      href: "/collections/elevated-capsule",
+      label: "Polo",
+      href: "/collections/polo",
     },
     {
       number: "03",
-      label: "Graphic Tees",
-      href: "/collections/graphic-tees",
+      label: "T-Shirts",
+      href: "/collections/t-shirts",
     },
     {
       number: "04",
-      label: "Oversized Fits",
-      href: "/collections/oversized-fits",
+      label: "Exclusive",
+      href: "/Exclusive",
     },
     {
       number: "05",
@@ -651,20 +651,24 @@ export default function Header() {
 
           <nav className="nav">
             <div className="nav-dropdown">
-              <button type="button" className="nav-dropdown-trigger">
+              <button
+                type="button"
+                className="nav-dropdown-trigger"
+                aria-haspopup="true"
+              >
                 Shop
               </button>
 
               <div className="nav-dropdown-menu">
-                <Link href="/collections/elevated-capsule">Polo</Link>
+                <Link href="/collections/polo">POLO</Link>
 
-                <Link href="/collections/graphic-tees">T-Shirts</Link>
+                <Link href="/collections/t-shirts">T-SHIRTS</Link>
 
-                <Link href="/collections/oversized-fits">All</Link>
+                <Link href="/collections/all">ALL</Link>
               </div>
             </div>
 
-            <Link href="/best-sellers">Exclusive</Link>
+            <Link href="/Exclusive">Exclusive</Link>
 
             <Link href="/about">About Us</Link>
           </nav>
