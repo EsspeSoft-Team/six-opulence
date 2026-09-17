@@ -1,7 +1,5 @@
 "use client";
 
-import "../auth.css";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,7 +13,6 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +30,8 @@ export default function LoginPage() {
       } else {
         setError(result.error || "Login failed. Check your credentials.");
       }
-    } catch {
+    } catch (err) {
+      console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -43,10 +41,7 @@ export default function LoginPage() {
   return (
     <main className="auth-page">
       <div className="auth-split">
-        {/* =====================================================
-            LEFT IMAGE
-        ====================================================== */}
-
+        {/* LEFT IMAGE */}
         <div className="auth-image">
           <Image
             src="/images/b6.png"
@@ -76,18 +71,13 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* =====================================================
-            RIGHT FORM
-        ====================================================== */}
-
+        {/* RIGHT FORM */}
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             {/* BRAND */}
-
             <div className="auth-brand">OPULENCE</div>
 
             {/* HEADING */}
-
             <div className="auth-heading">
               <p className="section-eyebrow">SIGN IN</p>
 
@@ -103,26 +93,29 @@ export default function LoginPage() {
             </div>
 
             {/* LOGIN FORM */}
-
             <form onSubmit={handleSubmit} className="form auth-form">
               {/* EMAIL */}
-
               <div className="auth-field">
                 <label htmlFor="email">Email Address</label>
 
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="Enter your email"
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) {
+                      setError("");
+                    }
+                  }}
                 />
               </div>
 
               {/* PASSWORD */}
-
               <div className="auth-field">
                 <div className="auth-label-row">
                   <label htmlFor="password">Password</label>
@@ -134,25 +127,34 @@ export default function LoginPage() {
 
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) {
+                      setError("");
+                    }
+                  }}
                 />
               </div>
 
               {/* ERROR */}
-
-              {error && <div className="error-text">{error}</div>}
+              {error && (
+                <div className="error-text" role="alert">
+                  {error}
+                </div>
+              )}
 
               {/* SUBMIT BUTTON */}
-
               <button
                 type="submit"
                 className="btn btn-solid auth-submit"
                 disabled={loading}
+                aria-disabled={loading}
               >
                 <span>{loading ? "LOGGING IN..." : "LOGIN"}</span>
 
@@ -161,15 +163,13 @@ export default function LoginPage() {
             </form>
 
             {/* REGISTER */}
-
             <div className="auth-register">
-              <span>Don't have an account?</span>
+              <span>Don&apos;t have an account?</span>
 
               <Link href="/register">Create one</Link>
             </div>
 
             {/* BOTTOM DETAIL */}
-
             <div className="auth-bottom">
               <span>OPULENCE</span>
 

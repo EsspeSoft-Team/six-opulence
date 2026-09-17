@@ -1,11 +1,10 @@
 "use client";
 
-import "../auth.css";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+
 import { useAuth } from "@/lib/auth-context";
 
 export default function RegisterPage() {
@@ -41,7 +40,8 @@ export default function RegisterPage() {
       } else {
         setError(result.error || "Registration failed.");
       }
-    } catch {
+    } catch (err) {
+      console.error("Registration error:", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ export default function RegisterPage() {
   return (
     <main className="auth-page">
       <div className="auth-split">
-        {/* IMAGE */}
+        {/* LEFT IMAGE */}
         <div className="auth-image">
           <Image
             src="/images/b6.png"
@@ -59,7 +59,9 @@ export default function RegisterPage() {
             fill
             priority
             sizes="(max-width: 768px) 100vw, 52vw"
-            style={{ objectFit: "cover" }}
+            style={{
+              objectFit: "cover",
+            }}
           />
 
           <div className="auth-image-overlay">
@@ -81,7 +83,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* FORM */}
+        {/* RIGHT FORM */}
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             {/* BRAND */}
@@ -112,17 +114,22 @@ export default function RegisterPage() {
 
                   <input
                     id="firstName"
+                    name="firstName"
                     type="text"
                     placeholder="First name"
                     autoComplete="given-name"
                     required
                     value={form.firstName}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setForm({
                         ...form,
                         firstName: e.target.value,
-                      })
-                    }
+                      });
+
+                      if (error) {
+                        setError("");
+                      }
+                    }}
                   />
                 </div>
 
@@ -132,17 +139,22 @@ export default function RegisterPage() {
 
                   <input
                     id="lastName"
+                    name="lastName"
                     type="text"
                     placeholder="Last name"
                     autoComplete="family-name"
                     required
                     value={form.lastName}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setForm({
                         ...form,
                         lastName: e.target.value,
-                      })
-                    }
+                      });
+
+                      if (error) {
+                        setError("");
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -153,17 +165,22 @@ export default function RegisterPage() {
 
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="Enter your email"
                   autoComplete="email"
                   required
                   value={form.email}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setForm({
                       ...form,
                       email: e.target.value,
-                    })
-                  }
+                    });
+
+                    if (error) {
+                      setError("");
+                    }
+                  }}
                 />
               </div>
 
@@ -173,29 +190,39 @@ export default function RegisterPage() {
 
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Password (min 5 characters)"
                   autoComplete="new-password"
                   required
                   minLength={5}
                   value={form.password}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setForm({
                       ...form,
                       password: e.target.value,
-                    })
-                  }
+                    });
+
+                    if (error) {
+                      setError("");
+                    }
+                  }}
                 />
               </div>
 
               {/* ERROR */}
-              {error && <div className="error-text">{error}</div>}
+              {error && (
+                <div className="error-text" role="alert">
+                  {error}
+                </div>
+              )}
 
-              {/* SUBMIT */}
+              {/* SUBMIT BUTTON */}
               <button
                 type="submit"
                 className="btn btn-solid auth-submit"
                 disabled={loading}
+                aria-disabled={loading}
               >
                 <span>
                   {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
