@@ -253,7 +253,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoading(true);
 
       try {
-        const updatedCart = await removeFromCartApi(cartId, lineId);
+        /*
+        --------------------------------------------------------
+        IMPORTANT:
+        Shopify removeFromCart expects string[]
+        --------------------------------------------------------
+        */
+
+        const updatedCart = await removeFromCartApi(cartId, [lineId]);
 
         if (!updatedCart) {
           throw new Error("Shopify did not return updated cart.");
@@ -409,6 +416,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           removeCartId();
           setCart(null);
           dispatchCartUpdate(null);
+
           throw new Error("Your cart could not be found.");
         }
 
@@ -443,6 +451,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       window.location.assign(checkoutUrl);
     } catch (error) {
       console.error("Proceed to checkout failed:", error);
+
       throw error;
     } finally {
       setLoading(false);

@@ -5,7 +5,9 @@ import Link from "next/link";
 import { getProductByHandle } from "@/lib/shopify";
 
 import ProductOptions from "@/components/ProductOptions";
+
 import ProductGallery from "@/components/ProductGallery";
+
 import RelatedProducts from "@/components/RelatedProducts";
 
 type ProductPageProps = {
@@ -20,6 +22,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   ========================================================= */
 
   const { handle } = await params;
+
   const productHandle = decodeURIComponent(handle).trim();
 
   /* =========================================================
@@ -46,7 +49,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
           }}
         >
           <h1>Product not found.</h1>
+
           <p>We couldn't find this product in the Shopify store.</p>
+
           <Link href="/collections/all">← BACK TO SHOP</Link>
         </div>
       </main>
@@ -115,9 +120,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
       <nav className="pdp-breadcrumb" aria-label="Breadcrumb">
         <Link href="/">Home</Link>
+
         <span>/</span>
+
         <Link href="/collections/all">Shop</Link>
+
         <span>/</span>
+
         <span>{product.title}</span>
       </nav>
 
@@ -132,7 +141,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <ProductGallery
           productTitle={product.title}
-          productHandle={product.handle}
           productImages={productImages}
           featuredImage={product?.featuredImage || null}
           firstAvailableVariantImage={firstAvailableVariant?.image || null}
@@ -174,6 +182,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <details className="pdp-accordion" open>
             <summary>
               <span>Product Description</span>
+
               <span className="pdp-accordion-icon">−</span>
             </summary>
 
@@ -209,6 +218,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <details className="pdp-accordion">
             <summary>
               <span>Product Specifications</span>
+
               <span className="pdp-accordion-icon">+</span>
             </summary>
 
@@ -242,6 +252,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <details className="pdp-accordion" id="return-info">
             <summary>
               <span>Product Disclosure</span>
+
               <span className="pdp-accordion-icon">+</span>
             </summary>
 

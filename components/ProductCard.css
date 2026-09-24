@@ -220,11 +220,11 @@
 .product-card__title {
   display: block;
 
-  color: #171717;
+  color: var(--color-text);
 
   font-family: var(--font-display);
 
-  font-size: 22px;
+  font-size: 19px;
   line-height: 1.2;
   font-weight: 500;
 

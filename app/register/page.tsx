@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { useAuth } from "@/lib/auth-context";
-
 export default function RegisterPage() {
-  const { register } = useAuth();
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -28,18 +25,28 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const result = await register(
-        form.email,
-        form.password,
-        form.firstName,
-        form.lastName,
-      );
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      });
 
-      if (result.success) {
-        router.push("/account");
-      } else {
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
         setError(result.error || "Registration failed.");
+        return;
       }
+
+      router.push("/account");
+      router.refresh();
     } catch (err) {
       console.error("Registration error:", err);
       setError("Something went wrong. Please try again.");
@@ -121,10 +128,10 @@ export default function RegisterPage() {
                     required
                     value={form.firstName}
                     onChange={(e) => {
-                      setForm({
-                        ...form,
+                      setForm((prev) => ({
+                        ...prev,
                         firstName: e.target.value,
-                      });
+                      }));
 
                       if (error) {
                         setError("");
@@ -146,10 +153,10 @@ export default function RegisterPage() {
                     required
                     value={form.lastName}
                     onChange={(e) => {
-                      setForm({
-                        ...form,
+                      setForm((prev) => ({
+                        ...prev,
                         lastName: e.target.value,
-                      });
+                      }));
 
                       if (error) {
                         setError("");
@@ -172,10 +179,10 @@ export default function RegisterPage() {
                   required
                   value={form.email}
                   onChange={(e) => {
-                    setForm({
-                      ...form,
+                    setForm((prev) => ({
+                      ...prev,
                       email: e.target.value,
-                    });
+                    }));
 
                     if (error) {
                       setError("");
@@ -198,10 +205,10 @@ export default function RegisterPage() {
                   minLength={5}
                   value={form.password}
                   onChange={(e) => {
-                    setForm({
-                      ...form,
+                    setForm((prev) => ({
+                      ...prev,
                       password: e.target.value,
-                    });
+                    }));
 
                     if (error) {
                       setError("");
@@ -217,7 +224,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {/* SUBMIT BUTTON */}
+              {/* SUBMIT */}
               <button
                 type="submit"
                 className="btn btn-solid auth-submit"
@@ -242,7 +249,6 @@ export default function RegisterPage() {
             {/* BOTTOM */}
             <div className="auth-bottom">
               <span>OPULENCE</span>
-
               <span>LIMITED EDITION MENSWEAR</span>
             </div>
           </div>
