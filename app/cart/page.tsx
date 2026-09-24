@@ -3,10 +3,11 @@
 import "./cart.css";
 
 import Image from "next/image";
+
 import { useCart } from "@/lib/cart-context";
 
 export default function CartPage() {
-  const { cart, loading, removeItem } = useCart();
+  const { cart, loading, removeItem, proceedToCheckout, cartCount } = useCart();
 
   /* =====================================================
      EMPTY CART
@@ -38,7 +39,46 @@ export default function CartPage() {
   }
 
   /* =====================================================
-     REMOVE
+     SUBTOTAL
+     
+     Shopify subtotalAmount থাকলে সেটা ব্যবহার করবে।
+     না থাকলে line price × quantity calculate করবে।
+  ===================================================== */
+
+  const calculatedSubtotal = cart.lines.edges.reduce(
+    (total: number, { node }: any) => {
+      const price = Number(node?.merchandise?.price?.amount || 0);
+
+      const quantity = Number(node?.quantity || 0);
+
+      return total + price * quantity;
+    },
+    0,
+  );
+
+  const shopifySubtotal = Number(cart?.cost?.subtotalAmount?.amount || 0);
+
+  const subtotal = shopifySubtotal > 0 ? shopifySubtotal : calculatedSubtotal;
+
+  const currency =
+    cart?.cost?.subtotalAmount?.currencyCode ||
+    cart?.cost?.totalAmount?.currencyCode ||
+    cart?.lines?.edges?.[0]?.node?.merchandise?.price?.currencyCode ||
+    "INR";
+
+  /* =====================================================
+     TOTAL
+     
+     Shopify total থাকলে সেটা ব্যবহার করবে।
+     না থাকলে subtotal fallback হবে।
+  ===================================================== */
+
+  const shopifyTotal = Number(cart?.cost?.totalAmount?.amount || 0);
+
+  const total = shopifyTotal > 0 ? shopifyTotal : subtotal;
+
+  /* =====================================================
+     REMOVE ITEM
   ===================================================== */
 
   async function handleRemove(lineId: string) {
@@ -46,12 +86,43 @@ export default function CartPage() {
       await removeItem(lineId);
     } catch (error) {
       console.error("Unable to remove item:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Unable to remove item. Please try again.",
+      );
+    }
+  }
+
+  /* =====================================================
+     PROCEED TO SHOPIFY CHECKOUT
+  ===================================================== */
+
+  async function handleCheckout() {
+    if (cartCount <= 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+    try {
+      await proceedToCheckout();
+    } catch (error) {
+      console.error("Unable to proceed to checkout:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Unable to proceed to checkout. Please try again.",
+      );
     }
   }
 
   return (
     <main className="cart-page">
-      {/* HEADER */}
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
 
       <section className="cart-header">
         <p className="cart-eyebrow">OPULENCE COLLECTION</p>
@@ -61,32 +132,40 @@ export default function CartPage() {
         <p className="cart-subtitle">Pieces selected for your collection.</p>
       </section>
 
-      {/* CART CONTENT */}
+      {/* =====================================================
+          CART CONTENT
+      ===================================================== */}
 
       <section className="cart-content">
-        {/* LEFT */}
+        {/* =====================================================
+            LEFT
+        ===================================================== */}
 
         <div className="cart-items">
           <div className="cart-items-top">
             <span>YOUR PIECES</span>
 
             <span>
-              {cart.lines.edges.length}{" "}
-              {cart.lines.edges.length === 1 ? "ITEM" : "ITEMS"}
+              {cartCount} {cartCount === 1 ? "ITEM" : "ITEMS"}
             </span>
           </div>
 
           <div className="cart-list">
             {cart.lines.edges.map(({ node }: any) => {
-              const product = node.merchandise?.product;
+              const product = node?.merchandise?.product;
 
-              const price = node.merchandise?.price;
+              const price = node?.merchandise?.price;
 
               const image = product?.featuredImage;
 
+              const lineTotal =
+                Number(price?.amount || 0) * Number(node?.quantity || 0);
+
               return (
                 <article key={node.id} className="cart-line">
-                  {/* IMAGE */}
+                  {/* =====================================================
+                        IMAGE
+                    ===================================================== */}
 
                   <div className="cart-line-img">
                     {image?.url ? (
@@ -104,14 +183,18 @@ export default function CartPage() {
                     )}
                   </div>
 
-                  {/* DETAILS */}
+                  {/* =====================================================
+                        DETAILS
+                    ===================================================== */}
 
                   <div className="cart-line-info">
                     <p className="cart-line-brand">OPULENCE</p>
 
-                    <h2 className="cart-line-title">{product?.title}</h2>
+                    <h2 className="cart-line-title">
+                      {product?.title || "Product"}
+                    </h2>
 
-                    {node.merchandise?.title &&
+                    {node?.merchandise?.title &&
                       node.merchandise.title !== "Default Title" && (
                         <p className="cart-line-variant">
                           {node.merchandise.title}
@@ -120,14 +203,17 @@ export default function CartPage() {
 
                     <p className="cart-line-qty">Qty: {node.quantity}</p>
 
-                    {/* MOBILE PRICE */}
+                    {/* =====================================================
+                          MOBILE PRICE
+                      ===================================================== */}
 
                     <p className="cart-line-price mobile-price">
-                      {price?.currencyCode}{" "}
-                      {Number(price?.amount || 0).toFixed(2)}
+                      {price?.currencyCode || currency} {lineTotal.toFixed(2)}
                     </p>
 
-                    {/* REMOVE */}
+                    {/* =====================================================
+                          REMOVE
+                      ===================================================== */}
 
                     <button
                       type="button"
@@ -141,12 +227,13 @@ export default function CartPage() {
                     </button>
                   </div>
 
-                  {/* DESKTOP PRICE */}
+                  {/* =====================================================
+                        DESKTOP PRICE
+                    ===================================================== */}
 
                   <div className="cart-line-right">
                     <p className="cart-line-price">
-                      {price?.currencyCode}{" "}
-                      {Number(price?.amount || 0).toFixed(2)}
+                      {price?.currencyCode || currency} {lineTotal.toFixed(2)}
                     </p>
                   </div>
                 </article>
@@ -155,21 +242,30 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* RIGHT SUMMARY */}
+        {/* =====================================================
+            RIGHT SUMMARY
+        ===================================================== */}
 
         <aside className="cart-summary">
           <div className="cart-summary-top">
             <p>ORDER SUMMARY</p>
           </div>
 
+          {/* =====================================================
+              SUBTOTAL
+          ===================================================== */}
+
           <div className="cart-summary-row">
             <span>Subtotal</span>
 
             <span>
-              {cart.cost?.subtotalAmount?.currencyCode}{" "}
-              {Number(cart.cost?.subtotalAmount?.amount || 0).toFixed(2)}
+              {currency} {subtotal.toFixed(2)}
             </span>
           </div>
+
+          {/* =====================================================
+              SHIPPING
+          ===================================================== */}
 
           <div className="cart-summary-row">
             <span>Shipping</span>
@@ -179,20 +275,36 @@ export default function CartPage() {
 
           <div className="cart-summary-divider" />
 
+          {/* =====================================================
+              TOTAL
+          ===================================================== */}
+
           <div className="cart-total">
             <span>TOTAL</span>
 
             <span>
-              {cart.cost?.totalAmount?.currencyCode}{" "}
-              {Number(cart.cost?.totalAmount?.amount || 0).toFixed(2)}
+              {currency} {total.toFixed(2)}
             </span>
           </div>
 
-          <a href={cart.checkoutUrl} className="cart-checkout-btn">
-            <span>PROCEED TO CHECKOUT</span>
+          {/* =====================================================
+              SHOPIFY CHECKOUT
+          ===================================================== */}
 
-            <span>→</span>
-          </a>
+          <button
+            type="button"
+            className="cart-checkout-btn"
+            onClick={handleCheckout}
+            disabled={loading || cartCount <= 0}
+          >
+            <span>{loading ? "PROCESSING..." : "PROCEED TO CHECKOUT"}</span>
+
+            {!loading && <span>→</span>}
+          </button>
+
+          {/* =====================================================
+              CONTINUE SHOPPING
+          ===================================================== */}
 
           <a href="/collections/all" className="cart-continue">
             CONTINUE SHOPPING

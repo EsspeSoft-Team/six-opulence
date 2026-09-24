@@ -18,7 +18,7 @@
 .collage-center {
   position: relative;
   z-index: 5;
-  max-width: 720px;
+  max-width: 820px;
   margin: 0 auto;
   text-align: center;
   padding-top: 70px;
@@ -191,21 +191,21 @@
 
 .collage-pos-1 {
   top: 6%;
-  left: 16%;
-  width: 350px;
+  left: 12%;
+  width: 300px;
   height: 250px;
 }
 
 .collage-pos-2 {
   top: 4%;
-  right: 6%;
-  width: 480px;
+  right: 5%;
+  width: 430px;
   height: 300px;
 }
 
 .collage-pos-3 {
   top: 22%;
-  left: 8%;
+  left: 6%;
   width: 175px;
   height: 210px;
 }
@@ -317,10 +317,15 @@
     margin: 22px 0 32px;
     font-size: 17px;
   }
-  .collage-pos-1,
+  /* .collage-pos-1,
   .collage-pos-3,
   .collage-pos-5 {
     display: none;
+  } */
+  .collage-pos-1 {
+    width: 140px;
+    height: 145px;
+    left: 10%;
   }
   .collage-pos-2 {
     width: 130px;
@@ -328,11 +333,23 @@
     top: 3%;
     right: 3%;
   }
+  .collage-pos-3 {
+    top: 37%;
+    left: 2%;
+    width: 140px;
+    height: 168px;
+  }
   .collage-pos-4 {
     width: 140px;
     height: 120px;
     bottom: 4%;
     left: 3%;
+  }
+  .collage-pos-5 {
+    bottom: 30%;
+    right: 4%;
+    width: 150px;
+    height: 200px;
   }
   .collage-pos-6 {
     width: 110px;
@@ -350,6 +367,9 @@
   .hero-slider1 {
     min-height: 590px;
   }
+  .collage-eyebrow {
+    padding-top: 15px;
+  }
   .collage-center {
     padding-top: 90px;
   }
@@ -360,13 +380,25 @@
     font-size: 16px;
     margin-top: 18px;
   }
+  .collage-pos-1 {
+    width: 114px;
+    height: 105px;
+    left: 5%;
+    top: 3%;
+  }
   .collage-pos-2 {
     width: 105px;
-    height: 130px;
+    height: 100px;
+  }
+  .collage-pos-3 {
+    display: none;
   }
   .collage-pos-4 {
     width: 120px;
     height: 105px;
+  }
+  .collage-pos-5 {
+    display: none;
   }
   .collage-pos-6 {
     width: 95px;

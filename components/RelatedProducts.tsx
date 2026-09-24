@@ -3,17 +3,17 @@ import ProductCard from "./ProductCard";
 
 export default async function RelatedProducts({
   productId,
+  productType,
 }: {
   productId: string;
+  productType: string;
 }) {
-  const related = await getRelatedProducts(productId);
+  const related = await getRelatedProducts(productId, productType, 4);
 
-  // Kono related product na thakle section show korbe na
   if (!related || related.length === 0) {
     return null;
   }
 
-  // Shudhu first 4 ta product show korbe
   const productsToShow = related.slice(0, 4);
 
   return (

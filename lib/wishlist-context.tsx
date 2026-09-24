@@ -2,191 +2,306 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   ReactNode,
-  useCallback,
 } from "react";
+
+/* ============================================================
+   TYPES
+============================================================ */
 
 type WishlistContextType = {
   wishlist: string[];
   toggleWishlist: (handle: string) => void;
   removeFromWishlist: (handle: string) => void;
   isWishlisted: (handle: string) => boolean;
+  clearWishlist: () => void;
+  wishlistCount: number;
 };
+
+/* ============================================================
+   CONTEXT
+============================================================ */
 
 const WishlistContext = createContext<WishlistContextType | undefined>(
   undefined,
 );
 
+/* ============================================================
+   STORAGE
+============================================================ */
+
 const WISHLIST_KEY = "wishlist_handles";
+const WISHLIST_EVENT = "wishlist-updated";
+
+/* ============================================================
+   NORMALIZE
+============================================================ */
+
+function normalizeWishlist(items: unknown): string[] {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      items
+        .filter(
+          (item): item is string =>
+            typeof item === "string" && item.trim().length > 0,
+        )
+        .map((item) => item.trim()),
+    ),
+  );
+}
+
+/* ============================================================
+   READ LOCAL STORAGE
+============================================================ */
+
+function getStoredWishlist(): string[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const stored = localStorage.getItem(WISHLIST_KEY);
+
+    if (!stored) {
+      return [];
+    }
+
+    const parsed = JSON.parse(stored);
+
+    return normalizeWishlist(parsed);
+  } catch (error) {
+    console.error("Wishlist load error:", error);
+
+    // Corrupt data thakle remove kore empty wishlist
+    try {
+      localStorage.removeItem(WISHLIST_KEY);
+    } catch {}
+
+    return [];
+  }
+}
+
+/* ============================================================
+   SAVE LOCAL STORAGE
+============================================================ */
+
+function saveStoredWishlist(items: string[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const normalized = normalizeWishlist(items);
+
+  try {
+    if (normalized.length === 0) {
+      localStorage.removeItem(WISHLIST_KEY);
+    } else {
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(normalized));
+    }
+
+    window.dispatchEvent(
+      new CustomEvent(WISHLIST_EVENT, {
+        detail: {
+          wishlist: normalized,
+        },
+      }),
+    );
+  } catch (error) {
+    console.error("Wishlist save error:", error);
+  }
+}
+
+/* ============================================================
+   PROVIDER
+============================================================ */
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  /* =========================================================
-     LOAD WISHLIST
-  ========================================================= */
+  /* ==========================================================
+     LOAD ONLY ONCE AFTER CLIENT HYDRATION
+  ========================================================== */
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(WISHLIST_KEY);
+    const storedWishlist = getStoredWishlist();
 
-      if (stored) {
-        const parsed = JSON.parse(stored);
-
-        if (Array.isArray(parsed)) {
-          setWishlist(
-            parsed
-              .filter((item): item is string => typeof item === "string")
-              .filter((item, index, arr) => arr.indexOf(item) === index),
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Failed to load wishlist:", error);
-    } finally {
-      setLoaded(true);
-    }
+    setWishlist(storedWishlist);
+    setHydrated(true);
   }, []);
 
-  /* =========================================================
-     SAVE WISHLIST
-  ========================================================= */
-
-  const saveWishlist = useCallback((items: string[]) => {
-    try {
-      localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
-
-      /*
-       * Other components / tabs can listen to this event.
-       */
-      window.dispatchEvent(
-        new CustomEvent("wishlist-updated", {
-          detail: {
-            wishlist: items,
-          },
-        }),
-      );
-    } catch (error) {
-      console.error("Failed to save wishlist:", error);
-    }
-  }, []);
-
-  /* =========================================================
+  /* ==========================================================
      TOGGLE WISHLIST
-  ========================================================= */
+  ========================================================== */
 
-  const toggleWishlist = useCallback(
-    (handle: string) => {
-      if (!handle) return;
+  const toggleWishlist = useCallback((handle: string) => {
+    const cleanHandle = handle?.trim();
 
-      setWishlist((prev) => {
-        const exists = prev.includes(handle);
+    if (!cleanHandle) {
+      return;
+    }
 
-        const updated = exists
-          ? prev.filter((item) => item !== handle)
-          : [...prev, handle];
+    setWishlist((current) => {
+      const exists = current.includes(cleanHandle);
 
-        saveWishlist(updated);
+      let updated: string[];
 
-        return updated;
-      });
-    },
-    [saveWishlist],
-  );
+      if (exists) {
+        // Remove
+        updated = current.filter((item) => item !== cleanHandle);
+      } else {
+        // Add
+        updated = [...current, cleanHandle];
+      }
 
-  /* =========================================================
-     REMOVE WISHLIST
-  ========================================================= */
+      const normalized = normalizeWishlist(updated);
 
-  const removeFromWishlist = useCallback(
-    (handle: string) => {
-      if (!handle) return;
+      saveStoredWishlist(normalized);
 
-      setWishlist((prev) => {
-        const updated = prev.filter((item) => item !== handle);
+      return normalized;
+    });
+  }, []);
 
-        saveWishlist(updated);
+  /* ==========================================================
+     REMOVE ONE
+  ========================================================== */
 
-        return updated;
-      });
-    },
-    [saveWishlist],
-  );
+  const removeFromWishlist = useCallback((handle: string) => {
+    const cleanHandle = handle?.trim();
 
-  /* =========================================================
-     CHECK WISHLIST
-  ========================================================= */
+    if (!cleanHandle) {
+      return;
+    }
+
+    setWishlist((current) => {
+      const updated = current.filter((item) => item !== cleanHandle);
+
+      const normalized = normalizeWishlist(updated);
+
+      saveStoredWishlist(normalized);
+
+      return normalized;
+    });
+  }, []);
+
+  /* ==========================================================
+     CHECK IF WISHLISTED
+  ========================================================== */
 
   const isWishlisted = useCallback(
     (handle: string) => {
-      return wishlist.includes(handle);
+      const cleanHandle = handle?.trim();
+
+      if (!cleanHandle) {
+        return false;
+      }
+
+      return wishlist.includes(cleanHandle);
     },
     [wishlist],
   );
 
-  /* =========================================================
-     SYNC BETWEEN TABS / COMPONENTS
-  ========================================================= */
+  /* ==========================================================
+     CLEAR ALL
+  ========================================================== */
+
+  const clearWishlist = useCallback(() => {
+    setWishlist([]);
+
+    saveStoredWishlist([]);
+  }, []);
+
+  /* ==========================================================
+     COUNT
+  ========================================================== */
+
+  const wishlistCount = useMemo(() => {
+    if (!hydrated) {
+      return 0;
+    }
+
+    return wishlist.length;
+  }, [wishlist, hydrated]);
+
+  /* ==========================================================
+     SAME TAB + OTHER TAB SYNC
+  ========================================================== */
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!hydrated) {
+      return;
+    }
+
+    /* --------------------------------------------------------
+       SAME TAB
+    -------------------------------------------------------- */
+
+    const handleWishlistUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        wishlist?: unknown;
+      }>;
+
+      const updated = normalizeWishlist(customEvent.detail?.wishlist);
+
+      setWishlist(updated);
+    };
+
+    /* --------------------------------------------------------
+       OTHER BROWSER TAB
+    -------------------------------------------------------- */
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key !== WISHLIST_KEY) {
         return;
       }
 
+      if (!event.newValue) {
+        setWishlist([]);
+        return;
+      }
+
       try {
-        const parsed = event.newValue ? JSON.parse(event.newValue) : [];
+        const parsed = JSON.parse(event.newValue);
 
-        if (Array.isArray(parsed)) {
-          setWishlist(
-            parsed.filter((item): item is string => typeof item === "string"),
-          );
-        }
-      } catch (error) {
-        console.error("Failed to sync wishlist:", error);
+        setWishlist(normalizeWishlist(parsed));
+      } catch {
+        setWishlist([]);
       }
     };
 
-    const handleWishlistUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent<{
-        wishlist?: string[];
-      }>;
-
-      const updated = customEvent.detail?.wishlist;
-
-      if (Array.isArray(updated)) {
-        setWishlist(updated);
-      }
-    };
+    window.addEventListener(WISHLIST_EVENT, handleWishlistUpdate);
 
     window.addEventListener("storage", handleStorage);
 
-    window.addEventListener("wishlist-updated", handleWishlistUpdate);
-
     return () => {
+      window.removeEventListener(WISHLIST_EVENT, handleWishlistUpdate);
+
       window.removeEventListener("storage", handleStorage);
-
-      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
     };
-  }, [loaded]);
+  }, [hydrated]);
 
-  /* =========================================================
+  /* ==========================================================
      PROVIDER
-  ========================================================= */
+  ========================================================== */
 
   return (
     <WishlistContext.Provider
       value={{
         wishlist,
+        wishlistCount,
         toggleWishlist,
         removeFromWishlist,
         isWishlisted,
+        clearWishlist,
       }}
     >
       {children}
@@ -194,15 +309,15 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/* ===========================================================
+/* ============================================================
    HOOK
-=========================================================== */
+============================================================ */
 
 export function useWishlist() {
   const context = useContext(WishlistContext);
 
   if (!context) {
-    throw new Error("useWishlist must be used within a WishlistProvider");
+    throw new Error("useWishlist must be used within WishlistProvider");
   }
 
   return context;

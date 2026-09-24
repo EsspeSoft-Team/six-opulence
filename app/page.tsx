@@ -5,11 +5,11 @@ import {
   getProductsByType,
 } from "@/lib/shopify";
 
+import { getAccessCollections } from "@/lib/content/home/access";
+import { getDualBanners } from "@/lib/content/home/dualBanner";
+
 import HeroSlider from "@/components/home/HeroSlider";
 import FeatureBar from "@/components/home/FeatureBar";
-
-// import DiscoverCollection from "@/components/home/DiscoverCollection";
-
 import BestSellers from "@/components/home/BestSellers";
 import DualBanner from "@/components/home/DualBanner";
 import AllProductsSection from "@/components/home/AllProductsSection";
@@ -29,8 +29,10 @@ export default async function HomePage() {
     collections,
     allProducts,
     poloProducts,
-    graphicProducts,
+    tshirtProducts,
     oversizedProducts,
+    accessCollections,
+    dualBanners,
   ] = await Promise.all([
     getNewArrivals(6),
     getCollections(3),
@@ -38,12 +40,10 @@ export default async function HomePage() {
     getProductsByType("Polo", 12),
     getProductsByType("Tee", 12),
     getProductsByType("Oversized Tee", 12),
+    getAccessCollections(),
+    getDualBanners(),
   ]);
 
-  // T-Shirt products
-  const tshirtProducts = graphicProducts;
-
-  // Temporary best seller source
   const bestSellerProducts = allProducts.slice(0, 5);
 
   return (
@@ -54,20 +54,14 @@ export default async function HomePage() {
       {/* Existing sections */}
       <AboutSection />
 
-      {/* 
-      <OpulenceFashionHero />
-      */}
-
-      {/*
-      <DiscoverCollection collections={collections} />
-      */}
-
       {/* Scroll-synced world */}
-      <AccessCollection />
+      <AccessCollection chapters={accessCollections} />
 
       {/* Best Sellers */}
       {/*
-      <BestSellers products={bestSellerProducts} />
+      <BestSellers
+        products={bestSellerProducts}
+      />
       */}
 
       {/* Product Categories */}
@@ -77,28 +71,11 @@ export default async function HomePage() {
         tshirt={tshirtProducts}
       />
 
-      {/* Jewelry Feature */}
-      {/*
-      <JewelryFeature />
-      */}
-
       {/* Dual Category Banner */}
-      <DualBanner />
+      <DualBanner banners={dualBanners} />
 
       {/* Video Section */}
       <VideoSection />
-
-      {/*
-      <JewelryFeature />
-      */}
-
-      {/*
-      <Stockists />
-      */}
-
-      {/*
-      <NewArrivalsSection products={newArrivals} />
-      */}
 
       {/* Testimonials */}
       <CustomerReviews />

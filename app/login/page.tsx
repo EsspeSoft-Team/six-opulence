@@ -1,19 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
+
 import Image from "next/image";
 
-import { useAuth } from "@/lib/auth-context";
-
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -23,17 +20,30 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await login(email, password);
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
 
-      if (result.success) {
-        router.push("/account");
-      } else {
-        setError(result.error || "Login failed. Check your credentials.");
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || "Unable to start login.");
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
-    } finally {
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Login error:", error);
+
+      setError("Unable to continue login. Please try again.");
+
       setLoading(false);
     }
   }
@@ -42,6 +52,7 @@ export default function LoginPage() {
     <main className="auth-page">
       <div className="auth-split">
         {/* LEFT IMAGE */}
+
         <div className="auth-image">
           <Image
             src="/images/b6.png"
@@ -72,12 +83,15 @@ export default function LoginPage() {
         </div>
 
         {/* RIGHT FORM */}
+
         <div className="auth-form-panel">
           <div className="auth-form-inner">
             {/* BRAND */}
+
             <div className="auth-brand">OPULENCE</div>
 
             {/* HEADING */}
+
             <div className="auth-heading">
               <p className="section-eyebrow">SIGN IN</p>
 
@@ -88,13 +102,15 @@ export default function LoginPage() {
               </h1>
 
               <p className="auth-description">
-                Enter your details to access your Opulence account.
+                Enter your email to access your Opulence account.
               </p>
             </div>
 
             {/* LOGIN FORM */}
+
             <form onSubmit={handleSubmit} className="form auth-form">
               {/* EMAIL */}
+
               <div className="auth-field">
                 <label htmlFor="email">Email Address</label>
 
@@ -108,33 +124,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (error) {
-                      setError("");
-                    }
-                  }}
-                />
-              </div>
 
-              {/* PASSWORD */}
-              <div className="auth-field">
-                <div className="auth-label-row">
-                  <label htmlFor="password">Password</label>
-
-                  <Link href="/forgot-password" className="forgot-password">
-                    Forgot password?
-                  </Link>
-                </div>
-
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
                     if (error) {
                       setError("");
                     }
@@ -143,33 +133,37 @@ export default function LoginPage() {
               </div>
 
               {/* ERROR */}
+
               {error && (
                 <div className="error-text" role="alert">
                   {error}
                 </div>
               )}
 
-              {/* SUBMIT BUTTON */}
+              {/* LOGIN BUTTON */}
+
               <button
                 type="submit"
                 className="btn btn-solid auth-submit"
                 disabled={loading}
                 aria-disabled={loading}
               >
-                <span>{loading ? "LOGGING IN..." : "LOGIN"}</span>
+                <span>{loading ? "CONTINUING..." : "LOGIN"}</span>
 
                 {!loading && <span className="auth-submit-arrow">→</span>}
               </button>
             </form>
 
-            {/* REGISTER */}
-            <div className="auth-register">
-              <span>Don&apos;t have an account?</span>
+            {/* REGISTER INFO */}
 
-              <Link href="/register">Create one</Link>
+            <div className="auth-register">
+              <span>New to Opulence?</span>
+
+              <span>Continue with your email</span>
             </div>
 
-            {/* BOTTOM DETAIL */}
+            {/* BOTTOM */}
+
             <div className="auth-bottom">
               <span>OPULENCE</span>
 

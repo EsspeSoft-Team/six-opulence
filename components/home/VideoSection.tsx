@@ -26,21 +26,19 @@ export default function VideoSection() {
 
       {/* Content */}
       <div className="opulence-video-content">
-        <span className="opulence-video-eyebrow">THE OPULENCE EDIT</span>
+        <span className="opulence-video-eyebrow">THE OPULENCE OATH</span>
 
         <h2>
-          Designed For
-          <br />
-          The Exceptional.
+          The Measure of <br /> Good Taste.
         </h2>
 
         <p>
-          A considered collection of modern menswear, crafted for those who
-          choose quality over excess.
+          A curated expression of refined clothing, where proportion, material
+          and detail speak for themselves.
         </p>
 
         <Link href="/new-arrivals" className="opulence-video-button">
-          <span>EXPLORE COLLECTION</span>
+          <span>EXPLORE THE COLLECTION </span>
 
           <span className="opulence-video-arrow">→</span>
         </Link>

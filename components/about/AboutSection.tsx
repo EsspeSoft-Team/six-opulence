@@ -5,92 +5,131 @@ import Image from "next/image";
 const aboutFeatures = [
   {
     number: "01",
-    title: "Thoughtful Design",
-    text: "Every detail is considered.",
+    title: "CONSIDERED DESIGN",
+    text: "Refined silhouettes.\nNothing without purpose.",
   },
   {
     number: "02",
-    title: "Premium Quality",
-    text: "Made with fabrics that endure.",
+    title: "THE CRAFT",
+    text: "Thoughtful fabrics.\nEnduring finishes.",
   },
   {
     number: "03",
-    title: "Limited by Choice",
-    text: "Less quantity. More meaning.",
+    title: "LIMITED BY CHOICE",
+    text: "Fewer pieces.\nGreater distinction.",
   },
 ];
 
 export default function AboutSection() {
   return (
     <section className="about-section1">
-      {/* ================= IMAGE ================= */}
-      <div className="about-image-wrap">
-        <div className="about-image">
-          <Image
-            src="/images/DESKTOP_-_WEB_-_DENIM_b7277e3d-4d4a-48d2-b833-9f195d7ce86f.webp"
-            alt="Opulence craftsmanship"
-            fill
-            sizes="(max-width: 900px) 100vw, 50vw"
-            style={{ objectFit: "cover" }}
-          />
-        </div>
+      <div className="about-section1__inner">
+        {/* =========================================
+            IMAGE
+        ========================================== */}
 
-        <div className="about-image-caption">
-          <span>OPULENCE</span>
-          <span>EST. 2026</span>
-        </div>
-      </div>
+        <div className="about-image-wrap">
+          <div className="about-image">
+            <Image
+              src="/images/DESKTOP_-_WEB_-_DENIM_b7277e3d-4d4a-48d2-b833-9f195d7ce86f.webp"
+              alt="Opulence craftsmanship"
+              fill
+              sizes="(max-width: 767px) 100vw, 50vw"
+            />
 
-      {/* ================= CONTENT ================= */}
-      <div className="about-content">
-        <div className="about-intro">
-          <p className="section-eyebrow">The Opulence Story</p>
+            <div className="about-image-overlay" />
 
-          <span className="about-small-mark">—</span>
-
-          <h2 className=" title">
-            MADE WITH
-            <br />
-            <em>INTENTION.</em>
-          </h2>
-        </div>
-
-        <div className="about-description-wrap">
-          <p className="about-desc">
-            Opulence is built around a simple idea — exceptional clothing should
-            feel considered, not excessive.
-          </p>
-
-          <p className="about-desc secondary">
-            From the fabric we choose to the silhouettes we create, every piece
-            is designed with purpose, refined through detail, and made to stay
-            relevant beyond a season.
-          </p>
-        </div>
-
-        {/* ================= FEATURES ================= */}
-        <div className="about-features">
-          {aboutFeatures.map((feature) => (
-            <div className="about-feature" key={feature.number}>
-              <span className="about-feature-number">{feature.number}</span>
-
-              <div className="about-feature-content">
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
-              </div>
+            <div className="about-image-top-label">
+              <span>01</span>
+              <span>THE OPULENCE STORY</span>
             </div>
-          ))}
+
+            <div className="about-image-caption">
+              <div>
+                <span className="caption-label">OPULENCE</span>
+                <span className="caption-sub">EST. 2026</span>
+              </div>
+
+              <span className="caption-mark">O</span>
+            </div>
+          </div>
         </div>
 
-        {/* ================= BOTTOM ================= */}
-        <div className="about-bottom">
-          <Link href="/about" className="about-link">
-            <span>Discover Our Story</span>
+        {/* =========================================
+            CONTENT
+        ========================================== */}
 
-            <span className="about-link-arrow">↗</span>
-          </Link>
+        <div className="about-content">
+          <div className="about-content-top">
+            <div className="about-meta">
+              <span className="section-eyebrow">THE OPULENCE STORY</span>
 
-          <span className="about-bottom-note">Designed in India</span>
+              <span className="about-meta-line" />
+
+              <span className="about-meta-number">01 / 03</span>
+            </div>
+
+            <h2 className="about-title">
+              Made With
+              <br />
+              Intention.
+            </h2>
+
+            <p className="about-lead">
+              Luxury should feel considered, never excessive.
+            </p>
+
+            <div className="about-description">
+              <p>
+                OPULENCE is defined by what is chosen, refined and made to
+                endure.
+              </p>
+
+              <p>
+                From considered fabrics to precise silhouettes, every piece is
+                shaped with purpose and designed beyond the season.
+              </p>
+            </div>
+          </div>
+
+          {/* =========================================
+              FEATURES
+          ========================================== */}
+
+          <div className="about-features">
+            {aboutFeatures.map((feature) => (
+              <div className="about-feature" key={feature.number}>
+                <span className="about-feature-number">{feature.number}</span>
+
+                <div className="about-feature-content">
+                  <h3>{feature.title}</h3>
+
+                  <p>
+                    {feature.text.split("\n").map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        {index === 0 && <br />}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* =========================================
+              BOTTOM
+          ========================================== */}
+
+          <div className="about-bottom">
+            <Link href="/collections/all" className="about-link">
+              <span>DISCOVER THE COLLECTION</span>
+
+              <span className="about-link-circle">↗</span>
+            </Link>
+
+            <span className="about-bottom-note">DESIGNED IN INDIA</span>
+          </div>
         </div>
       </div>
     </section>

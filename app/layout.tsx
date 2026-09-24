@@ -8,9 +8,10 @@ import { AuthProvider } from "@/lib/auth-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
 
 import LayoutContent from "./LayoutContent";
+import Preloader from "@/components/Preloader";
 
 export const metadata: Metadata = {
-  title: "Opulence — Limited Edition Menswear",
+  title: "OPULENCE — Official Website",
   description: "Premium D2C menswear. Limited to 2,000 pieces.",
 };
 
@@ -31,12 +32,15 @@ export default function RootLayout({
         />
 
         <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@300;400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
 
       <body>
+        {/* OPULENCE PRELOADER */}
+        <Preloader />
+
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>

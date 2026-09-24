@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getProducts, getCollectionByHandle } from "@/lib/shopify";
+import { getProducts, getProductsByType } from "@/lib/shopify";
 
 import ShopFilters from "@/components/ShopFilters";
 import CatalogView from "@/components/CatalogView";
@@ -12,11 +12,6 @@ type PageProps = {
   params: Promise<{
     handle: string;
   }>;
-};
-
-const collectionMap: Record<string, string> = {
-  polo: "elevated-capsule",
-  "t-shirts": "graphic-tees",
 };
 
 export default async function CollectionPage({ params }: PageProps) {
@@ -35,33 +30,28 @@ export default async function CollectionPage({ params }: PageProps) {
 
   if (handle === "all") {
     products = await getProducts(50);
-
     title = "ALL PRODUCTS";
+  } else if (handle === "polo") {
+    /* =========================================================
+     POLO
+     
+     Shopify Product Type = Polo
+  ========================================================= */
+    products = await getProductsByType("Polo", 50);
+    title = "POLO";
+  } else if (handle === "t-shirts") {
+    /* =========================================================
+     T-SHIRTS
+     
+     Shopify Product Type = Tee
+  ========================================================= */
+    products = await getProductsByType("Tee", 50);
+    title = "T-SHIRTS";
   } else {
     /* =========================================================
-     POLO / T-SHIRTS
+     INVALID COLLECTION
   ========================================================= */
-    const shopifyHandle = collectionMap[handle];
-
-    if (!shopifyHandle) {
-      notFound();
-    }
-
-    const collection = await getCollectionByHandle(shopifyHandle, 50);
-
-    if (!collection) {
-      notFound();
-    }
-
-    products = collection.products?.edges?.map((edge: any) => edge.node) || [];
-
-    if (handle === "polo") {
-      title = "POLO";
-    } else if (handle === "t-shirts") {
-      title = "T-SHIRTS";
-    } else {
-      title = collection.title?.toUpperCase() || "COLLECTION";
-    }
+    notFound();
   }
 
   /* =========================================================
@@ -105,6 +95,8 @@ export default async function CollectionPage({ params }: PageProps) {
               <div className="sidebar-label">CATEGORIES</div>
 
               <div className="category-list">
+                {/* ALL PRODUCTS */}
+
                 <Link
                   href="/collections/all"
                   className={handle === "all" ? "active" : ""}
@@ -112,12 +104,16 @@ export default async function CollectionPage({ params }: PageProps) {
                   All Products
                 </Link>
 
+                {/* POLO */}
+
                 <Link
                   href="/collections/polo"
                   className={handle === "polo" ? "active" : ""}
                 >
                   Polo
                 </Link>
+
+                {/* T-SHIRTS */}
 
                 <Link
                   href="/collections/t-shirts"

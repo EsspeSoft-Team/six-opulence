@@ -19,13 +19,9 @@
   width: 100%;
   height: 100vh;
   min-height: 960px;
-
   padding: 4rem 5vw;
-
   box-sizing: border-box;
-
   overflow: hidden;
-
   background: var(--color-white);
 }
 
@@ -47,7 +43,6 @@
 .stockists-content-wrapper {
   width: 100%;
   height: 100%;
-
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -60,11 +55,8 @@
 .stockists-content-left {
   width: 27%;
   max-width: 300px;
-
   flex-shrink: 0;
 }
-
-/* Intro wrapper */
 
 .stockists-intro {
   display: flex;
@@ -72,44 +64,42 @@
   gap: 20px;
 }
 
-/* Common text */
+/* =========================================================
+   COMMON TEXT
+========================================================= */
 
 .stockists-b-m {
   color: #fff;
-
   font-family: inherit;
-
   font-size: 1rem;
   line-height: 1.35;
-
   font-weight: 500;
-
   letter-spacing: -0.02em;
 }
 
-/* Main heading */
+/* =========================================================
+   MAIN HEADING
+========================================================= */
 
 .stockists-intro-title {
   max-width: 300px;
-
-  font-size: 60px;
+  font-size: 78px;
   line-height: 1;
-
   font-weight: 500;
   font-family: var(--font-display);
 }
 
-/* Description */
+/* =========================================================
+   DESCRIPTION
+========================================================= */
 
 .stockists-intro-description {
   max-width: 275px;
-
-  font-size: 0.95rem;
+  font-size: 15px;
   line-height: 1.5;
-
   font-weight: 400;
   font-family: var(--font-body);
-  font-size: 15px;
+  color: var(--color-text-muted) !important;
 }
 
 /* =========================================================
@@ -118,16 +108,12 @@
 
 .stockists-content-right {
   position: relative;
-
   width: 70%;
   height: 100%;
-
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-
   gap: 20px;
-
   overflow: visible;
 }
 
@@ -137,12 +123,9 @@
 
 .stockists-item-wrapper {
   position: relative;
-
   width: 205px;
   flex: 0 0 160px;
-
   will-change: transform;
-
   transform: translate3d(0, 0, 0);
 }
 
@@ -152,12 +135,9 @@
 
 .stockists-item {
   width: 160px;
-
   display: flex;
   flex-direction: column;
-
   gap: 30px;
-
   overflow: visible;
 }
 
@@ -167,21 +147,14 @@
 
 .stockists-origin {
   position: relative;
-
   width: 160px;
-
   background: #f4f4f4;
-
   display: flex;
   flex-direction: column;
-
   gap: 8px;
-
   padding-top: 6px;
   padding-bottom: 12px;
-
   overflow: hidden;
-
   box-sizing: border-box;
 }
 
@@ -191,22 +164,14 @@
 
 .stockists-b-l {
   position: relative;
-
   z-index: 2;
-
   padding-left: 10px;
-
   color: #000;
-
   font-family: inherit;
-
   font-size: 1.2rem;
   line-height: 1.2;
-
   font-weight: 800;
-
   text-transform: uppercase;
-
   letter-spacing: -0.04em;
 }
 
@@ -216,14 +181,11 @@
 
 .stockists-origin-number {
   position: relative;
-
   width: 100%;
   height: 180px;
-
   display: flex;
   align-items: flex-end;
   justify-content: center;
-
   overflow: hidden;
 }
 
@@ -233,14 +195,10 @@
 
 .stockists-vector {
   display: block;
-
   width: 185px;
   height: 185px;
-
   object-fit: contain;
-
   object-position: center bottom;
-
   flex-shrink: 0;
 }
 
@@ -255,32 +213,30 @@
   padding: 10px 6px;
 }
 
-/* 1 */
+/* =========================================================
+   CARD BACKGROUNDS
+========================================================= */
+
 .stockists-item-wrapper:nth-child(1) .stockists-item-text-block {
   background-color: #a28251;
 }
 
-/* 2 */
 .stockists-item-wrapper:nth-child(2) .stockists-item-text-block {
   background-color: #693a26;
 }
 
-/* 3 */
 .stockists-item-wrapper:nth-child(3) .stockists-item-text-block {
   background-color: #441d1e;
 }
 
-/* 4 */
 .stockists-item-wrapper:nth-child(4) .stockists-item-text-block {
   background-color: #a18051;
 }
 
-/* 5 */
 .stockists-item-wrapper:nth-child(5) .stockists-item-text-block {
   background-color: #222c3a;
 }
 
-/* 6 */
 .stockists-item-wrapper:nth-child(6) .stockists-item-text-block {
   background-color: #1f1812;
 }
@@ -291,14 +247,10 @@
 
 .stockists-item-title {
   color: #fff;
-
   font-family: var(--font-body);
-
   font-size: 1.15rem;
   line-height: 1.2;
-
   font-weight: 700;
-
   letter-spacing: -0.025em;
 }
 
@@ -309,26 +261,20 @@
 .stockists-item-caption {
   display: flex;
   flex-direction: column;
-
   gap: 15px;
 }
 
 .stockists-caption {
   color: #fff;
-
   opacity: 0.9;
-
   font-family: var(--font-body);
-
   font-size: 0.82rem;
   line-height: 1.5;
-
   font-weight: 400;
 }
 
 /* =========================================================
    DESKTOP START POSITIONS
-   EXACT STAGGERED LOOK
 ========================================================= */
 
 .stockists-card-1 {
@@ -349,38 +295,353 @@
 
 /* =========================================================
    TABLET
+   768px - 1100px
+
+   IMPORTANT:
+   Desktop horizontal layout is disabled here.
 ========================================================= */
 
-@media (max-width: 1100px) {
+@media (min-width: 768px) and (max-width: 1100px) {
   .section-stockists-wrapper {
-    height: 300vh;
+    height: auto;
+    min-height: auto;
   }
 
   .section-stockists {
-    padding: 3rem 3vw;
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: auto;
+    padding: 70px 32px 80px;
+    overflow: visible;
   }
 
+  .container-stockists {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Main layout becomes vertical */
+
+  .stockists-content-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 55px;
+  }
+
+  /* ---------------------------------------------------------
+     LEFT
+  --------------------------------------------------------- */
+
   .stockists-content-left {
-    width: 24%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .stockists-intro {
+    width: 100%;
+    gap: 16px;
+  }
+
+  .stockists-intro-title {
+    max-width: 650px;
+    font-size: clamp(52px, 8vw, 72px);
+    line-height: 0.95;
+  }
+
+  .stockists-intro-description {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* ---------------------------------------------------------
+     RIGHT
+  --------------------------------------------------------- */
+
+  .stockists-content-right {
+    width: 100%;
+    height: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 45px 24px;
+
+    align-items: start;
+    justify-content: initial;
+
+    overflow: visible;
+  }
+
+  /* ---------------------------------------------------------
+     CARDS
+  --------------------------------------------------------- */
+
+  .stockists-item-wrapper,
+  .stockists-card-1,
+  .stockists-card-2,
+  .stockists-card-3,
+  .stockists-card-4,
+  .stockists-card-5,
+  .stockists-card-6 {
+    width: 100% !important;
+    max-width: none;
+    flex: none;
+
+    transform: none !important;
+
+    position: relative;
+  }
+
+  .stockists-item {
+    width: 100%;
+    gap: 20px;
+  }
+
+  .stockists-origin {
+    width: 100%;
+  }
+
+  /* ---------------------------------------------------------
+     NUMBER
+  --------------------------------------------------------- */
+
+  .stockists-origin-number {
+    height: 175px;
+  }
+
+  .stockists-vector {
+    width: 170px;
+    height: 170px;
+  }
+
+  /* ---------------------------------------------------------
+     CITY
+  --------------------------------------------------------- */
+
+  .stockists-b-l {
+    padding-left: 12px;
+    font-size: 1.1rem;
+  }
+
+  /* ---------------------------------------------------------
+     CARD TEXT
+  --------------------------------------------------------- */
+
+  .stockists-item-text-block {
+    gap: 16px;
+    padding: 18px 14px;
+  }
+
+  .stockists-item-title {
+    font-size: 1.05rem;
+    line-height: 1.2;
+  }
+
+  .stockists-caption {
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+}
+
+/* =========================================================
+   TABLET SMALL
+   768px - 850px
+========================================================= */
+
+@media (min-width: 768px) and (max-width: 850px) {
+  .section-stockists {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .stockists-content-wrapper {
+    gap: 45px;
   }
 
   .stockists-content-right {
-    width: 74%;
-    gap: 14px;
-  }
-
-  .stockists-item-wrapper,
-  .stockists-item,
-  .stockists-origin {
-    width: 180px;
-  }
-
-  .stockists-item-wrapper {
-    flex-basis: 180px;
+    gap: 35px 18px;
   }
 
   .stockists-origin-number {
-    height: 155px;
+    height: 150px;
+  }
+
+  .stockists-vector {
+    width: 145px;
+    height: 145px;
+  }
+
+  .stockists-b-l {
+    font-size: 1rem;
+  }
+
+  .stockists-item-title {
+    font-size: 0.95rem;
+  }
+
+  .stockists-caption {
+    font-size: 0.73rem;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   767px AND BELOW
+========================================================= */
+
+@media (max-width: 767px) {
+  .section-stockists-wrapper {
+    height: auto;
+    min-height: auto;
+  }
+
+  .section-stockists {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: auto;
+    padding: 0 20px 60px;
+    overflow: visible;
+  }
+
+  .container-stockists {
+    height: auto;
+  }
+
+  .stockists-content-wrapper {
+    height: auto;
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  /* ---------------------------------------------------------
+     LEFT
+  --------------------------------------------------------- */
+
+  .stockists-content-left {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .stockists-intro {
+    width: 100%;
+    gap: 16px;
+  }
+
+  .stockists-intro-title {
+    max-width: 100%;
+    font-size: 40px;
+    line-height: 1;
+  }
+
+  .stockists-intro-description {
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ---------------------------------------------------------
+     RIGHT
+  --------------------------------------------------------- */
+
+  .stockists-content-right {
+    width: 100%;
+    height: auto;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 50px 12px;
+
+    overflow: visible;
+  }
+
+  /* ---------------------------------------------------------
+     CARDS
+  --------------------------------------------------------- */
+
+  .stockists-item-wrapper,
+  .stockists-card-1,
+  .stockists-card-2,
+  .stockists-card-3,
+  .stockists-card-4,
+  .stockists-card-5,
+  .stockists-card-6 {
+    width: 100% !important;
+    max-width: none;
+
+    flex: none;
+
+    transform: none !important;
+  }
+
+  .stockists-item {
+    width: 100%;
+    gap: 20px;
+  }
+
+  .stockists-origin {
+    width: 100%;
+  }
+
+  /* ---------------------------------------------------------
+     NUMBER
+  --------------------------------------------------------- */
+
+  .stockists-origin-number {
+    height: 140px;
+  }
+
+  .stockists-vector {
+    width: 140px;
+    height: 140px;
+  }
+
+  /* ---------------------------------------------------------
+     TEXT
+  --------------------------------------------------------- */
+
+  .stockists-item-title {
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .stockists-caption {
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .stockists-item-text-block {
+    gap: 14px;
+    padding: 10px 6px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .section-stockists {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 50px;
+  }
+
+  .stockists-content-right {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .stockists-origin-number {
+    height: 160px;
   }
 
   .stockists-vector {
@@ -398,120 +659,25 @@
 }
 
 /* =========================================================
-   MOBILE
+   EXTRA SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 767px) {
-  .section-stockists-wrapper {
-    height: auto;
-  }
-
+@media (max-width: 360px) {
   .section-stockists {
-    position: relative;
-
-    height: auto;
-    min-height: auto;
-
-    padding: 70px 20px;
-
-    overflow: visible;
-  }
-
-  .container-stockists {
-    height: auto;
-  }
-
-  .stockists-content-wrapper {
-    height: auto;
-
-    flex-direction: column;
-
-    gap: 60px;
-  }
-
-  /* LEFT */
-
-  .stockists-content-left {
-    width: 100%;
-    max-width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .stockists-intro-title {
-    max-width: 100%;
-  }
-
-  .stockists-intro-description {
-    max-width: 100%;
-  }
-
-  /* RIGHT */
-
-  .stockists-content-right {
-    width: 100%;
-    height: auto;
-
-    display: grid;
-
-    grid-template-columns: repeat(2, 1fr);
-
-    gap: 50px 12px;
-  }
-
-  /* Cards become normal */
-
-  .stockists-item-wrapper,
-  .stockists-card-1,
-  .stockists-card-2,
-  .stockists-card-3,
-  .stockists-card-4 {
-    width: 100% !important;
-
-    flex: none;
-
-    transform: none !important;
-  }
-
-  .stockists-item {
-    width: 100%;
-  }
-
-  .stockists-origin {
-    width: 100%;
+    font-size: 34px;
   }
 
   .stockists-origin-number {
-    height: 140px;
+    height: 145px;
   }
 
   .stockists-vector {
     width: 140px;
     height: 140px;
-  }
-
-  .stockists-item-title {
-    font-size: 0.95rem;
-  }
-
-  .stockists-caption {
-    font-size: 0.72rem;
-  }
-}
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
-@media (max-width: 480px) {
-  .stockists-content-right {
-    grid-template-columns: 1fr;
-  }
-
-  .stockists-origin-number {
-    height: 160px;
-  }
-
-  .stockists-vector {
-    width: 155px;
-    height: 155px;
   }
 }

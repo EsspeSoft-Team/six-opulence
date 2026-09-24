@@ -532,6 +532,10 @@ export const mockCart = {
   totalQuantity: 0,
 
   cost: {
+    subtotalAmount: {
+      amount: "0",
+      currencyCode: "INR",
+    },
     totalAmount: {
       amount: "0",
       currencyCode: "INR",
@@ -660,6 +664,10 @@ export function mockAddLineToCart(variantId: string, quantity: number) {
     totalQuantity,
 
     cost: {
+      subtotalAmount: {
+        amount: String(totalAmount),
+        currencyCode: "INR",
+      },
       totalAmount: {
         amount: String(totalAmount),
         currencyCode: "INR",
@@ -709,6 +717,10 @@ export function mockGetCart() {
     totalQuantity,
 
     cost: {
+      subtotalAmount: {
+        amount: String(totalAmount),
+        currencyCode: "INR",
+      },
       totalAmount: {
         amount: String(totalAmount),
         currencyCode: "INR",

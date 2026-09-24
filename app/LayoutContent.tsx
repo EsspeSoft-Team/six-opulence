@@ -7,6 +7,9 @@ import NewsletterBar from "@/components/home/NewsletterBar";
 import FeatureBar from "@/components/home/FeatureBar";
 import Footer from "@/components/Footer";
 
+import { CartProvider } from "@/lib/cart-context";
+import { WishlistProvider } from "@/lib/wishlist-context";
+
 export default function LayoutContent({
   children,
 }: {
@@ -19,21 +22,31 @@ export default function LayoutContent({
     pathname === "/register" ||
     pathname === "/forgot-password";
 
+  /* ============================================================
+     AUTH PAGES
+     ============================================================ */
+
   if (isAuthPage) {
     return <main>{children}</main>;
   }
 
+  /* ============================================================
+     GLOBAL PROVIDERS
+     ============================================================ */
+
   return (
-    <>
-      <Header />
+    <CartProvider>
+      <WishlistProvider>
+        <Header />
 
-      <main>{children}</main>
+        <main>{children}</main>
 
-      <div className="global-footer-area">
-        <NewsletterBar />
-        <FeatureBar />
-        <Footer />
-      </div>
-    </>
+        <div className="global-footer-area">
+          <NewsletterBar />
+          <FeatureBar />
+          <Footer />
+        </div>
+      </WishlistProvider>
+    </CartProvider>
   );
 }

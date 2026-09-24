@@ -1,489 +1,533 @@
-/* ============================================================
-   FOOTER
-   ============================================================ */
+/* =====================================================
+   OPULENCE LUXURY FOOTER
+===================================================== */
 
-.footer {
+.opulence-footer {
   width: 100%;
-  background: #000000;
+  background: #050505;
   color: #ffffff;
   overflow: hidden;
+  position: relative;
 }
 
-.footer-inner {
-  width: 100%;
-}
-
-/* ============================================================
+/* =====================================================
    MAIN FOOTER
-   ============================================================ */
+===================================================== */
 
-.footer-main {
-  width: min(100% - 120px, 1280px);
-
+.opulence-footer-inner {
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 70px 0 65px;
-
-  display: grid;
-  grid-template-columns: 600px 1fr;
-
-  column-gap: 115px;
-
-  align-items: start;
+  padding: 95px 40px 75px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-/* ============================================================
-   PRODUCT IMAGE
-   ============================================================ */
+/* =====================================================
+   LOGO
+===================================================== */
 
-.footer-product {
+.opulence-footer-logo {
   width: 100%;
-  height: 380px;
-
-  overflow: hidden;
-
-  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.footer-product-link {
-  display: block;
+/* =====================================================
+   WHITE LOGO IMAGE
+===================================================== */
 
-  width: 100%;
-  height: 100%;
-}
-
-.footer-product-image {
-  display: block;
-
-  width: 100%;
+.opulence-logo-img {
+  width: 180px;
   height: auto;
-
-  object-fit: cover;
-
-  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 100%;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
-.footer-product-link:hover .footer-product-image {
-  transform: scale(1.035);
-}
+/* =====================================================
+   THE ART OF AFFLUENCE
+===================================================== */
 
-/* ============================================================
-   RIGHT SIDE
-   ============================================================ */
-
-.footer-right {
-  min-width: 0;
-
-  padding-top: 7px;
-}
-
-/* ============================================================
-   COLUMNS
-   ============================================================ */
-
-.footer-columns {
-  display: grid;
-
-  grid-template-columns:
-    1fr
-    1.25fr;
-
-  column-gap: 55px;
-}
-
-.footer-column {
-  min-width: 0;
-}
-
-/* ============================================================
-   COLUMN TITLE
-   ============================================================ */
-
-.footer-column-title {
-  margin: 0 0 26px;
-
+.opulence-tagline {
+  margin-top: 30px;
   color: #ffffff;
-
-  font-family: var(--font-body);
-
-  font-size: 15px;
-  line-height: 1;
-
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 5px;
+  text-transform: capitalize;
 }
 
-/* ============================================================
-   LINKS
-   ============================================================ */
+/* =====================================================
+   NAVIGATION
+===================================================== */
 
-.footer-links {
+.opulence-footer-nav {
+  margin-top: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+
+/* NAV LINKS */
+
+.opulence-footer-nav a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.opulence-footer-nav a:hover {
+  color: #ffffff;
+  opacity: 0.55;
+}
+
+/* =====================================================
+   CUSTOMER SUPPORT
+===================================================== */
+
+.opulence-customer-support {
+  margin-top: 48px;
   display: flex;
   flex-direction: column;
-
-  gap: 25px;
+  align-items: center;
+  justify-content: center;
 }
 
-.footer-link {
-  display: block;
+/* CUSTOMER SUPPORT TITLE */
 
-  color: rgba(255, 255, 255, 0.62);
+.opulence-support-title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
+  color: rgba(255, 255, 255, 0.45);
   font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
 
-  font-size: 15px;
-  line-height: 1.25;
+/* GOLD LINES */
 
+.opulence-support-title::before,
+.opulence-support-title::after {
+  content: "";
+  width: 65px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.45);
+  display: block;
+}
+
+.opulence-support-title::before {
+  margin-right: 22px;
+}
+
+.opulence-support-title::after {
+  margin-left: 22px;
+}
+
+/* SUPPORT MESSAGE */
+
+.opulence-support-text {
+  margin-top: 22px;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+}
+
+/* SUPPORT EMAIL */
+
+.opulence-support-email {
+  margin-top: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  color: #ffffff;
   text-decoration: none;
 
-  transition:
-    color 200ms ease,
-    transform 200ms ease;
-}
-
-.footer-link:hover {
-  color: #ffffff;
-  transform: translateX(2px);
-}
-
-/* ============================================================
-   DIVIDER
-   ============================================================ */
-
-.footer-divider {
-  width: 100%;
-  height: 1px;
-
-  margin-top: 58px;
-
-  background: rgba(255, 255, 255, 0.25);
-}
-
-/* ============================================================
-   BOTTOM
-   ============================================================ */
-
-.footer-bottom {
-  width: 100%;
-
-  padding-top: 35px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-}
-
-.footer-copyright {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.72);
-
   font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 
-  font-size: 14px;
-  line-height: 1.2;
+  transition:
+    color 0.3s ease,
+    opacity 0.3s ease;
 }
 
-/* ============================================================
-   SOCIAL
-   ============================================================ */
+.opulence-support-email:hover {
+  color: #ffffff;
+  opacity: 0.55;
+}
 
-.footer-social {
+/* EMAIL ICON */
+
+.opulence-email-icon {
+  width: 30px;
+  height: 30px;
+
   display: flex;
-
   align-items: center;
+  justify-content: center;
 
-  gap: 17px;
+  background: var(--color-white);
+  color: var(--color-text);
+
+  border-radius: 50%;
+
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
-.footer-social-icon {
+/* =====================================================
+   SOCIAL MEDIA
+===================================================== */
+
+.opulence-social {
+  margin-top: 35px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+}
+
+/* SOCIAL LINK */
+
+.opulence-social-link {
   width: 22px;
   height: 22px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   color: #ffffff;
-
-  font-family: Arial, sans-serif;
-
-  font-size: 13px;
-  line-height: 1;
-
   text-decoration: none;
 
-  transition: opacity 200ms ease;
+  font-size: 17px;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
-.footer-social-icon:hover {
+/* SOCIAL HOVER */
+
+.opulence-social-link:hover {
+  color: #ffffff;
   opacity: 0.55;
+  transform: translateY(-2px);
 }
 
-/* ============================================================
-   LARGE OPULENCE LOGO
-   ============================================================ */
+/* =====================================================
+   FOOTER BOTTOM
+===================================================== */
 
-.footer-large-logo {
-  width: 100%;
+.opulence-footer-bottom {
+  width: calc(100% - 80px);
+  max-width: 1280px;
+  margin: 0 auto;
 
-  /* margin-top: 15px; */
+  padding: 25px 0 28px;
 
-  /* color: #292929; */
-  color: #9f9f9f;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 
-  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  font-size: clamp(150px, 18.8vw, 300px);
+  position: relative;
+  box-sizing: border-box;
+}
 
+/* =====================================================
+   COPYRIGHT
+===================================================== */
+
+.opulence-copyright {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 400;
+  line-height: 1.6;
 
-  line-height: 0.62;
-
-  letter-spacing: -0.075em;
-
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
   text-align: center;
-
-  white-space: nowrap;
-
-  user-select: none;
-
-  transform: translateY(20px);
-  padding-bottom: 80px;
 }
 
-/* ============================================================
+/* =====================================================
+   BACK TO TOP
+===================================================== */
+
+.opulence-back-top {
+  position: absolute;
+  right: 0;
+
+  border: 0;
+  outline: none;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 0;
+
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 400;
+  line-height: 1;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  transition: opacity 0.3s ease;
+}
+
+.opulence-back-top:hover {
+  opacity: 0.5;
+}
+
+/* BACK TOP ARROW */
+
+.back-top-arrow {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+/* =====================================================
    TABLET
-   ============================================================ */
-
-@media (max-width: 1100px) {
-  .footer-main {
-    width: calc(100% - 80px);
-
-    grid-template-columns: 300px 1fr;
-
-    column-gap: 60px;
-
-    padding-top: 75px;
-  }
-
-  .footer-product {
-    width: 300px;
-    height: 320px;
-  }
-
-  .footer-columns {
-    column-gap: 35px;
-  }
-
-  .footer-column-title {
-    font-size: 13px;
-  }
-
-  .footer-link {
-    font-size: 13px;
-  }
-}
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
+===================================================== */
 
 @media (max-width: 768px) {
-  .footer-main {
-    width: calc(100% - 40px);
-
-    padding: 25px 0 20px;
-
-    display: grid;
-
-    grid-template-columns: 150px 1fr;
-
-    column-gap: 28px;
-  }
-  .footer-large-logo {
-    padding-bottom: 40px;
+  .opulence-footer-inner {
+    padding: 75px 25px 60px;
   }
 
-  /* Product image */
-
-  .footer-product {
-    width: 150px;
-    height: 190px;
-
-    border-radius: 5px;
+  .opulence-logo-img {
+    width: 72px;
   }
 
-  /* Right side */
-
-  .footer-right {
-    padding-top: 2px;
+  .opulence-tagline {
+    margin-top: 26px;
+    font-size: 24px;
+    letter-spacing: 4px;
   }
 
-  /* Columns */
-
-  .footer-columns {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 35px 20px;
+  .opulence-footer-nav {
+    margin-top: 38px;
+    gap: 16px;
   }
 
-  .footer-column:nth-child(3) {
-    grid-column: 1 / -1;
-  }
-
-  .footer-column-title {
-    margin-bottom: 15px;
-
-    font-size: 10px;
-  }
-
-  .footer-links {
-    gap: 9px;
-  }
-
-  .footer-link {
+  .opulence-footer-nav a {
     font-size: 9px;
-    line-height: 1.35;
+    letter-spacing: 1.6px;
   }
 
-  /* Divider */
+  /* CUSTOMER SUPPORT */
 
-  .footer-divider {
-    margin-top: 32px;
+  .opulence-customer-support {
+    margin-top: 42px;
   }
 
-  /* Bottom */
+  .opulence-support-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+  }
 
-  .footer-bottom {
-    padding-top: 20px;
+  .opulence-support-title::before,
+  .opulence-support-title::after {
+    width: 45px;
+  }
 
+  .opulence-support-title::before {
+    margin-right: 16px;
+  }
+
+  .opulence-support-title::after {
+    margin-left: 16px;
+  }
+
+  .opulence-support-text {
+    margin-top: 18px;
+    font-size: 14px;
+  }
+
+  .opulence-support-email {
+    margin-top: 17px;
+    font-size: 12px;
+  }
+
+  .opulence-email-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  /* BOTTOM */
+
+  .opulence-footer-bottom {
+    width: calc(100% - 40px);
+    padding: 23px 0 27px;
+
+    flex-direction: column;
     gap: 15px;
   }
 
-  .footer-copyright {
-    font-size: 8px;
-  }
-
-  .footer-social {
-    gap: 7px;
-  }
-
-  .footer-social-icon {
-    width: 17px;
-    height: 17px;
-
-    font-size: 9px;
-  }
-
-  /* Large logo */
-
-  .footer-large-logo {
-    margin-top: 25px;
-
-    font-size: 25vw;
-
-    line-height: 0.65;
-
-    transform: translateY(8px);
+  .opulence-back-top {
+    position: static;
   }
 }
 
-/* ============================================================
-   SMALL MOBILE
-   ============================================================ */
+/* =====================================================
+   MOBILE
+===================================================== */
 
 @media (max-width: 480px) {
-  .footer-main {
-    width: calc(100% - 28px);
-
-    /* padding-top: 40px; */
-
-    grid-template-columns: 105px 1fr;
-
-    column-gap: 18px;
+  .opulence-footer-inner {
+    padding: 20px 20px 45px;
   }
 
-  .footer-product {
-    width: 105px;
-    height: 135px;
+  .opulence-logo-img {
+    width: 110px;
   }
 
-  .footer-columns {
-    gap: 25px 14px;
+  .opulence-tagline {
+    margin-top: 24px;
+    font-size: 21px;
+    line-height: 1.4;
+    letter-spacing: 3px;
   }
 
-  .footer-column-title {
-    font-size: 8px;
+  /* MOBILE NAV */
 
-    margin-bottom: 11px;
+  .opulence-footer-nav {
+    margin-top: 35px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
   }
 
-  .footer-links {
-    gap: 7px;
+  .opulence-footer-nav a {
+    font-size: 9px;
+    letter-spacing: 1.8px;
   }
 
-  .footer-link {
-    font-size: 7px;
+  /* CUSTOMER SUPPORT */
+
+  .opulence-customer-support {
+    margin-top: 38px;
   }
 
-  .footer-divider {
-    margin-top: 25px;
+  .opulence-support-title {
+    font-size: 9px;
+    letter-spacing: 2.5px;
   }
 
-  .footer-bottom {
-    padding-top: 16px;
+  .opulence-support-title::before,
+  .opulence-support-title::after {
+    width: 28px;
   }
 
-  .footer-copyright {
+  .opulence-support-title::before {
+    margin-right: 12px;
+  }
+
+  .opulence-support-title::after {
+    margin-left: 12px;
+  }
+
+  .opulence-support-text {
+    margin-top: 17px;
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    padding: 0 15px;
+  }
+
+  .opulence-support-email {
+    margin-top: 17px;
+    gap: 10px;
+
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+
+  .opulence-email-icon {
+    width: 27px;
+    height: 27px;
+    font-size: 10px;
+  }
+
+  /* SOCIAL */
+
+  .opulence-social {
+    margin-top: 30px;
+    gap: 20px;
+  }
+
+  .opulence-social-link {
+    width: 21px;
+    height: 21px;
+    font-size: 16px;
+  }
+
+  /* BOTTOM */
+
+  .opulence-footer-bottom {
+    width: calc(100% - 30px);
+
+    padding: 22px 0 25px;
+
+    gap: 20px;
+  }
+
+  .opulence-copyright {
     font-size: 6.5px;
+    letter-spacing: 1.8px;
   }
 
-  .footer-social {
-    gap: 5px;
-  }
-
-  .footer-social-icon {
-    width: 14px;
-    height: 14px;
-
+  .opulence-back-top {
     font-size: 7px;
+    letter-spacing: 1.8px;
   }
 
-  .footer-large-logo {
-    margin-top: 0px;
-
-    font-size: 24vw;
+  .back-top-arrow {
+    font-size: 15px;
   }
-}
-
-.footer-large-logo {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 18px;
-}
-
-.footer-large-logo img {
-  display: block;
-  width: 100px;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.footer-large-logo h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
 }

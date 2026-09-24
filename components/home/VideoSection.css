@@ -167,10 +167,10 @@
   align-items: center;
   justify-content: center;
 
-  width: 26px;
-  height: 26px;
+  /* width: 26px;
+  height: 26px; */
 
-  border: 1px solid currentColor;
+  /* border: 1px solid currentColor; */
 
   font-size: 14px;
   line-height: 1;

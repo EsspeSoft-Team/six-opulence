@@ -1,10 +1,17 @@
 /**
  * Shopify Storefront API client
  * ------------------------------
- * Shopify Storefront API-r sathe connect korar central file.
+ * Central Shopify Storefront API client for:
+ * - Products
+ * - Product variants
+ * - Collections
+ * - Search
+ * - Customer auth
+ * - Cart
  *
- * MOCK MODE:
- * Shopify credentials na thakle mock-data theke demo data use korbe.
+ * IMPORTANT:
+ * Product listing queries include variants so ProductCard can
+ * directly use Shopify variant IDs for Add to Cart.
  */
 
 import {
@@ -16,80 +23,143 @@ import {
   mockGetCart,
 } from "./mock-data";
 
-const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+/* ============================================================
+   SHOPIFY CONFIG
+============================================================ */
+
+const domain =
+  process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ||
+  process.env.SHOPIFY_STORE_DOMAIN;
 
 const storefrontAccessToken =
   process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
-const apiVersion = process.env.SHOPIFY_STOREFRONT_API_VERSION || "2024-07";
+const apiVersion = process.env.SHOPIFY_STOREFRONT_API_VERSION || "2026-07";
 
-// Credentials na thakle mock mode
+/*
+ * Real Shopify API will be used when both credentials exist.
+ * Otherwise mock mode is used.
+ */
 const USE_MOCK = !domain || !storefrontAccessToken;
 
 const endpoint = domain
   ? `https://${domain}/api/${apiVersion}/graphql.json`
   : "";
 
+/* ============================================================
+   TYPES
+============================================================ */
+
 type ShopifyFetchParams = {
   query: string;
   variables?: Record<string, unknown>;
 };
 
-/* ===========================================================
+/* ============================================================
+   COMMON VARIANT FIELDS
+============================================================ */
+
+/*
+ * Keep this field block identical everywhere.
+ *
+ * ProductCard needs:
+ * - id
+ * - availableForSale
+ * - selectedOptions
+ *
+ * Product details also uses:
+ * - title
+ * - price
+ */
+
+const PRODUCT_VARIANTS_FRAGMENT = `
+  variants(first: 25) {
+    edges {
+      node {
+        id
+        title
+        availableForSale
+        price {
+          amount
+          currencyCode
+        }
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          url
+          altText
+        }
+      }
+    }
+  }
+`;
+
+/* ============================================================
    CORE SHOPIFY FETCH
-=========================================================== */
+============================================================ */
 
 export async function shopifyFetch<T>({
   query,
   variables,
 }: ShopifyFetchParams): Promise<T> {
   if (!domain || !storefrontAccessToken) {
-    throw new Error("Shopify env variables missing. .env.local check koro.");
+    throw new Error(
+      "Shopify env variables missing. Check .env.local for NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN and NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN.",
+    );
   }
 
   const response = await fetch(endpoint, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
       "X-Shopify-Storefront-Access-Token": storefrontAccessToken,
     },
-
     body: JSON.stringify({
       query,
       variables,
     }),
-
     next: {
       revalidate: 60,
     },
   });
 
-  const json = await response.json();
-
   if (!response.ok) {
-    console.error("Shopify HTTP Error:", JSON.stringify(json, null, 2));
+    const errorText = await response.text();
 
-    throw new Error("Shopify Storefront API request failed.");
+    console.error("Shopify HTTP Error:", response.status, errorText);
+
+    throw new Error(
+      `Shopify API request failed with status ${response.status}`,
+    );
   }
+
+  const json = await response.json();
 
   if (json.errors) {
     console.error("Shopify API Error:", JSON.stringify(json.errors, null, 2));
 
-    throw new Error(
-      json.errors?.[0]?.message || "Shopify Storefront API request failed.",
-    );
+    throw new Error("Shopify Storefront API request failed.");
+  }
+
+  if (!json.data) {
+    throw new Error("Shopify API returned no data.");
   }
 
   return json.data as T;
 }
 
-/* ===========================================================
+/* ============================================================
    PRODUCTS
-=========================================================== */
+============================================================ */
 
 /**
  * Get all products
+ *
+ * IMPORTANT:
+ * variants are included here so ProductCard can add
+ * the correct Shopify variant to the cart.
  */
 export async function getProducts(first = 12) {
   if (USE_MOCK) {
@@ -117,6 +187,8 @@ export async function getProducts(first = 12) {
                 currencyCode
               }
             }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -139,29 +211,14 @@ export async function getProducts(first = 12) {
   return data.products.edges.map((edge) => edge.node);
 }
 
-/**
- * Get single product by handle
- */
+/* ============================================================
+   SINGLE PRODUCT
+============================================================ */
+
 export async function getProductByHandle(handle: string) {
-  /* MOCK */
-
   if (USE_MOCK) {
-    const product = mockProducts.find((p) => p.handle === handle);
-
-    if (!product) {
-      return null;
-    }
-
-    return {
-      ...product,
-
-      images: {
-        edges: (product.images?.edges || []).slice(0, 10),
-      },
-    };
+    return mockProducts.find((p) => p.handle === handle) || null;
   }
-
-  /* REAL SHOPIFY */
 
   const query = `
     query getProduct($handle: String!) {
@@ -169,8 +226,14 @@ export async function getProductByHandle(handle: string) {
         id
         title
         handle
+        productType
         description
         descriptionHtml
+
+        featuredImage {
+          url
+          altText
+        }
 
         images(first: 10) {
           edges {
@@ -181,30 +244,14 @@ export async function getProductByHandle(handle: string) {
           }
         }
 
-        variants(first: 25) {
-          edges {
-            node {
-              id
-              title
-              availableForSale
-
-              price {
-                amount
-                currencyCode
-              }
-
-              selectedOptions {
-                name
-                value
-              }
-
-              image {
-                url
-                altText
-              }
-            }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
           }
         }
+
+        ${PRODUCT_VARIANTS_FRAGMENT}
       }
     }
   `;
@@ -221,13 +268,10 @@ export async function getProductByHandle(handle: string) {
   return data.product;
 }
 
-/* ===========================================================
+/* ============================================================
    COLLECTIONS
-=========================================================== */
+============================================================ */
 
-/**
- * Get collections
- */
 export async function getCollections(first = 10) {
   if (USE_MOCK) {
     return mockCollections.slice(0, first);
@@ -268,9 +312,10 @@ export async function getCollections(first = 10) {
   return data.collections.edges.map((edge) => edge.node);
 }
 
-/**
- * Get collection by handle
- */
+/* ============================================================
+   COLLECTION PRODUCTS
+============================================================ */
+
 export async function getCollectionByHandle(handle: string, first = 24) {
   if (USE_MOCK) {
     const collection = mockCollections.find((c) => c.handle === handle);
@@ -280,7 +325,7 @@ export async function getCollectionByHandle(handle: string, first = 24) {
 
   const query = `
     query getCollection(
-      $handle: String!
+      $handle: String!,
       $first: Int!
     ) {
       collection(handle: $handle) {
@@ -294,6 +339,7 @@ export async function getCollectionByHandle(handle: string, first = 24) {
               id
               title
               handle
+              description
 
               featuredImage {
                 url
@@ -306,6 +352,8 @@ export async function getCollectionByHandle(handle: string, first = 24) {
                   currencyCode
                 }
               }
+
+              ${PRODUCT_VARIANTS_FRAGMENT}
             }
           }
         }
@@ -326,9 +374,9 @@ export async function getCollectionByHandle(handle: string, first = 24) {
   return data.collection;
 }
 
-/* ===========================================================
+/* ============================================================
    NEW ARRIVALS
-=========================================================== */
+============================================================ */
 
 export async function getNewArrivals(first = 12) {
   if (USE_MOCK) {
@@ -338,8 +386,8 @@ export async function getNewArrivals(first = 12) {
   const query = `
     query getNewArrivals($first: Int!) {
       products(
-        first: $first
-        sortKey: CREATED_AT
+        first: $first,
+        sortKey: CREATED_AT,
         reverse: true
       ) {
         edges {
@@ -359,6 +407,8 @@ export async function getNewArrivals(first = 12) {
                 currencyCode
               }
             }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -381,33 +431,70 @@ export async function getNewArrivals(first = 12) {
   return data.products.edges.map((edge) => edge.node);
 }
 
-/* ===========================================================
+/* ============================================================
    RELATED PRODUCTS
-=========================================================== */
+============================================================ */
 
-export async function getRelatedProducts(productId: string) {
+/**
+ * Related products:
+ * - Prefer products with the same Shopify product type.
+ * - Exclude the current product.
+ * - Return up to 4 products.
+ *
+ * This avoids depending only on Shopify's productRecommendations
+ * engine, which can return an empty array for products that do not
+ * yet have enough recommendation data.
+ */
+export async function getRelatedProducts(
+  productId: string,
+  productType: string,
+  first = 4,
+) {
+  const cleanProductType = productType?.trim();
+
   if (USE_MOCK) {
-    return mockProducts.filter((p) => p.id !== productId).slice(0, 10);
+    return mockProducts
+      .filter(
+        (product: any) =>
+          product.id !== productId &&
+          (!cleanProductType || product.productType === cleanProductType),
+      )
+      .slice(0, first);
+  }
+
+  if (!cleanProductType) {
+    return [];
   }
 
   const query = `
-    query getRelated($productId: ID!) {
-      productRecommendations(
-        productId: $productId
+    query getRelatedProducts(
+      $query: String!,
+      $first: Int!
+    ) {
+      products(
+        first: $first,
+        query: $query
       ) {
-        id
-        title
-        handle
+        edges {
+          node {
+            id
+            title
+            handle
+            productType
 
-        featuredImage {
-          url
-          altText
-        }
+            featuredImage {
+              url
+              altText
+            }
 
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -415,41 +502,135 @@ export async function getRelatedProducts(productId: string) {
   `;
 
   const data = await shopifyFetch<{
-    productRecommendations: any[];
+    products: {
+      edges: {
+        node: any;
+      }[];
+    };
   }>({
     query,
     variables: {
-      productId,
+      query: `product_type:${cleanProductType}`,
+      first: first + 1,
     },
   });
 
-  return data.productRecommendations || [];
+  return data.products.edges
+    .map((edge) => edge.node)
+    .filter((product) => product.id !== productId)
+    .slice(0, first);
 }
 
-/* ===========================================================
+/* ============================================================
    SEARCH
-=========================================================== */
+============================================================ */
 
-export async function searchProducts(searchTerm: string, first = 20) {
+export async function searchProducts(searchTerm: string, first = 50) {
+  const cleanTerm = searchTerm.trim();
+
+  if (!cleanTerm) {
+    return [];
+  }
+
   if (USE_MOCK) {
-    const term = searchTerm.toLowerCase();
+    const term = cleanTerm.toLowerCase();
 
     return mockProducts
-      .filter(
-        (p) =>
-          p.title.toLowerCase().includes(term) ||
-          p.productType.toLowerCase().includes(term),
-      )
+      .filter((p: any) => {
+        const searchText = [
+          p.title,
+          p.handle,
+          p.description,
+          p.productType,
+          p.vendor,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchText.includes(term);
+      })
       .slice(0, first);
   }
 
   const query = `
     query searchProducts(
-      $query: String!
+      $query: String!,
       $first: Int!
     ) {
       products(
-        first: $first
+        first: $first,
+        query: $query
+      ) {
+        edges {
+          node {
+            id
+            title
+            handle
+            description
+            productType
+            vendor
+
+            featuredImage {
+              url
+              altText
+            }
+
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await shopifyFetch<{
+    products: {
+      edges: {
+        node: any;
+      }[];
+    };
+  }>({
+    query,
+    variables: {
+      query: cleanTerm,
+      first,
+    },
+  });
+
+  return data.products.edges.map((edge) => edge.node);
+}
+
+/* ============================================================
+   EXCLUSIVE PRODUCTS
+============================================================ */
+
+export async function getExclusiveProducts(first = 24) {
+  if (USE_MOCK) {
+    return mockProducts
+      .filter(
+        (product: any) =>
+          Array.isArray(product.tags) &&
+          product.tags.some(
+            (tag: string) => tag.trim().toLowerCase() === "exclusive",
+          ),
+      )
+      .slice(0, first);
+  }
+
+  const query = `
+    query getExclusiveProducts(
+      $query: String!,
+      $first: Int!
+    ) {
+      products(
+        first: $first,
         query: $query
       ) {
         edges {
@@ -469,6 +650,8 @@ export async function searchProducts(searchTerm: string, first = 20) {
                 currencyCode
               }
             }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -484,7 +667,7 @@ export async function searchProducts(searchTerm: string, first = 20) {
   }>({
     query,
     variables: {
-      query: searchTerm,
+      query: "tag:Exclusive",
       first,
     },
   });
@@ -492,9 +675,9 @@ export async function searchProducts(searchTerm: string, first = 20) {
   return data.products.edges.map((edge) => edge.node);
 }
 
-/* ===========================================================
+/* ============================================================
    BEST SELLERS
-=========================================================== */
+============================================================ */
 
 export async function getBestSellers(first = 8) {
   if (USE_MOCK) {
@@ -504,7 +687,7 @@ export async function getBestSellers(first = 8) {
   const query = `
     query getBestSellers($first: Int!) {
       products(
-        first: $first
+        first: $first,
         sortKey: BEST_SELLING
       ) {
         edges {
@@ -524,6 +707,8 @@ export async function getBestSellers(first = 8) {
                 currencyCode
               }
             }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -546,10 +731,15 @@ export async function getBestSellers(first = 8) {
   return data.products.edges.map((edge) => edge.node);
 }
 
-/* ===========================================================
-   PRODUCTS BY TYPE
-=========================================================== */
+/* ============================================================
+   PRODUCT TYPE
+============================================================ */
 
+/**
+ * Example:
+ * getProductsByType("Polo", 12)
+ * getProductsByType("Tee", 12)
+ */
 export async function getProductsByType(productType: string, first = 8) {
   if (USE_MOCK) {
     return mockProducts
@@ -559,11 +749,11 @@ export async function getProductsByType(productType: string, first = 8) {
 
   const query = `
     query getProductsByType(
-      $query: String!
+      $query: String!,
       $first: Int!
     ) {
       products(
-        first: $first
+        first: $first,
         query: $query
       ) {
         edges {
@@ -583,6 +773,8 @@ export async function getProductsByType(productType: string, first = 8) {
                 currencyCode
               }
             }
+
+            ${PRODUCT_VARIANTS_FRAGMENT}
           }
         }
       }
@@ -606,10 +798,13 @@ export async function getProductsByType(productType: string, first = 8) {
   return data.products.edges.map((edge) => edge.node);
 }
 
-/* ===========================================================
+/* ============================================================
    CUSTOMER AUTH
-=========================================================== */
+============================================================ */
 
+/**
+ * Customer registration
+ */
 export async function customerRegister(
   email: string,
   password: string,
@@ -622,7 +817,6 @@ export async function customerRegister(
         id: "gid://mock/Customer/1",
         email,
       },
-
       customerUserErrors: [],
     };
   }
@@ -631,9 +825,7 @@ export async function customerRegister(
     mutation customerCreate(
       $input: CustomerCreateInput!
     ) {
-      customerCreate(
-        input: $input
-      ) {
+      customerCreate(input: $input) {
         customer {
           id
           email
@@ -651,7 +843,6 @@ export async function customerRegister(
     customerCreate: any;
   }>({
     query,
-
     variables: {
       input: {
         email,
@@ -665,9 +856,9 @@ export async function customerRegister(
   return data.customerCreate;
 }
 
-/* ===========================================================
+/* ============================================================
    CUSTOMER LOGIN
-=========================================================== */
+============================================================ */
 
 export async function customerLogin(email: string, password: string) {
   if (USE_MOCK) {
@@ -676,7 +867,6 @@ export async function customerLogin(email: string, password: string) {
         accessToken: "mock-token",
         expiresAt: "",
       },
-
       customerUserErrors: [],
     };
   }
@@ -705,7 +895,6 @@ export async function customerLogin(email: string, password: string) {
     customerAccessTokenCreate: any;
   }>({
     query,
-
     variables: {
       input: {
         email,
@@ -717,9 +906,9 @@ export async function customerLogin(email: string, password: string) {
   return data.customerAccessTokenCreate;
 }
 
-/* ===========================================================
+/* ============================================================
    CUSTOMER LOGOUT
-=========================================================== */
+============================================================ */
 
 export async function customerLogout(accessToken: string) {
   if (USE_MOCK) {
@@ -740,16 +929,15 @@ export async function customerLogout(accessToken: string) {
 
   await shopifyFetch({
     query,
-
     variables: {
       customerAccessToken: accessToken,
     },
   });
 }
 
-/* ===========================================================
+/* ============================================================
    GET CUSTOMER
-=========================================================== */
+============================================================ */
 
 export async function getCustomer(accessToken: string) {
   if (USE_MOCK) {
@@ -793,8 +981,8 @@ export async function getCustomer(accessToken: string) {
         }
 
         orders(
-          first: 20
-          sortKey: PROCESSED_AT
+          first: 20,
+          sortKey: PROCESSED_AT,
           reverse: true
         ) {
           edges {
@@ -829,7 +1017,6 @@ export async function getCustomer(accessToken: string) {
     customer: any;
   }>({
     query,
-
     variables: {
       customerAccessToken: accessToken,
     },
@@ -838,9 +1025,9 @@ export async function getCustomer(accessToken: string) {
   return data.customer;
 }
 
-/* ===========================================================
-   FORGOT PASSWORD
-=========================================================== */
+/* ============================================================
+   CUSTOMER PASSWORD RECOVERY
+============================================================ */
 
 export async function customerRecoverPassword(email: string) {
   if (USE_MOCK) {
@@ -853,9 +1040,7 @@ export async function customerRecoverPassword(email: string) {
     mutation customerRecover(
       $email: String!
     ) {
-      customerRecover(
-        email: $email
-      ) {
+      customerRecover(email: $email) {
         customerUserErrors {
           field
           message
@@ -868,7 +1053,6 @@ export async function customerRecoverPassword(email: string) {
     customerRecover: any;
   }>({
     query,
-
     variables: {
       email,
     },
@@ -877,13 +1061,32 @@ export async function customerRecoverPassword(email: string) {
   return data.customerRecover;
 }
 
-/* ===========================================================
+/* ============================================================
    CART
-=========================================================== */
+============================================================ */
 
 /**
- * Create new cart
+ * Create Shopify cart
  */
+function normalizeCartVariantImages(cart: any) {
+  if (!cart?.lines?.edges) return cart;
+
+  cart.lines.edges = cart.lines.edges.map((edge: any) => {
+    const merchandise = edge?.node?.merchandise;
+
+    if (merchandise?.image?.url && merchandise?.product) {
+      merchandise.product.featuredImage = {
+        url: merchandise.image.url,
+        altText: merchandise.image.altText || null,
+      };
+    }
+
+    return edge;
+  });
+
+  return cart;
+}
+
 export async function createCart() {
   if (USE_MOCK) {
     return {
@@ -917,20 +1120,27 @@ export async function createCart() {
                     id
                     title
 
+                    image {
+                      url
+                      altText
+                    }
+
                     product {
-                      id
                       title
-                      handle
 
                       featuredImage {
                         url
-                        altText
                       }
                     }
 
                     price {
                       amount
                       currencyCode
+                    }
+
+                    selectedOptions {
+                      name
+                      value
                     }
                   }
                 }
@@ -950,25 +1160,28 @@ export async function createCart() {
   const data = await shopifyFetch<{
     cartCreate: {
       cart: any;
-      userErrors: {
-        field: string[];
-        message: string;
-      }[];
+      userErrors: any[];
     };
   }>({
     query,
   });
 
   if (data.cartCreate.userErrors?.length) {
-    throw new Error(data.cartCreate.userErrors[0].message);
+    console.error("Shopify cartCreate errors:", data.cartCreate.userErrors);
+
+    throw new Error(
+      data.cartCreate.userErrors[0]?.message ||
+        "Unable to create Shopify cart.",
+    );
   }
 
-  return data.cartCreate.cart;
+  return normalizeCartVariantImages(data.cartCreate.cart);
 }
 
-/**
- * Add item to cart
- */
+/* ============================================================
+   ADD TO CART
+============================================================ */
+
 export async function addToCart(
   cartId: string,
   variantId: string,
@@ -980,11 +1193,11 @@ export async function addToCart(
 
   const query = `
     mutation cartLinesAdd(
-      $cartId: ID!
+      $cartId: ID!,
       $lines: [CartLineInput!]!
     ) {
       cartLinesAdd(
-        cartId: $cartId
+        cartId: $cartId,
         lines: $lines
       ) {
         cart {
@@ -1010,14 +1223,21 @@ export async function addToCart(
                     id
                     title
 
+                    image {
+                      url
+                      altText
+                    }
+
+                    selectedOptions {
+                      name
+                      value
+                    }
+
                     product {
-                      id
                       title
-                      handle
 
                       featuredImage {
                         url
-                        altText
                       }
                     }
 
@@ -1043,17 +1263,12 @@ export async function addToCart(
   const data = await shopifyFetch<{
     cartLinesAdd: {
       cart: any;
-      userErrors: {
-        field: string[];
-        message: string;
-      }[];
+      userErrors: any[];
     };
   }>({
     query,
-
     variables: {
       cartId,
-
       lines: [
         {
           merchandiseId: variantId,
@@ -1064,15 +1279,21 @@ export async function addToCart(
   });
 
   if (data.cartLinesAdd.userErrors?.length) {
-    throw new Error(data.cartLinesAdd.userErrors[0].message);
+    console.error("Shopify cartLinesAdd errors:", data.cartLinesAdd.userErrors);
+
+    throw new Error(
+      data.cartLinesAdd.userErrors[0]?.message ||
+        "Unable to add product to cart.",
+    );
   }
 
-  return data.cartLinesAdd.cart;
+  return normalizeCartVariantImages(data.cartLinesAdd.cart);
 }
 
-/**
- * Get existing cart
- */
+/* ============================================================
+   GET CART
+============================================================ */
+
 export async function getCart(cartId: string) {
   if (USE_MOCK) {
     return mockGetCart();
@@ -1110,8 +1331,12 @@ export async function getCart(cartId: string) {
                   id
                   title
 
+                  selectedOptions {
+                    name
+                    value
+                  }
+
                   product {
-                    id
                     title
                     handle
 
@@ -1138,74 +1363,148 @@ export async function getCart(cartId: string) {
     cart: any;
   }>({
     query,
-
     variables: {
       cartId,
     },
   });
 
-  return data.cart;
+  return normalizeCartVariantImages(data.cart);
 }
 
-/**
- * Remove item from cart
- *
- * lineId = Shopify cart line id
- */
-export async function removeFromCart(cartId: string, lineId: string) {
-  if (!cartId) {
-    throw new Error("Cart ID is required.");
-  }
+/* ============================================================
+   UPDATE CART LINES
+============================================================ */
 
-  if (!lineId) {
-    throw new Error("Cart line ID is required.");
-  }
-
-  /* =======================================================
-     MOCK MODE
-  ======================================================= */
-
+export async function updateCartLines(
+  cartId: string,
+  lines: {
+    id: string;
+    quantity: number;
+  }[],
+) {
   if (USE_MOCK) {
-    const currentCart = mockGetCart();
-
-    if (!currentCart) {
-      return null;
-    }
-
-    const currentEdges = currentCart.lines?.edges || [];
-
-    const updatedEdges = currentEdges.filter(
-      (edge: any) => edge.node.id !== lineId,
-    );
-
-    const totalQuantity = updatedEdges.reduce(
-      (total: number, edge: any) => total + Number(edge.node.quantity || 0),
-      0,
-    );
-
-    return {
-      ...currentCart,
-
-      totalQuantity,
-
-      lines: {
-        ...currentCart.lines,
-        edges: updatedEdges,
-      },
-    };
+    return mockGetCart();
   }
 
-  /* =======================================================
-     REAL SHOPIFY
-  ======================================================= */
+  const query = `
+    mutation cartLinesUpdate(
+      $cartId: ID!,
+      $lines: [CartLineUpdateInput!]!
+    ) {
+      cartLinesUpdate(
+        cartId: $cartId,
+        lines: $lines
+      ) {
+        cart {
+          id
+          checkoutUrl
+          totalQuantity
+
+          cost {
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+
+          lines(first: 50) {
+            edges {
+              node {
+                id
+                quantity
+
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                    title
+
+                    image {
+                      url
+                      altText
+                    }
+
+                    selectedOptions {
+                      name
+                      value
+                    }
+
+                    product {
+                      title
+                      handle
+
+                      featuredImage {
+                        url
+                        altText
+                      }
+                    }
+
+                    price {
+                      amount
+                      currencyCode
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        userErrors {
+          field
+          message
+        }
+      }
+    }
+  `;
+
+  const data = await shopifyFetch<{
+    cartLinesUpdate: {
+      cart: any;
+      userErrors: any[];
+    };
+  }>({
+    query,
+    variables: {
+      cartId,
+      lines,
+    },
+  });
+
+  if (data.cartLinesUpdate.userErrors?.length) {
+    console.error(
+      "Shopify cartLinesUpdate errors:",
+      data.cartLinesUpdate.userErrors,
+    );
+
+    throw new Error(
+      data.cartLinesUpdate.userErrors[0]?.message || "Unable to update cart.",
+    );
+  }
+
+  return normalizeCartVariantImages(data.cartLinesUpdate.cart);
+}
+
+/* ============================================================
+   REMOVE CART LINES
+============================================================ */
+
+export async function removeFromCart(cartId: string, lineIds: string[]) {
+  if (USE_MOCK) {
+    return mockGetCart();
+  }
 
   const query = `
     mutation cartLinesRemove(
-      $cartId: ID!
+      $cartId: ID!,
       $lineIds: [ID!]!
     ) {
       cartLinesRemove(
-        cartId: $cartId
+        cartId: $cartId,
         lineIds: $lineIds
       ) {
         cart {
@@ -1236,8 +1535,17 @@ export async function removeFromCart(cartId: string, lineId: string) {
                     id
                     title
 
+                    image {
+                      url
+                      altText
+                    }
+
+                    selectedOptions {
+                      name
+                      value
+                    }
+
                     product {
-                      id
                       title
                       handle
 
@@ -1269,25 +1577,27 @@ export async function removeFromCart(cartId: string, lineId: string) {
   const data = await shopifyFetch<{
     cartLinesRemove: {
       cart: any;
-
-      userErrors: {
-        field: string[];
-        message: string;
-      }[];
+      userErrors: any[];
     };
   }>({
     query,
-
     variables: {
       cartId,
-
-      lineIds: [lineId],
+      lineIds,
     },
   });
 
   if (data.cartLinesRemove.userErrors?.length) {
-    throw new Error(data.cartLinesRemove.userErrors[0].message);
+    console.error(
+      "Shopify cartLinesRemove errors:",
+      data.cartLinesRemove.userErrors,
+    );
+
+    throw new Error(
+      data.cartLinesRemove.userErrors[0]?.message ||
+        "Unable to remove cart item.",
+    );
   }
 
-  return data.cartLinesRemove.cart;
+  return normalizeCartVariantImages(data.cartLinesRemove.cart);
 }

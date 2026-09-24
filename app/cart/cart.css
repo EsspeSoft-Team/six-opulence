@@ -27,7 +27,7 @@
 .cart-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(54px, 7vw, 105px);
+  font-size: clamp(54px, 7vw, 60px);
   line-height: 0.9;
   font-weight: 400;
   letter-spacing: -0.04em;
@@ -361,7 +361,7 @@
   margin: 0;
 
   font-family: var(--font-display);
-  font-size: clamp(60px, 9vw, 80px);
+  font-size: clamp(60px, 9vw, 60px);
   line-height: 0.9;
   font-weight: 400;
   letter-spacing: -0.04em;

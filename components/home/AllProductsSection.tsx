@@ -30,11 +30,11 @@ const tabs: { key: TabKey; label: string }[] = [
   },
   {
     key: "polo",
-    label: "POLO",
+    label: "POLOS",
   },
   {
     key: "t-shirt",
-    label: "T-SHIRT",
+    label: "TEES",
   },
 ];
 
@@ -64,12 +64,15 @@ export default function AllProductsSection({
       <div className="container">
         {/* Section Header */}
         <div className="section-header-centered">
-          <p className="section-eyebrow">Shop</p>
+          <p className="section-eyebrow">THE COLLECTION</p>
 
-          <h2 className="section-title-centered title">All Products</h2>
+          <h2 className="section-title-centered title">
+            Selected With Intent.
+          </h2>
 
           <p className="section-subtext-centered para">
-            Browse the full collection, or filter by style.
+            A curated expression of modern clothing, defined by proportion,
+            material and quiet refinement.
           </p>
         </div>
 

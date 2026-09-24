@@ -7,50 +7,66 @@ import {
   useState,
   ReactNode,
 } from "react";
-import {
-  customerLogin,
-  customerRegister,
-  customerLogout,
-  getCustomer,
-} from "./shopify";
+
+type Customer = {
+  id: string;
+
+  displayName?: string;
+
+  firstName?: string | null;
+
+  lastName?: string | null;
+
+  emailAddress?: {
+    emailAddress: string;
+  } | null;
+};
 
 type AuthContextType = {
-  customer: any;
+  customer: Customer | null;
+
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ) => Promise<{ success: boolean; error?: string }>;
+
+  login: (email?: string) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+
   logout: () => Promise<void>;
+
   refreshCustomer: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = "shopify_customer_token";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [customer, setCustomer] = useState<any>(null);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   async function loadCustomer() {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      setLoading(false);
-      return;
-    }
     try {
-      const customerData = await getCustomer(token);
-      if (customerData) {
-        setCustomer(customerData);
-      } else {
-        localStorage.removeItem(TOKEN_KEY);
+      const response = await fetch("/api/auth/me", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        setCustomer(null);
+        return;
       }
-    } catch {
-      localStorage.removeItem(TOKEN_KEY);
+
+      const data = await response.json();
+
+      if (data.authenticated && data.customer) {
+        setCustomer(data.customer);
+      } else {
+        setCustomer(null);
+      }
+    } catch (error) {
+      console.error("Load customer error:", error);
+
+      setCustomer(null);
     } finally {
       setLoading(false);
     }
@@ -60,46 +76,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadCustomer();
   }, []);
 
-  async function login(email: string, password: string) {
-    const result = await customerLogin(email, password);
+  async function login(email?: string) {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
 
-    if (result.customerUserErrors?.length > 0) {
-      return { success: false, error: result.customerUserErrors[0].message };
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          email: email || "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        return {
+          success: false,
+
+          error: data.error || "Unable to start login.",
+        };
+      }
+
+      window.location.href = data.url;
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error("Login error:", error);
+
+      return {
+        success: false,
+
+        error: "Unable to start login.",
+      };
     }
-
-    const token = result.customerAccessToken?.accessToken;
-    if (!token) {
-      return { success: false, error: "Login failed. Try again." };
-    }
-
-    localStorage.setItem(TOKEN_KEY, token);
-    await loadCustomer();
-    return { success: true };
-  }
-
-  async function register(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ) {
-    const result = await customerRegister(email, password, firstName, lastName);
-
-    if (result.customerUserErrors?.length > 0) {
-      return { success: false, error: result.customerUserErrors[0].message };
-    }
-
-    // Registration success howar por sathe sathe login kore dei
-    return login(email, password);
   }
 
   async function logout() {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
-      await customerLogout(token);
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      setCustomer(null);
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        window.location.href = "/login";
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      setCustomer(null);
+
+      window.location.href = "/login";
     }
-    localStorage.removeItem(TOKEN_KEY);
-    setCustomer(null);
   }
 
   return (
@@ -108,7 +146,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         customer,
         loading,
         login,
-        register,
         logout,
         refreshCustomer: loadCustomer,
       }}
@@ -120,8 +157,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }

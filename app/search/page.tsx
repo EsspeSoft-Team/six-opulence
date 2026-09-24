@@ -1,34 +1,21 @@
-import { getProducts } from "@/lib/shopify";
+import { searchProducts } from "@/lib/shopify";
+
 import ProductCard from "@/components/ProductCard";
+
 import "./search.css";
 
 type SearchPageProps = {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
-  };
+  }>;
 };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = (searchParams?.q || "").trim();
+  const params = await searchParams;
 
-  const products = await getProducts(50);
+  const query = (params?.q || "").trim();
 
-  const searchResults = query
-    ? products.filter((product: any) => {
-        const searchText = [
-          product.title,
-          product.handle,
-          product.description,
-          product.productType,
-          product.vendor,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-
-        return searchText.includes(query.toLowerCase());
-      })
-    : [];
+  const searchResults = query ? await searchProducts(query, 50) : [];
 
   return (
     <main className="search-page">

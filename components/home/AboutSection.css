@@ -1,91 +1,165 @@
-/* =========================================
+/* =====================================================
    OPULENCE ABOUT SECTION
-========================================= */
+   Slim horizontal luxury introduction
+===================================================== */
 
 .about-section {
   width: 100%;
-  padding: 100px 0px;
-  background: var(--color-white);
+
+  background: #ffffff;
+
+  padding: 68px 24px;
+
   overflow: hidden;
+
+  box-sizing: border-box;
 }
+
+/* =====================================================
+   CONTAINER
+===================================================== */
+
+.about-section__container {
+  width: 100%;
+
+  max-width: 1400px;
+
+  margin: 0 auto;
+}
+
+/* =====================================================
+   INNER
+===================================================== */
 
 .about-section__inner {
   width: 100%;
-  max-width: 1200px;
+
+  max-width: 1250px;
+
   margin: 0 auto;
+
   text-align: center;
 }
 
-/* EYEBROW */
+/* =====================================================
+   EYEBROW
+===================================================== */
 
 .about-section__eyebrow {
   display: inline-block;
-  margin-bottom: 28px;
+
+  margin-bottom: 18px;
 
   font-family: var(--font-body);
+
   font-size: 11px;
-  font-weight: 600;
+
+  font-weight: 500;
+
+  line-height: 1;
+
   letter-spacing: 3px;
+
   text-transform: uppercase;
-
-  color: #8a877f;
-}
-
-/* TITLE */
-
-.about-section__title {
-  margin: 0 auto;
-
-  max-width: 1000px;
-
-  font-family: var(--font-display);
-  font-size: clamp(55px, 7vw, 100px);
-  font-weight: 400;
-  line-height: 0.94;
-  letter-spacing: -0.055em;
-
-  color: #171717;
-}
-
-.about-section__title em {
-  font-style: italic;
-  font-weight: 400;
-}
-
-/* DESCRIPTION */
-
-.about-section__text {
-  max-width: 650px;
-  margin: 42px auto 0;
-
-  font-family: var(--font-body);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.7;
 
   color: var(--color-text-muted);
 }
 
-/* BUTTON */
+/* =====================================================
+   TITLE
+===================================================== */
+
+.about-section__title {
+  width: 100%;
+
+  max-width: 1280px;
+
+  margin: 0 auto;
+
+  padding: 0;
+
+  font-family: var(--font-display);
+
+  font-size: clamp(48px, 5.2vw, 76px);
+
+  font-weight: 400;
+
+  line-height: 0.96;
+
+  letter-spacing: -0.045em;
+
+  color: var(--color-text);
+}
+
+/* =====================================================
+   TITLE EMPHASIS
+===================================================== */
+
+.about-section__title em {
+  font-style: italic;
+
+  font-weight: 400;
+}
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
+.about-section__text {
+  width: 100%;
+
+  max-width: 900px;
+
+  margin: 24px auto 0;
+
+  font-family: var(--font-body);
+
+  font-size: 15px;
+
+  font-weight: 400;
+
+  line-height: 1.65;
+
+  letter-spacing: 0.01em;
+
+  color: var(--color-text-muted);
+
+  text-align: center;
+}
+
+/* =====================================================
+   BUTTON
+===================================================== */
 
 .about-section__button {
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
-  gap: 18px;
 
-  margin-top: 38px;
-  padding: 15px 24px;
+  gap: 13px;
 
-  border: 1px solid #1b1b1b;
+  margin-top: 23px;
 
-  color: var(--color-white);
-  background: var(--color-dark);
+  padding: 12px 20px;
 
-  font-family: var(--font-body);
-  font-size: 12px;
+  background: #171717;
+
+  border: 1px solid #171717;
+
+  color: #ffffff;
+
+  font-family: var(--font-body), "Poppins", Arial, sans-serif;
+
+  font-size: 9px;
+
   font-weight: 500;
-  letter-spacing: 1.2px;
+
+  line-height: 1;
+
+  letter-spacing: 1.5px;
+
   text-transform: uppercase;
 
   text-decoration: none;
@@ -96,181 +170,188 @@
     gap 0.3s ease;
 }
 
-.about-section__button span {
-  font-size: 17px;
+/* =====================================================
+   BUTTON ARROW
+===================================================== */
+
+.about-section__button-arrow {
+  font-size: 14px;
+
   line-height: 1;
+
+  transition: transform 0.3s ease;
 }
+
+/* =====================================================
+   BUTTON HOVER
+===================================================== */
 
 .about-section__button:hover {
-  background: var(--color-dark);
-  color: var(--color-white);
-  gap: 24px;
-}
-
-/* DIVIDER */
-
-/* .about-section__line {
-  width: 100%;
-  height: 1px;
-
-  margin-top: 70px;
-
-  background: #deded9;
-} */
-
-/* VALUES */
-
-.about-section__values {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 70px;
-
-  margin-top: 45px;
-}
-
-.about-section__value {
-  text-align: center;
-}
-
-.about-section__value > span {
-  display: block;
-
-  margin-bottom: 16px;
-
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 2px;
-
-  color: #99958d;
-}
-
-.about-section__value h3 {
-  margin: 0;
-
-  font-family: var(--font-display);
-  font-size: 25px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  background: transparent;
 
   color: #171717;
+
+  gap: 18px;
 }
 
-.about-section__value p {
-  max-width: 230px;
-  margin: 12px auto 0;
-
-  font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.6;
-
-  color: #85827b;
+.about-section__button:hover .about-section__button-arrow {
+  transform: translateX(3px);
 }
 
-/* =========================================
-   TABLET
-========================================= */
+/* =====================================================
+   LARGE DESKTOP
+===================================================== */
 
-@media (max-width: 900px) {
+@media (min-width: 1400px) {
   .about-section {
-    padding: 100px 0px;
+    padding: 72px 30px;
   }
 
   .about-section__title {
-    font-size: clamp(48px, 8vw, 72px);
+    max-width: 1250px;
+
+    font-size: 78px;
   }
 
   .about-section__text {
-    max-width: 580px;
-    font-size: 15px;
-  }
+    max-width: 950px;
 
-  /* .about-section__line {
-    margin-top: 80px;
-  } */
-
-  .about-section__values {
-    gap: 35px;
+    font-size: 14px;
   }
 }
 
-/* =========================================
-   MOBILE
-========================================= */
+/* =====================================================
+   TABLET
+===================================================== */
 
-@media (max-width: 767px) {
+@media (max-width: 900px) {
   .about-section {
-    padding: 85px 20px;
+    padding: 60px 25px;
+  }
+
+  .about-section__inner {
+    max-width: 900px;
   }
 
   .about-section__eyebrow {
-    margin-bottom: 22px;
-    font-size: 10px;
+    margin-bottom: 17px;
+
+    font-size: 9px;
+
     letter-spacing: 2.5px;
   }
 
   .about-section__title {
-    max-width: 500px;
+    max-width: 850px;
 
-    font-size: 48px;
-    line-height: 0.95;
-    letter-spacing: -0.05em;
+    font-size: clamp(42px, 6vw, 62px);
+
+    line-height: 0.98;
   }
 
   .about-section__text {
-    max-width: 450px;
-    margin-top: 28px;
+    max-width: 720px;
 
-    font-size: 14px;
+    margin-top: 23px;
+
+    font-size: 13px;
+
     line-height: 1.65;
   }
 
   .about-section__button {
-    margin-top: 30px;
-    padding: 14px 20px;
-
-    font-size: 10px;
-  }
-
-  /* .about-section__line {
-    margin-top: 65px;
-  } */
-
-  .about-section__values {
-    grid-template-columns: 1fr;
-    gap: 38px;
-
-    margin-top: 38px;
-  }
-
-  .about-section__value h3 {
-    font-size: 22px;
-  }
-
-  .about-section__value p {
-    font-size: 12px;
+    margin-top: 23px;
   }
 }
 
-/* =========================================
-   SMALL MOBILE
-========================================= */
+/* =====================================================
+   MOBILE
+===================================================== */
 
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .about-section {
-    padding: 70px 0px;
+    padding: 52px 20px;
+  }
+
+  .about-section__eyebrow {
+    margin-bottom: 16px;
+
+    font-size: 8px;
+
+    letter-spacing: 2.2px;
   }
 
   .about-section__title {
-    font-size: 40px;
+    max-width: 600px;
+
+    font-size: clamp(34px, 9vw, 48px);
+
+    line-height: 0.99;
+
+    letter-spacing: -0.04em;
   }
 
   .about-section__text {
-    font-size: 13px;
+    max-width: 500px;
+
+    margin-top: 21px;
+
+    font-size: 12px;
+
+    line-height: 1.65;
   }
 
-  /* .about-section__line {
-    margin-top: 55px;
-  } */
+  .about-section__button {
+    margin-top: 22px;
+
+    padding: 11px 17px;
+
+    font-size: 8px;
+
+    letter-spacing: 1.3px;
+  }
+
+  .about-section__button-arrow {
+    font-size: 13px;
+  }
+}
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+  .about-section {
+    padding: 45px 18px;
+  }
+
+  .about-section__eyebrow {
+    margin-bottom: 14px;
+
+    font-size: 8px;
+
+    letter-spacing: 1.8px;
+  }
+
+  .about-section__title {
+    font-size: 33px;
+
+    line-height: 1;
+  }
+
+  .about-section__text {
+    margin-top: 19px;
+
+    font-size: 11.5px;
+
+    line-height: 1.6;
+  }
+
+  .about-section__button {
+    margin-top: 20px;
+
+    padding: 11px 16px;
+
+    font-size: 8px;
+  }
 }

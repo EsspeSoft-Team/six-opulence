@@ -1,27 +1,61 @@
 import "./product-detail.css";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { getProductByHandle } from "@/lib/shopify";
 
 import ProductOptions from "@/components/ProductOptions";
+import ProductGallery from "@/components/ProductGallery";
 import RelatedProducts from "@/components/RelatedProducts";
 
-export default async function ProductPage({
-  params,
-}: {
-  params: { handle: string };
-}) {
-  const product = await getProductByHandle(params.handle);
+type ProductPageProps = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  /* =========================================================
+     GET HANDLE
+  ========================================================= */
+
+  const { handle } = await params;
+  const productHandle = decodeURIComponent(handle).trim();
+
+  /* =========================================================
+     GET SHOPIFY PRODUCT
+  ========================================================= */
+
+  const product = await getProductByHandle(productHandle);
+
+  /* =========================================================
+     PRODUCT NOT FOUND
+  ========================================================= */
 
   if (!product) {
     return (
-      <div className="container">
-        <p>Product not found.</p>
-      </div>
+      <main className="container">
+        <div
+          style={{
+            minHeight: "50vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: "16px",
+          }}
+        >
+          <h1>Product not found.</h1>
+          <p>We couldn't find this product in the Shopify store.</p>
+          <Link href="/collections/all">← BACK TO SHOP</Link>
+        </div>
+      </main>
     );
   }
+
+  /* =========================================================
+     VARIANTS
+  ========================================================= */
 
   const variants =
     product?.variants?.edges?.map(({ node }: any) => ({
@@ -30,26 +64,60 @@ export default async function ProductPage({
       availableForSale: node.availableForSale,
       price: node.price,
       selectedOptions: node.selectedOptions || [],
+      image: node.image || null,
     })) || [];
+
+  /* =========================================================
+     FIRST AVAILABLE VARIANT
+  ========================================================= */
 
   const firstAvailableVariant =
     variants.find((variant: any) => variant.availableForSale) || variants[0];
 
+  /* =========================================================
+     PRODUCT IMAGES
+  ========================================================= */
+
+  const productImages = product?.images?.edges?.slice(0, 50) || [];
+
+  /* =========================================================
+     PRICE
+  ========================================================= */
+
+  const price =
+    firstAvailableVariant?.price?.amount ||
+    product?.priceRange?.minVariantPrice?.amount ||
+    "";
+
+  const currency =
+    firstAvailableVariant?.price?.currencyCode ||
+    product?.priceRange?.minVariantPrice?.currencyCode ||
+    "INR";
+
+  /* =========================================================
+     FIRST AVAILABLE VARIANT COLOR
+  ========================================================= */
+
+  const firstAvailableVariantColor =
+    firstAvailableVariant?.selectedOptions?.find(
+      (option: any) => option.name?.toLowerCase() === "color",
+    )?.value || "";
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
+
   return (
-    <div className="container-fluid">
+    <main className="container-fluid">
       {/* =====================================================
           BREADCRUMB
       ===================================================== */}
 
       <nav className="pdp-breadcrumb" aria-label="Breadcrumb">
         <Link href="/">Home</Link>
-
         <span>/</span>
-
         <Link href="/collections/all">Shop</Link>
-
         <span>/</span>
-
         <span>{product.title}</span>
       </nav>
 
@@ -59,67 +127,53 @@ export default async function ProductPage({
 
       <div className="pdp">
         {/* ===================================================
-            LEFT
+            LEFT - PRODUCT IMAGES
         =================================================== */}
 
-        <div className="pdp-images">
-          {product.images?.edges?.slice(0, 10).map((edge: any, i: number) => (
-            <div key={`${edge.node.url}-${i}`} className="pdp-image">
-              <Image
-                src={edge.node.url}
-                alt={edge.node.altText || `${product.title} ${i + 1}`}
-                fill
-                sizes="(max-width: 768px) 90vw, 55vw"
-                priority={i < 2}
-                style={{
-                  objectFit: "cover",
-                }}
-              />
-            </div>
-          ))}
-        </div>
+        <ProductGallery
+          productTitle={product.title}
+          productHandle={product.handle}
+          productImages={productImages}
+          featuredImage={product?.featuredImage || null}
+          firstAvailableVariantImage={firstAvailableVariant?.image || null}
+          firstAvailableVariantColor={firstAvailableVariantColor}
+        />
 
         {/* ===================================================
-            RIGHT
+            RIGHT - PRODUCT INFORMATION
         =================================================== */}
 
         <aside className="page-right">
-          {/* BRAND */}
-
           <div className="pdp-brand">OPULENCE</div>
-
-          {/* TITLE */}
 
           <h1 className="pdp-title">{product.title}</h1>
 
-          {/* PRICE */}
-
           <p className="pdp-price">
-            {firstAvailableVariant?.price?.currencyCode || "INR"}{" "}
-            {firstAvailableVariant?.price?.amount || ""}
+            {currency} {price}
           </p>
 
           {/* =================================================
               PRODUCT OPTIONS
           ================================================= */}
 
-          <ProductOptions
-            product={{
-              id: product.id,
-              title: product.title,
-              handle: product.handle,
-            }}
-            variants={variants}
-          />
+          {variants.length > 0 && (
+            <ProductOptions
+              product={{
+                id: product.id,
+                title: product.title,
+                handle: product.handle,
+              }}
+              variants={variants}
+            />
+          )}
 
           {/* =================================================
-              DESCRIPTION
+              PRODUCT DESCRIPTION
           ================================================= */}
 
           <details className="pdp-accordion" open>
             <summary>
               <span>Product Description</span>
-
               <span className="pdp-accordion-icon">−</span>
             </summary>
 
@@ -130,6 +184,8 @@ export default async function ProductPage({
                     __html: product.descriptionHtml,
                   }}
                 />
+              ) : product.description ? (
+                <p>{product.description}</p>
               ) : (
                 <>
                   <p>
@@ -153,32 +209,27 @@ export default async function ProductPage({
           <details className="pdp-accordion">
             <summary>
               <span>Product Specifications</span>
-
               <span className="pdp-accordion-icon">+</span>
             </summary>
 
             <div className="pdp-accordion-content">
               <div className="pdp-spec-row">
                 <span>Fit</span>
-
                 <span>Regular Fit</span>
               </div>
 
               <div className="pdp-spec-row">
                 <span>Fabric</span>
-
                 <span>Premium Cotton</span>
               </div>
 
               <div className="pdp-spec-row">
                 <span>Care</span>
-
                 <span>Machine Wash</span>
               </div>
 
               <div className="pdp-spec-row">
                 <span>Country</span>
-
                 <span>Made in India</span>
               </div>
             </div>
@@ -191,7 +242,6 @@ export default async function ProductPage({
           <details className="pdp-accordion" id="return-info">
             <summary>
               <span>Product Disclosure</span>
-
               <span className="pdp-accordion-icon">+</span>
             </summary>
 
@@ -214,7 +264,10 @@ export default async function ProductPage({
           RELATED PRODUCTS
       ===================================================== */}
 
-      <RelatedProducts productId={product.id} />
-    </div>
+      <RelatedProducts
+        productId={product.id}
+        productType={product.productType || ""}
+      />
+    </main>
   );
 }

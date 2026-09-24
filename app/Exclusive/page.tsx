@@ -1,9 +1,9 @@
-import { getNewArrivals } from "@/lib/shopify";
+import { getExclusiveProducts } from "@/lib/shopify";
 import ProductCard from "@/components/ProductCard";
 import "./Exclusive.css";
 
 export default async function ExclusivePage() {
-  const products = await getNewArrivals(24);
+  const products = await getExclusiveProducts(24);
 
   return (
     <main className="exclusive-page">

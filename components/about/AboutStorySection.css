@@ -1,0 +1,514 @@
+/* =========================================================
+   OPULENCE EDITORIAL ABOUT STORY
+========================================================= */
+
+.op-about-story {
+  width: 100%;
+  background: #f5f2ec;
+  color: #171717;
+  overflow: hidden;
+}
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+.op-eyebrow {
+  display: block;
+
+  font-family: var(--font-body);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 2.8px;
+
+  color: var(--color-text-muted);
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TOP SECTION
+========================================================= */
+
+.op-about-top {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    48%
+    28%
+    24%;
+
+  min-height: 390px;
+}
+
+/* =========================================================
+   BELIEF
+========================================================= */
+
+.op-belief {
+  padding: 45px 40px 50px 6.5vw;
+
+  box-sizing: border-box;
+}
+
+.op-belief h2 {
+  max-width: 720px;
+
+  margin: 17px 0 0;
+
+  font-family: var(--font-display);
+
+  font-size: clamp(42px, 4.2vw, 68px);
+
+  font-weight: 400;
+
+  line-height: 0.96;
+
+  letter-spacing: -0.055em;
+
+  color: var(--color-text);
+}
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+.op-intro {
+  padding: 45px 35px 50px 25px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.op-intro p {
+  max-width: 340px;
+
+  margin: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 14px;
+
+  line-height: 1.65;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   STORY LINK
+========================================================= */
+
+.op-story-link {
+  width: fit-content;
+
+  margin-top: 28px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  text-decoration: none;
+
+  font-family: var(--font-body);
+
+  font-size: 8px;
+
+  font-weight: 600;
+
+  letter-spacing: 2px;
+
+  color: var(--color-text);
+
+  transition: gap 0.3s ease;
+}
+
+.op-story-link:hover {
+  gap: 20px;
+}
+
+.op-story-line {
+  width: 45px;
+
+  height: 1px;
+
+  background: #74706a;
+}
+
+/* =========================================================
+   TOP IMAGE
+========================================================= */
+
+.op-top-image {
+  position: relative;
+
+  min-height: 390px;
+
+  overflow: hidden;
+
+  background: #d8d4cc;
+}
+
+.op-top-image img {
+  object-fit: cover;
+
+  object-position: center;
+
+  transition: transform 0.8s ease;
+}
+
+.op-top-image:hover img {
+  transform: scale(1.025);
+}
+
+/* =========================================================
+   IMAGE LABEL
+========================================================= */
+
+.op-image-side-label {
+  position: absolute;
+
+  z-index: 2;
+
+  top: 45px;
+
+  right: 25px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+
+  font-family: var(--font-body);
+
+  font-size: 7px;
+
+  letter-spacing: 2px;
+
+  color: #fff;
+
+  text-align: right;
+}
+
+.op-image-side-label::after {
+  content: "";
+
+  display: block;
+
+  width: 1px;
+
+  height: 65px;
+
+  margin: 20px 0 0 auto;
+
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* =========================================================
+   IMAGE NUMBER
+========================================================= */
+
+.op-image-number {
+  position: absolute;
+
+  z-index: 2;
+
+  right: 24px;
+
+  bottom: 24px;
+
+  font-family: var(--font-body);
+
+  font-size: 8px;
+
+  letter-spacing: 2px;
+
+  color: var(cololr-white);
+}
+
+/* =========================================================
+   BOTTOM SECTION
+========================================================= */
+
+.op-about-bottom {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    47%
+    53%;
+
+  min-height: 440px;
+}
+
+/* =========================================================
+   STORY IMAGE
+========================================================= */
+
+.op-story-image {
+  position: relative;
+
+  min-height: 440px;
+
+  overflow: hidden;
+
+  background: #b7ada0;
+}
+
+.op-story-image img {
+  object-fit: cover;
+
+  object-position: center;
+
+  transition: transform 0.9s ease;
+}
+
+.op-story-image:hover img {
+  transform: scale(1.025);
+}
+
+/* =========================================================
+   STORY IMAGE CAPTION
+========================================================= */
+
+.op-story-image-caption {
+  position: absolute;
+
+  z-index: 2;
+
+  left: 45px;
+
+  right: 45px;
+
+  bottom: 27px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  padding-top: 13px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.45);
+
+  font-family: var(--font-body);
+
+  font-size: 8px;
+
+  font-weight: 600;
+
+  letter-spacing: 2.5px;
+
+  color: #fff;
+}
+
+/* =========================================================
+   BEGINNING
+========================================================= */
+
+.op-beginning {
+  display: grid;
+
+  grid-template-columns:
+    48%
+    52%;
+
+  padding: 55px 6.5vw 55px 5vw;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   BEGINNING MAIN
+========================================================= */
+
+.op-beginning-main h2 {
+  margin: 15px 0 0;
+
+  font-family: var(--font-display);
+
+  font-size: clamp(48px, 5vw, 78px);
+
+  font-weight: 400;
+
+  line-height: 0.92;
+
+  letter-spacing: -0.055em;
+
+  color: var(--color-text);
+}
+
+.op-beginning-main p {
+  max-width: 280px;
+
+  margin: 28px 0 0;
+
+  font-family: var(--font-body);
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   JOURNEY
+========================================================= */
+
+.op-journey {
+  align-self: end;
+
+  padding-left: 35px;
+}
+
+.op-journey p {
+  max-width: 330px;
+
+  margin: 0;
+
+  font-family: var(--font-body);
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .op-about-top {
+    grid-template-columns:
+      46%
+      30%
+      24%;
+  }
+
+  .op-belief {
+    padding-left: 4vw;
+  }
+
+  .op-belief h2 {
+    font-size: 43px;
+  }
+
+  .op-beginning {
+    padding: 45px 4vw 45px 4vw;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+  .op-about-top {
+    display: flex;
+
+    flex-direction: column;
+  }
+
+  .op-belief {
+    padding: 0px 22px 35px;
+  }
+
+  .op-belief h2 {
+    font-size: 40px;
+
+    line-height: 1.1;
+  }
+
+  .op-intro {
+    padding: 0 22px 45px;
+  }
+
+  .op-intro p {
+    max-width: 100%;
+
+    font-size: 12px;
+  }
+
+  .op-top-image {
+    min-height: 420px;
+  }
+
+  .op-about-bottom {
+    display: flex;
+
+    flex-direction: column;
+  }
+
+  .op-story-image {
+    min-height: 430px;
+  }
+
+  .op-story-image-caption {
+    left: 22px;
+    right: 22px;
+  }
+
+  .op-beginning {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 55px 22px 60px;
+  }
+
+  .op-beginning-main h2 {
+    font-size: 52px;
+  }
+
+  .op-beginning-main p {
+    max-width: 100%;
+
+    margin-top: 25px;
+  }
+
+  .op-journey {
+    padding-left: 0;
+
+    margin-top: 45px;
+  }
+
+  .op-journey p {
+    max-width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .op-belief h2 {
+    font-size: 40px;
+  }
+
+  .op-top-image {
+    min-height: 360px;
+  }
+
+  .op-story-image {
+    min-height: 370px;
+  }
+
+  .op-beginning-main h2 {
+    font-size: 46px;
+  }
+}

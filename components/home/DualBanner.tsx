@@ -1,33 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import "./DualBanner.css";
 
-import Link from "next/link";
-import Image from "next/image";
+const IMAGE_INTERVAL = 3500;
 
-const IMAGE_INTERVAL = 3500; // ms between image changes
+export type DualBannerData = {
+  id: string;
 
-const poloImages = [
-  "/images/polo.png",
-  "/images/polo2.png",
-  "/images/polo1.png",
-];
+  number: string;
+  category: string;
 
-const graphicImages = [
-  "/images/ove2.png",
-  "/images/over1.png",
-  "/images/DESKTOP_-_WEB_-_INNERV_df9383d6-2ea7-40e0-ab86-b7b0fff6f4f9.webp",
-];
+  images: string[];
+
+  alt: string;
+
+  eyebrow: string;
+
+  title: string[];
+
+  description: string[];
+
+  buttonText: string;
+  buttonLink: string;
+
+  theme: "dark" | "light";
+};
 
 function useCyclingImages(images: string[]) {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => {
+    if (images.length <= 1) return;
+
+    const interval = setInterval(() => {
       setActive((prev) => (prev + 1) % images.length);
     }, IMAGE_INTERVAL);
-    return () => clearInterval(id);
+
+    return () => clearInterval(interval);
   }, [images.length]);
 
   return active;
@@ -36,11 +49,15 @@ function useCyclingImages(images: string[]) {
 function BannerImageStack({ images, alt }: { images: string[]; alt: string }) {
   const active = useCyclingImages(images);
 
+  if (!images || images.length === 0) {
+    return null;
+  }
+
   return (
     <>
       {images.map((src, i) => (
         <Image
-          key={src}
+          key={`${src}-${i}`}
           src={src}
           alt={alt}
           fill
@@ -53,87 +70,99 @@ function BannerImageStack({ images, alt }: { images: string[]; alt: string }) {
   );
 }
 
-export default function DualBanner() {
+function BannerPanel({
+  banner,
+  index,
+}: {
+  banner: DualBannerData;
+  index: number;
+}) {
+  return (
+    <div
+      className={`dual-banner-panel ${
+        banner.theme === "dark" ? "dual-banner-polo" : "dual-banner-graphic"
+      }`}
+    >
+      {/* Images */}
+      <BannerImageStack images={banner.images} alt={banner.alt} />
+
+      {/* Overlay */}
+      <div
+        className={
+          banner.theme === "dark"
+            ? "dual-banner-dark-overlay"
+            : "dual-banner-light-overlay"
+        }
+      />
+
+      {/* Side Marker */}
+      <div
+        className={`dual-banner-side-marker ${
+          index % 2 === 1 ? "dual-banner-side-marker-right" : ""
+        }`}
+      >
+        <span>{banner.number}</span>
+
+        <i />
+
+        <span>{banner.category}</span>
+      </div>
+
+      {/* Content */}
+      <div className="dual-banner-content">
+        {banner.eyebrow && (
+          <p className="dual-banner-eyebrow">{banner.eyebrow}</p>
+        )}
+
+        {banner.title?.length > 0 && (
+          <h2>
+            {banner.title.map((line, i) => (
+              <span key={i}>
+                {line}
+
+                {i < banner.title.length - 1 && <br />}
+              </span>
+            ))}
+          </h2>
+        )}
+
+        <span className="dual-banner-accent" />
+
+        {banner.description?.length > 0 && (
+          <p className="dual-banner-desc">
+            {banner.description.map((line, i) => (
+              <span key={i}>
+                {line}
+
+                {i < banner.description.length - 1 && <br />}
+              </span>
+            ))}
+          </p>
+        )}
+
+        {banner.buttonText && (
+          <Link href={banner.buttonLink || "#"} className="dual-banner-link">
+            <span>{banner.buttonText}</span>
+            <b>→</b>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function DualBanner({ banners }: { banners: DualBannerData[] }) {
+  if (!banners || banners.length === 0) {
+    return null;
+  }
+
   return (
     <section className="dual-banner">
-      {/* ================= POLO ================= */}
-      <div className="dual-banner-panel dual-banner-polo">
-        <BannerImageStack images={poloImages} alt="Polo T-Shirts" />
+      {banners.map((banner, index) => (
+        <BannerPanel key={banner.id} banner={banner} index={index} />
+      ))}
 
-        <div className="dual-banner-dark-overlay" />
-
-        {/* Side Number */}
-        <div className="dual-banner-side-marker">
-          <span>01</span>
-          <i />
-          <span>POLOS</span>
-        </div>
-
-        <div className="dual-banner-content">
-          <p className="dual-banner-eyebrow">Smart. Sharp. Always.</p>
-
-          <h2>
-            POLO
-            <br />
-            T-SHIRTS
-          </h2>
-
-          <span className="dual-banner-accent" />
-
-          <p className="dual-banner-desc">
-            From casual days to classy moments,
-            <br />
-            our polos have you covered.
-          </p>
-
-          <Link
-            href="/collections/elevated-capsule"
-            className="dual-banner-link"
-          >
-            <span>Explore Polos</span>
-            <b>→</b>
-          </Link>
-        </div>
-      </div>
-
-      {/* ================= GRAPHIC TEES ================= */}
-      <div className="dual-banner-panel dual-banner-graphic">
-        <BannerImageStack images={graphicImages} alt="Graphic Tees" />
-
-        <div className="dual-banner-light-overlay" />
-
-        {/* Side Number */}
-        <div className="dual-banner-side-marker dual-banner-side-marker-right">
-          <span>02</span>
-          <i />
-          <span>GRAPHIC TEES</span>
-        </div>
-
-        <div className="dual-banner-content">
-          <p className="dual-banner-eyebrow">Bold. Expressive. You.</p>
-
-          <h2>
-            OVERSIZE
-            <br />
-            GRAPHIC TEES
-          </h2>
-
-          <span className="dual-banner-accent" />
-
-          <p className="dual-banner-desc">
-            Premium oversized tees with
-            <br />
-            unique graphics that speak your vibe.
-          </p>
-
-          <Link href="/collections/graphic-tees" className="dual-banner-link">
-            <span>Explore Tees</span>
-            <b>→</b>
-          </Link>
-        </div>
-      </div>
-
-      {/* ================= CENTER DETAIL ================= */}
+      {/* Center Detail */}
       <div className="dual-banner-center-mark">
         <span>✦</span>
       </div>

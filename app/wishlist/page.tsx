@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { useWishlist } from "@/lib/wishlist-context";
-import { getProductByHandle } from "@/lib/shopify";
+import { getProducts } from "@/lib/shopify";
+
 import ProductCard from "@/components/ProductCard";
+
 import "./wishlist.css";
 
 export default function WishlistPage() {
@@ -12,41 +15,103 @@ export default function WishlistPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /* ============================================================
+     LOAD WISHLIST PRODUCTS
+  ============================================================ */
+
   useEffect(() => {
+    let cancelled = false;
+
     async function loadProducts() {
       setLoading(true);
 
       try {
-        const results = await Promise.all(
-          wishlist.map((handle) =>
-            getProductByHandle(handle).catch(() => null),
-          ),
+        /*
+         * Shopify theke products niye ashchi.
+         * Saved wishlist handle-er sathe match korbo.
+         */
+        const allProducts = await getProducts(50);
+
+        if (cancelled) {
+          return;
+        }
+
+        const savedHandles = new Set(
+          wishlist.map((handle) => handle?.trim()).filter(Boolean),
         );
 
-        setProducts(results.filter(Boolean));
+        /*
+         * Wishlist-er sathe Shopify product handle match
+         */
+        const matchedProducts = allProducts.filter(
+          (product: any) => product?.handle && savedHandles.has(product.handle),
+        );
+
+        setProducts(matchedProducts);
+
+        /*
+         * Jodi old/stale handle thake,
+         * automatically remove kore dibo.
+         *
+         * Example:
+         * wishlist = [valid-product, old-product]
+         *
+         * old-product Shopify-te na thakle
+         * ota wishlist theke remove hobe.
+         */
+        const matchedHandles = new Set(
+          matchedProducts.map((product: any) => product.handle),
+        );
+
+        const staleHandles = wishlist.filter(
+          (handle) => !matchedHandles.has(handle),
+        );
+
+        if (staleHandles.length > 0) {
+          staleHandles.forEach((handle) => {
+            removeFromWishlist(handle);
+          });
+        }
       } catch (error) {
         console.error("Failed to load wishlist products:", error);
-        setProducts([]);
+
+        if (!cancelled) {
+          setProducts([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    if (wishlist.length > 0) {
-      loadProducts();
-    } else {
+    /*
+     * Wishlist empty
+     */
+    if (wishlist.length === 0) {
       setProducts([]);
       setLoading(false);
+      return;
     }
-  }, [wishlist]);
+
+    loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [wishlist, removeFromWishlist]);
+
+  /* ============================================================
+     REMOVE
+  ============================================================ */
 
   function handleRemove(handle: string) {
     removeFromWishlist(handle);
   }
 
-  /* =====================================================
+  /* ============================================================
      LOADING
-  ===================================================== */
+  ============================================================ */
 
   if (loading) {
     return (
@@ -59,9 +124,9 @@ export default function WishlistPage() {
     );
   }
 
-  /* =====================================================
+  /* ============================================================
      EMPTY
-  ===================================================== */
+  ============================================================ */
 
   if (products.length === 0) {
     return (
@@ -88,9 +153,9 @@ export default function WishlistPage() {
     );
   }
 
-  /* =====================================================
-     WISHLIST
-  ===================================================== */
+  /* ============================================================
+     WISHLIST PRODUCTS
+  ============================================================ */
 
   return (
     <main className="wishlist-page">
@@ -125,17 +190,13 @@ export default function WishlistPage() {
                 aria-label={`Remove ${product.title} from wishlist`}
               >
                 <span>REMOVE</span>
+
                 <span className="wishlist-remove-x">×</span>
               </button>
 
-              <ProductCard
-                product={{
-                  ...product,
-                  priceRange: {
-                    minVariantPrice: product.variants?.edges?.[0]?.node?.price,
-                  },
-                }}
-              />
+              {/* PRODUCT */}
+
+              <ProductCard product={product} />
             </div>
           ))}
         </div>

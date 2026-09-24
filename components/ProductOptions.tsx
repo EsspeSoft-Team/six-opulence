@@ -21,6 +21,10 @@ type Variant = {
   availableForSale: boolean;
   price: VariantPrice;
   selectedOptions?: SelectedOption[];
+  image?: {
+    url: string;
+    altText?: string | null;
+  } | null;
 };
 
 type Product = {
@@ -171,6 +175,58 @@ export default function ProductOptions({
   );
 
   /* =========================================================
+     PERSIST SELECTED SIZE + COLOR
+  ========================================================= */
+
+  const colorStorageKey = `opulence:selected-color:${product.handle}`;
+  const sizeStorageKey = `opulence:selected-size:${product.handle}`;
+
+  const [selectionLoaded, setSelectionLoaded] = useState(false);
+
+  /* Restore the last selected variant after page reload. */
+  useEffect(() => {
+    try {
+      const savedSize = localStorage.getItem(sizeStorageKey);
+      const savedColor = localStorage.getItem(colorStorageKey);
+
+      if (savedSize && sizeOptions.includes(savedSize)) {
+        setSelectedSize(savedSize);
+      }
+
+      if (savedColor && colorOptions.includes(savedColor)) {
+        setSelectedColor(savedColor);
+      }
+    } catch (error) {
+      console.warn("Could not restore variant selection:", error);
+    } finally {
+      setSelectionLoaded(true);
+    }
+  }, [sizeStorageKey, colorStorageKey, sizeOptions, colorOptions]);
+
+  /* Save the current selection for the next reload. */
+  useEffect(() => {
+    if (!selectionLoaded) return;
+
+    try {
+      if (selectedSize) {
+        localStorage.setItem(sizeStorageKey, selectedSize);
+      }
+
+      if (selectedColor) {
+        localStorage.setItem(colorStorageKey, selectedColor);
+      }
+    } catch (error) {
+      console.warn("Could not save variant selection:", error);
+    }
+  }, [
+    selectionLoaded,
+    selectedSize,
+    selectedColor,
+    sizeStorageKey,
+    colorStorageKey,
+  ]);
+
+  /* =========================================================
      QUANTITY
   ========================================================= */
 
@@ -195,6 +251,31 @@ export default function ProductOptions({
   ========================================================= */
 
   const [couponCopied, setCouponCopied] = useState(false);
+
+  /* =========================================================
+     SIZE CHART
+  ========================================================= */
+
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
+
+  useEffect(() => {
+    if (!sizeChartOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSizeChartOpen(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [sizeChartOpen]);
 
   /* =========================================================
      CURRENT VARIANT
@@ -225,6 +306,27 @@ export default function ProductOptions({
   ========================================================= */
 
   const selectedVariantAvailable = Boolean(selectedVariant?.availableForSale);
+
+  /* =========================================================
+     VARIANT IMAGE SYNC
+     Product detail page can listen to this event and update
+     the main product image when color/size changes.
+  ========================================================= */
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!selectedVariant) return;
+
+    window.dispatchEvent(
+      new CustomEvent("opulence:variant-change", {
+        detail: {
+          variantId: selectedVariant.id,
+          image: selectedVariant.image || null,
+          selectedOptions: selectedVariant.selectedOptions || [],
+        },
+      }),
+    );
+  }, [selectedVariant]);
 
   /* =========================================================
      RESET INVALID SELECTION
@@ -535,9 +637,7 @@ export default function ProductOptions({
             type="button"
             className="size-chart-button"
             onClick={() => {
-              document.getElementById("size-chart")?.scrollIntoView({
-                behavior: "smooth",
-              });
+              setSizeChartOpen(true);
             }}
           >
             Size Chart
@@ -728,6 +828,75 @@ export default function ProductOptions({
 
         <a href="#return-info">More Info</a>
       </div>
+
+      {/* =====================================================
+          SIZE CHART MODAL
+      ====================================================== */}
+
+      {sizeChartOpen && (
+        <div
+          className="size-chart-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="size-chart-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSizeChartOpen(false);
+            }
+          }}
+        >
+          <div className="size-chart-modal">
+            <button
+              type="button"
+              className="size-chart-close"
+              aria-label="Close size chart"
+              onClick={() => setSizeChartOpen(false)}
+            >
+              ×
+            </button>
+
+            <h3 id="size-chart-title">Size Chart</h3>
+
+            <div className="size-chart-table">
+              <div className="size-chart-row size-chart-head">
+                <span>Size</span>
+                <span>Chest</span>
+                <span>Length</span>
+              </div>
+
+              <div className="size-chart-row">
+                <span>S</span>
+                <span>38"</span>
+                <span>27"</span>
+              </div>
+
+              <div className="size-chart-row">
+                <span>M</span>
+                <span>40"</span>
+                <span>28"</span>
+              </div>
+
+              <div className="size-chart-row">
+                <span>L</span>
+                <span>42"</span>
+                <span>29"</span>
+              </div>
+
+              <div className="size-chart-row">
+                <span>XL</span>
+                <span>44"</span>
+                <span>30"</span>
+              </div>
+
+              <div className="size-chart-row">
+                <span>XXL</span>
+                <span>46"</span>
+                <span>31"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

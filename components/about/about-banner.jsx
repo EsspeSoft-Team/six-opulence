@@ -88,22 +88,22 @@ export default function AboutBanner() {
           CENTER TEXT
       ========================= */}
       <div className="collage-center">
-        <p className="collage-eyebrow">A Modern Man's Essence</p>
+        <p className="collage-eyebrow">A Modern Man's</p>
         <span className="collage-eyebrow-line" />
 
         <h1 className="collage-heading">
           <span className="collage-line" style={{ animationDelay: "0.2s" }}>
-            Worn,
+            CREATED,
           </span>
 
           <span className="collage-line" style={{ animationDelay: "0.4s" }}>
-            Not Inherited.
+            NOT CLAIMED.
           </span>
         </h1>
 
-        <p className="collage-tagline">Style. Substance. Self-Made.</p>
+        <p className="collage-tagline">Purpose. Precision. Legacy. </p>
 
-        <p className="collage-desc">Not what you inherit. What you build</p>
+        <p className="collage-desc">BUILT, NOT GIVEN. </p>
 
         <span className="collage-divider-bottom" />
 
