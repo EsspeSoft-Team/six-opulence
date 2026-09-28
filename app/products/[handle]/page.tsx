@@ -5,9 +5,8 @@ import Link from "next/link";
 import { getProductByHandle } from "@/lib/shopify";
 
 import ProductOptions from "@/components/ProductOptions";
-
 import ProductGallery from "@/components/ProductGallery";
-
+import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
 
 type ProductPageProps = {
@@ -22,7 +21,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   ========================================================= */
 
   const { handle } = await params;
-
   const productHandle = decodeURIComponent(handle).trim();
 
   /* =========================================================
@@ -270,6 +268,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </details>
         </aside>
       </div>
+
+      {/* =====================================================
+          PRODUCT REVIEWS
+          Reviews appear BEFORE Related Products
+      ===================================================== */}
+
+      <ProductReviews productId={product.id} productHandle={product.handle} />
 
       {/* =====================================================
           RELATED PRODUCTS

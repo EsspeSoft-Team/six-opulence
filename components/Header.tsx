@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import CartDrawer from "@/components/CartDrawer";
 
 /* =========================================================
    ICONS
@@ -526,12 +527,14 @@ export default function Header() {
 
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const [cartOpen, setCartOpen] = useState(false);
+
   /* =====================================================
      BODY SCROLL
   ===================================================== */
 
   useEffect(() => {
-    const drawerOpen = infoOpen || mobileMenuOpen || searchOpen;
+    const drawerOpen = infoOpen || mobileMenuOpen || searchOpen || cartOpen;
 
     if (drawerOpen) {
       document.body.classList.add("header-drawer-open");
@@ -542,7 +545,7 @@ export default function Header() {
     return () => {
       document.body.classList.remove("header-drawer-open");
     };
-  }, [infoOpen, mobileMenuOpen, searchOpen]);
+  }, [infoOpen, mobileMenuOpen, searchOpen, cartOpen]);
 
   /* =====================================================
      ESC
@@ -577,7 +580,15 @@ export default function Header() {
   function openInfo() {
     setSearchOpen(false);
     setMobileMenuOpen(false);
+    setCartOpen(false);
     setInfoOpen(true);
+  }
+
+  function openCart() {
+    setSearchOpen(false);
+    setMobileMenuOpen(false);
+    setInfoOpen(false);
+    setCartOpen(true);
   }
 
   function openMobileMenu() {
@@ -709,7 +720,13 @@ export default function Header() {
 
               {/* CART */}
 
-              <Link href="/cart" className="header-action" aria-label="Cart">
+              <button
+                type="button"
+                className="header-action header-cart-trigger"
+                aria-label="Open Cart"
+                aria-expanded={cartOpen}
+                onClick={openCart}
+              >
                 <span className="header-action-icon">
                   <BagIcon />
 
@@ -719,7 +736,7 @@ export default function Header() {
                 </span>
 
                 <span>Cart</span>
-              </Link>
+              </button>
 
               {/* MORE */}
 
@@ -776,6 +793,8 @@ export default function Header() {
       />
 
       <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }
