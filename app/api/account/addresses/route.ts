@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { shopifyAdminFetch } from "@/lib/shopify-admin";
+
+export const runtime = "nodejs";
+
+/* ============================================================
+   TYPES
+============================================================ */
 
 type AddressInput = {
   firstName?: string;
@@ -8,89 +15,228 @@ type AddressInput = {
   address2?: string;
   city?: string;
   province?: string;
-  provinceCode?: string;
   zip?: string;
   countryCode?: string;
   phone?: string;
-  setAsDefault?: boolean;
 };
 
-async function getLoggedInCustomerId(request: NextRequest) {
-  const origin = request.nextUrl.origin;
+type ShopifyUserError = {
+  field?: string[];
+  message: string;
+};
 
-  const response = await fetch(`${origin}/api/auth/me`, {
-    method: "GET",
-    headers: {
-      cookie: request.headers.get("cookie") || "",
-    },
-    cache: "no-store",
+type CustomerAddress = {
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  city?: string | null;
+  province?: string | null;
+  provinceCode?: string | null;
+  zip?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  phone?: string | null;
+};
+
+type CustomerAddressesResponse = {
+  customer: {
+    id: string;
+    defaultAddress?: {
+      id: string;
+    } | null;
+    addressesV2: {
+      edges: {
+        node: CustomerAddress;
+      }[];
+    };
+  } | null;
+};
+
+type CustomerAddressCreateResponse = {
+  customerAddressCreate: {
+    address: CustomerAddress | null;
+    userErrors: ShopifyUserError[];
+  };
+};
+
+type CustomerAddressUpdateResponse = {
+  customerAddressUpdate: {
+    address: CustomerAddress | null;
+    userErrors: ShopifyUserError[];
+  };
+};
+
+type CustomerAddressDeleteResponse = {
+  customerAddressDelete: {
+    deletedAddressId: string | null;
+    userErrors: ShopifyUserError[];
+  };
+};
+
+/* ============================================================
+   ADMIN GRAPHQL HELPER
+   IMPORTANT:
+   shopifyAdminFetch accepts ONE object argument.
+============================================================ */
+
+async function adminGraphQL<T>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<T> {
+  return shopifyAdminFetch<T>({
+    query,
+    variables,
   });
+}
 
-  if (!response.ok) {
+/* ============================================================
+   GET LOGGED-IN CUSTOMER
+============================================================ */
+
+async function getLoggedInCustomer() {
+  const request = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/auth/me`,
+    {
+      method: "GET",
+      headers: {
+        cookie: "",
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (!request.ok) {
     return null;
   }
 
-  const data = await response.json();
+  const data = await request.json();
 
-  return (
-    data?.customer?.id || data?.user?.customer?.id || data?.customerId || null
-  );
+  return data?.customer || data?.user || null;
 }
 
-function cleanAddress(body: AddressInput) {
-  return {
-    firstName: String(body.firstName || "").trim(),
-    lastName: String(body.lastName || "").trim(),
-    address1: String(body.address1 || "").trim(),
-    address2: String(body.address2 || "").trim(),
-    city: String(body.city || "").trim(),
-    province: String(body.province || "").trim(),
-    provinceCode: body.provinceCode
-      ? String(body.provinceCode).trim()
-      : undefined,
-    zip: String(body.zip || "").trim(),
-    countryCode: String(body.countryCode || "IN")
-      .trim()
-      .toUpperCase(),
-    phone: String(body.phone || "").trim(),
-  };
-}
+/* ============================================================
+   BETTER AUTH LOOKUP
+   Forward current request cookies to /api/auth/me
+============================================================ */
 
-function validateAddress(address: ReturnType<typeof cleanAddress>) {
-  if (
-    !address.firstName ||
-    !address.lastName ||
-    !address.address1 ||
-    !address.city ||
-    !address.province ||
-    !address.zip
-  ) {
-    return "First name, last name, address, city, state and PIN code are required.";
+async function getCustomerFromAuth(request: NextRequest) {
+  const cookie = request.headers.get("cookie") || "";
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "http://localhost:3000";
+
+  try {
+    const response = await fetch(`${siteUrl}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        cookie,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+
+    return data?.customer || data?.user || null;
+  } catch (error) {
+    console.error("AUTH LOOKUP ERROR:", error);
+    return null;
   }
+}
 
-  if (address.zip.length < 4 || address.zip.length > 12) {
-    return "Please enter a valid PIN code.";
+/* ============================================================
+   GET CUSTOMER ID
+============================================================ */
+
+async function resolveCustomerId(request: NextRequest) {
+  const customer = await getCustomerFromAuth(request);
+
+  const customerId =
+    customer?.id || customer?.customer?.id || customer?.customerId || null;
+
+  if (customerId) {
+    return customerId;
   }
 
   return null;
 }
 
-/* =========================================================
-   GET
-   Load customer's saved addresses.
-========================================================= */
+/* ============================================================
+   NORMALIZE ADDRESS
+============================================================ */
+
+function normalizeAddress(body: any): AddressInput {
+  return {
+    firstName: String(body?.firstName || "").trim(),
+    lastName: String(body?.lastName || "").trim(),
+    address1: String(body?.address1 || "").trim(),
+    address2: String(body?.address2 || "").trim(),
+    city: String(body?.city || "").trim(),
+    province: String(body?.province || "").trim(),
+    zip: String(body?.zip || "").trim(),
+    countryCode: String(body?.countryCode || "IN")
+      .trim()
+      .toUpperCase(),
+    phone: String(body?.phone || "").trim(),
+  };
+}
+
+/* ============================================================
+   VALIDATE ADDRESS
+============================================================ */
+
+function validateAddress(address: AddressInput) {
+  if (!address.firstName) {
+    return "First name is required.";
+  }
+
+  if (!address.lastName) {
+    return "Last name is required.";
+  }
+
+  if (!address.address1) {
+    return "Address is required.";
+  }
+
+  if (!address.city) {
+    return "City is required.";
+  }
+
+  if (!address.zip) {
+    return "PIN / ZIP code is required.";
+  }
+
+  if (!address.countryCode) {
+    return "Country is required.";
+  }
+
+  return null;
+}
+
+/* ============================================================
+   GET ADDRESSES
+============================================================ */
 
 export async function GET(request: NextRequest) {
   try {
-    const customerId = await getLoggedInCustomerId(request);
+    const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer session not found.",
+          error: "You are not logged in.",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
@@ -98,77 +244,59 @@ export async function GET(request: NextRequest) {
       query GetCustomerAddresses($id: ID!) {
         customer(id: $id) {
           id
+
           defaultAddress {
             id
           }
+
           addressesV2(first: 50) {
-            nodes {
-              id
-              firstName
-              lastName
-              company
-              address1
-              address2
-              city
-              province
-              provinceCode
-              zip
-              country
-              countryCodeV2
-              phone
+            edges {
+              node {
+                id
+                firstName
+                lastName
+                address1
+                address2
+                city
+                province
+                provinceCode
+                zip
+                country
+                countryCode
+                phone
+              }
             }
           }
         }
       }
     `;
 
-    const data = await shopifyAdminFetch<{
-      data?: {
-        customer?: {
-          id: string;
-          defaultAddress?: {
-            id: string;
-          } | null;
-          addressesV2?: {
-            nodes: any[];
-          };
-        } | null;
-      };
-      errors?: Array<{ message?: string }>;
-    }>(query, {
-      variables: {
-        id: customerId,
-      },
+    const data = await adminGraphQL<CustomerAddressesResponse>(query, {
+      id: customerId,
     });
 
-    if (data?.errors?.length) {
-      throw new Error(
-        data.errors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
-      );
-    }
-
-    const customer = data?.data?.customer;
-
-    if (!customer) {
+    if (!data.customer) {
       return NextResponse.json(
         {
           success: false,
           error: "Customer not found.",
         },
-        { status: 404 },
+        {
+          status: 404,
+        },
       );
     }
 
+    const addresses =
+      data.customer.addressesV2?.edges?.map((edge) => edge.node) || [];
+
     return NextResponse.json({
       success: true,
-      addresses: customer.addressesV2?.nodes || [],
-      defaultAddressId: customer.defaultAddress?.id || null,
+      addresses,
+      defaultAddressId: data.customer.defaultAddress?.id || null,
     });
   } catch (error) {
-    console.error("GET /api/account/addresses:", error);
+    console.error("GET ADDRESSES ERROR:", error);
 
     return NextResponse.json(
       {
@@ -176,32 +304,37 @@ export async function GET(request: NextRequest) {
         error:
           error instanceof Error ? error.message : "Unable to load addresses.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }
 
-/* =========================================================
-   POST
-   Create address.
-========================================================= */
+/* ============================================================
+   CREATE ADDRESS
+============================================================ */
 
 export async function POST(request: NextRequest) {
   try {
-    const customerId = await getLoggedInCustomerId(request);
+    const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer session not found.",
+          error: "You are not logged in.",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
-    const body = (await request.json()) as AddressInput;
-    const address = cleanAddress(body);
+    const body = await request.json();
+
+    const address = normalizeAddress(body);
+
     const validationError = validateAddress(address);
 
     if (validationError) {
@@ -210,9 +343,13 @@ export async function POST(request: NextRequest) {
           success: false,
           error: validationError,
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
+
+    const setAsDefault = Boolean(body?.setAsDefault);
 
     const mutation = `
       mutation CreateCustomerAddress(
@@ -236,9 +373,10 @@ export async function POST(request: NextRequest) {
             provinceCode
             zip
             country
-            countryCodeV2
+            countryCode
             phone
           }
+
           userErrors {
             field
             message
@@ -247,62 +385,34 @@ export async function POST(request: NextRequest) {
       }
     `;
 
-    const data = await shopifyAdminFetch<{
-      data?: {
-        customerAddressCreate?: {
-          address?: any;
-          userErrors?: Array<{
-            field?: string[];
-            message?: string;
-          }>;
-        };
-      };
-      errors?: Array<{ message?: string }>;
-    }>(mutation, {
-      variables: {
-        address: {
-          firstName: address.firstName,
-          lastName: address.lastName,
-          address1: address.address1,
-          address2: address.address2 || undefined,
-          city: address.city,
-          province: address.province,
-          provinceCode: address.provinceCode,
-          zip: address.zip,
-          countryCode: address.countryCode,
-          phone: address.phone || undefined,
-        },
-        customerId,
-        setAsDefault: Boolean(body.setAsDefault),
-      },
+    const data = await adminGraphQL<CustomerAddressCreateResponse>(mutation, {
+      address,
+      customerId,
+      setAsDefault,
     });
 
-    if (data?.errors?.length) {
-      throw new Error(
-        data.errors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
-      );
-    }
+    const result = data.customerAddressCreate;
 
-    const payload = data?.data?.customerAddressCreate;
-
-    if (payload?.userErrors?.length) {
-      throw new Error(
-        payload.userErrors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
+    if (result.userErrors?.length) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.userErrors.map((item) => item.message).join(", "),
+          errors: result.userErrors,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     return NextResponse.json({
       success: true,
-      address: payload?.address || null,
+      message: "Address added successfully.",
+      address: result.address,
     });
   } catch (error) {
-    console.error("POST /api/account/addresses:", error);
+    console.error("CREATE ADDRESS ERROR:", error);
 
     return NextResponse.json(
       {
@@ -310,45 +420,51 @@ export async function POST(request: NextRequest) {
         error:
           error instanceof Error ? error.message : "Unable to add address.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }
 
-/* =========================================================
-   PATCH
-   Update address.
-========================================================= */
+/* ============================================================
+   UPDATE ADDRESS
+============================================================ */
 
 export async function PATCH(request: NextRequest) {
   try {
-    const customerId = await getLoggedInCustomerId(request);
+    const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer session not found.",
+          error: "You are not logged in.",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
-    const body = (await request.json()) as AddressInput & {
-      addressId?: string;
-    };
+    const body = await request.json();
 
-    if (!body.addressId) {
+    const addressId = String(body?.addressId || "").trim();
+
+    if (!addressId) {
       return NextResponse.json(
         {
           success: false,
           error: "Address ID is required.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
-    const address = cleanAddress(body);
+    const address = normalizeAddress(body);
+
     const validationError = validateAddress(address);
 
     if (validationError) {
@@ -357,9 +473,13 @@ export async function PATCH(request: NextRequest) {
           success: false,
           error: validationError,
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
+
+    const setAsDefault = Boolean(body?.setAsDefault);
 
     const mutation = `
       mutation UpdateCustomerAddress(
@@ -385,9 +505,10 @@ export async function PATCH(request: NextRequest) {
             provinceCode
             zip
             country
-            countryCodeV2
+            countryCode
             phone
           }
+
           userErrors {
             field
             message
@@ -396,63 +517,35 @@ export async function PATCH(request: NextRequest) {
       }
     `;
 
-    const data = await shopifyAdminFetch<{
-      data?: {
-        customerAddressUpdate?: {
-          address?: any;
-          userErrors?: Array<{
-            field?: string[];
-            message?: string;
-          }>;
-        };
-      };
-      errors?: Array<{ message?: string }>;
-    }>(mutation, {
-      variables: {
-        address: {
-          firstName: address.firstName,
-          lastName: address.lastName,
-          address1: address.address1,
-          address2: address.address2 || undefined,
-          city: address.city,
-          province: address.province,
-          provinceCode: address.provinceCode,
-          zip: address.zip,
-          countryCode: address.countryCode,
-          phone: address.phone || undefined,
-        },
-        addressId: body.addressId,
-        customerId,
-        setAsDefault: Boolean(body.setAsDefault),
-      },
+    const data = await adminGraphQL<CustomerAddressUpdateResponse>(mutation, {
+      address,
+      addressId,
+      customerId,
+      setAsDefault,
     });
 
-    if (data?.errors?.length) {
-      throw new Error(
-        data.errors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
-      );
-    }
+    const result = data.customerAddressUpdate;
 
-    const payload = data?.data?.customerAddressUpdate;
-
-    if (payload?.userErrors?.length) {
-      throw new Error(
-        payload.userErrors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
+    if (result.userErrors?.length) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.userErrors.map((item) => item.message).join(", "),
+          errors: result.userErrors,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     return NextResponse.json({
       success: true,
-      address: payload?.address || null,
+      message: "Address updated successfully.",
+      address: result.address,
     });
   } catch (error) {
-    console.error("PATCH /api/account/addresses:", error);
+    console.error("UPDATE ADDRESS ERROR:", error);
 
     return NextResponse.json(
       {
@@ -460,37 +553,46 @@ export async function PATCH(request: NextRequest) {
         error:
           error instanceof Error ? error.message : "Unable to update address.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }
 
-/* =========================================================
-   DELETE
-========================================================= */
+/* ============================================================
+   DELETE ADDRESS
+============================================================ */
 
 export async function DELETE(request: NextRequest) {
   try {
-    const customerId = await getLoggedInCustomerId(request);
-    const body = await request.json();
+    const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer session not found.",
+          error: "You are not logged in.",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
-    if (!body?.addressId) {
+    const body = await request.json();
+
+    const addressId = String(body?.addressId || "").trim();
+
+    if (!addressId) {
       return NextResponse.json(
         {
           success: false,
           error: "Address ID is required.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -504,6 +606,7 @@ export async function DELETE(request: NextRequest) {
           customerId: $customerId
         ) {
           deletedAddressId
+
           userErrors {
             field
             message
@@ -512,50 +615,33 @@ export async function DELETE(request: NextRequest) {
       }
     `;
 
-    const data = await shopifyAdminFetch<{
-      data?: {
-        customerAddressDelete?: {
-          deletedAddressId?: string;
-          userErrors?: Array<{
-            field?: string[];
-            message?: string;
-          }>;
-        };
-      };
-      errors?: Array<{ message?: string }>;
-    }>(mutation, {
-      variables: {
-        addressId: body.addressId,
-        customerId,
-      },
+    const data = await adminGraphQL<CustomerAddressDeleteResponse>(mutation, {
+      addressId,
+      customerId,
     });
 
-    if (data?.errors?.length) {
-      throw new Error(
-        data.errors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
-      );
-    }
+    const result = data.customerAddressDelete;
 
-    const payload = data?.data?.customerAddressDelete;
-
-    if (payload?.userErrors?.length) {
-      throw new Error(
-        payload.userErrors
-          .map((item) => item.message)
-          .filter(Boolean)
-          .join(", "),
+    if (result.userErrors?.length) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.userErrors.map((item) => item.message).join(", "),
+          errors: result.userErrors,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     return NextResponse.json({
       success: true,
-      deletedAddressId: payload?.deletedAddressId || null,
+      message: "Address deleted successfully.",
+      deletedAddressId: result.deletedAddressId,
     });
   } catch (error) {
-    console.error("DELETE /api/account/addresses:", error);
+    console.error("DELETE ADDRESS ERROR:", error);
 
     return NextResponse.json(
       {
@@ -563,7 +649,9 @@ export async function DELETE(request: NextRequest) {
         error:
           error instanceof Error ? error.message : "Unable to delete address.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }
