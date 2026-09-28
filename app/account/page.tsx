@@ -951,9 +951,9 @@ export default function AccountPage() {
                   <h2>Saved Addresses</h2>
                 </div>
 
-                <Link href="/account/addresses" className="section-link">
+                <a href="#addresses" className="section-link">
                   Manage <span>↗</span>
-                </Link>
+                </a>
               </div>
 
               {defaultAddress ? (
@@ -968,9 +968,9 @@ export default function AccountPage() {
                     <p>{getAddressText()}</p>
                   </div>
 
-                  <Link href="/account/addresses" className="address-action">
+                  <a href="#addresses" className="address-action">
                     Edit <span>↗</span>
-                  </Link>
+                  </a>
                 </div>
               ) : (
                 <div className="account-address-card address-empty">
@@ -984,9 +984,9 @@ export default function AccountPage() {
                     <p>Add an address for a faster checkout experience.</p>
                   </div>
 
-                  <Link href="/account/addresses" className="address-action">
+                  <a href="#addresses" className="address-action">
                     Add <span>↗</span>
-                  </Link>
+                  </a>
                 </div>
               )}
             </section>
