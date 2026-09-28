@@ -1,44 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { shopifyAdminFetch } from "@/lib/shopify-admin";
 
-export const runtime = "nodejs";
-
-/* =========================================================
-   TYPES
-========================================================= */
-
-type AuthCustomer = {
-  id?: string;
-  email?: string;
-  emailAddress?: {
-    emailAddress?: string;
-  };
-};
-
-type AuthResponse = {
-  customer?: AuthCustomer | null;
-};
-
 type AddressInput = {
   firstName?: string;
   lastName?: string;
-  company?: string;
   address1?: string;
   address2?: string;
   city?: string;
   province?: string;
   provinceCode?: string;
-  countryCode?: string;
   zip?: string;
+  countryCode?: string;
   phone?: string;
+  setAsDefault?: boolean;
 };
 
-/* =========================================================
-   AUTH
-========================================================= */
+async function getLoggedInCustomerId(request: NextRequest) {
+  const origin = request.nextUrl.origin;
 
-async function getLoggedInCustomer(request: NextRequest) {
-  const response = await fetch(new URL("/api/auth/me", request.url), {
+  const response = await fetch(`${origin}/api/auth/me`, {
+    method: "GET",
     headers: {
       cookie: request.headers.get("cookie") || "",
     },
@@ -49,75 +30,129 @@ async function getLoggedInCustomer(request: NextRequest) {
     return null;
   }
 
-  const data = (await response.json()) as AuthResponse;
+  const data = await response.json();
 
-  return data.customer || null;
+  return (
+    data?.customer?.id || data?.user?.customer?.id || data?.customerId || null
+  );
+}
+
+function cleanAddress(body: AddressInput) {
+  return {
+    firstName: String(body.firstName || "").trim(),
+    lastName: String(body.lastName || "").trim(),
+    address1: String(body.address1 || "").trim(),
+    address2: String(body.address2 || "").trim(),
+    city: String(body.city || "").trim(),
+    province: String(body.province || "").trim(),
+    provinceCode: body.provinceCode
+      ? String(body.provinceCode).trim()
+      : undefined,
+    zip: String(body.zip || "").trim(),
+    countryCode: String(body.countryCode || "IN")
+      .trim()
+      .toUpperCase(),
+    phone: String(body.phone || "").trim(),
+  };
+}
+
+function validateAddress(address: ReturnType<typeof cleanAddress>) {
+  if (
+    !address.firstName ||
+    !address.lastName ||
+    !address.address1 ||
+    !address.city ||
+    !address.province ||
+    !address.zip
+  ) {
+    return "First name, last name, address, city, state and PIN code are required.";
+  }
+
+  if (address.zip.length < 4 || address.zip.length > 12) {
+    return "Please enter a valid PIN code.";
+  }
+
+  return null;
 }
 
 /* =========================================================
-   CUSTOMER ID
-========================================================= */
-
-async function resolveCustomerId(customer: AuthCustomer) {
-  if (customer.id) {
-    return customer.id;
-  }
-
-  const email = customer.email || customer.emailAddress?.emailAddress || "";
-
-  if (!email) {
-    return null;
-  }
-
-  const data = await shopifyAdminFetch<{
-    customers: {
-      edges: {
-        node: {
-          id: string;
-        };
-      }[];
-    };
-  }>({
-    query: `
-      query FindCustomer($query: String!) {
-        customers(first: 1, query: $query) {
-          edges {
-            node {
-              id
-            }
-          }
-        }
-      }
-    `,
-    variables: {
-      query: `email:${email}`,
-    },
-  });
-
-  return data.customers.edges[0]?.node?.id || null;
-}
-
-/* =========================================================
-   GET ADDRESSES
+   GET
+   Load customer's saved addresses.
 ========================================================= */
 
 export async function GET(request: NextRequest) {
   try {
-    const customer = await getLoggedInCustomer(request);
+    const customerId = await getLoggedInCustomerId(request);
 
-    if (!customer) {
+    if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "You must be logged in.",
+          error: "Customer session not found.",
         },
         { status: 401 },
       );
     }
 
-    const customerId = await resolveCustomerId(customer);
+    const query = `
+      query GetCustomerAddresses($id: ID!) {
+        customer(id: $id) {
+          id
+          defaultAddress {
+            id
+          }
+          addressesV2(first: 50) {
+            nodes {
+              id
+              firstName
+              lastName
+              company
+              address1
+              address2
+              city
+              province
+              provinceCode
+              zip
+              country
+              countryCodeV2
+              phone
+            }
+          }
+        }
+      }
+    `;
 
-    if (!customerId) {
+    const data = await shopifyAdminFetch<{
+      data?: {
+        customer?: {
+          id: string;
+          defaultAddress?: {
+            id: string;
+          } | null;
+          addressesV2?: {
+            nodes: any[];
+          };
+        } | null;
+      };
+      errors?: Array<{ message?: string }>;
+    }>(query, {
+      variables: {
+        id: customerId,
+      },
+    });
+
+    if (data?.errors?.length) {
+      throw new Error(
+        data.errors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
+      );
+    }
+
+    const customer = data?.data?.customer;
+
+    if (!customer) {
       return NextResponse.json(
         {
           success: false,
@@ -127,65 +162,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await shopifyAdminFetch<{
-      customer: {
-        id: string;
-        defaultAddress: {
-          id: string;
-        } | null;
-        addressesV2: {
-          edges: {
-            node: any;
-          }[];
-        };
-      } | null;
-    }>({
-      query: `
-        query GetCustomerAddresses(
-          $id: ID!
-        ) {
-          customer(id: $id) {
-            id
-
-            defaultAddress {
-              id
-            }
-
-            addressesV2(first: 20) {
-              edges {
-                node {
-                  id
-                  firstName
-                  lastName
-                  company
-                  address1
-                  address2
-                  city
-                  province
-                  provinceCode
-                  country
-                  countryCode
-                  zip
-                  phone
-                }
-              }
-            }
-          }
-        }
-      `,
-      variables: {
-        id: customerId,
-      },
-    });
-
     return NextResponse.json({
       success: true,
-      customer: data.customer,
-      addresses:
-        data.customer?.addressesV2?.edges?.map((edge) => edge.node) || [],
+      addresses: customer.addressesV2?.nodes || [],
+      defaultAddressId: customer.defaultAddress?.id || null,
     });
   } catch (error) {
-    console.error("GET ADDRESSES ERROR:", error);
+    console.error("GET /api/account/addresses:", error);
 
     return NextResponse.json(
       {
@@ -199,135 +182,133 @@ export async function GET(request: NextRequest) {
 }
 
 /* =========================================================
-   CREATE ADDRESS
+   POST
+   Create address.
 ========================================================= */
 
 export async function POST(request: NextRequest) {
   try {
-    const customer = await getLoggedInCustomer(request);
-
-    if (!customer) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "You must be logged in.",
-        },
-        { status: 401 },
-      );
-    }
-
-    const customerId = await resolveCustomerId(customer);
+    const customerId = await getLoggedInCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer not found.",
+          error: "Customer session not found.",
         },
-        { status: 404 },
+        { status: 401 },
       );
     }
 
-    const body = (await request.json()) as AddressInput & {
-      setAsDefault?: boolean;
-    };
+    const body = (await request.json()) as AddressInput;
+    const address = cleanAddress(body);
+    const validationError = validateAddress(address);
 
-    if (!body.address1 || !body.city || !body.zip) {
+    if (validationError) {
       return NextResponse.json(
         {
           success: false,
-          error: "Address, city and PIN code are required.",
+          error: validationError,
         },
         { status: 400 },
       );
     }
 
-    const data = await shopifyAdminFetch<{
-      customerAddressCreate: {
-        address: any;
-        userErrors: {
-          field?: string[];
-          message: string;
-        }[];
-      };
-    }>({
-      query: `
-        mutation CreateAddress(
-          $customerId: ID!
-          $address: MailingAddressInput!
-          $setAsDefault: Boolean
+    const mutation = `
+      mutation CreateCustomerAddress(
+        $address: MailingAddressInput!
+        $customerId: ID!
+        $setAsDefault: Boolean
+      ) {
+        customerAddressCreate(
+          address: $address
+          customerId: $customerId
+          setAsDefault: $setAsDefault
         ) {
-          customerAddressCreate(
-            customerId: $customerId
-            address: $address
-            setAsDefault: $setAsDefault
-          ) {
-            address {
-              id
-              firstName
-              lastName
-              company
-              address1
-              address2
-              city
-              province
-              provinceCode
-              country
-              countryCode
-              zip
-              phone
-            }
-
-            userErrors {
-              field
-              message
-            }
+          address {
+            id
+            firstName
+            lastName
+            address1
+            address2
+            city
+            province
+            provinceCode
+            zip
+            country
+            countryCodeV2
+            phone
+          }
+          userErrors {
+            field
+            message
           }
         }
-      `,
+      }
+    `;
+
+    const data = await shopifyAdminFetch<{
+      data?: {
+        customerAddressCreate?: {
+          address?: any;
+          userErrors?: Array<{
+            field?: string[];
+            message?: string;
+          }>;
+        };
+      };
+      errors?: Array<{ message?: string }>;
+    }>(mutation, {
       variables: {
-        customerId,
         address: {
-          firstName: body.firstName || "",
-          lastName: body.lastName || "",
-          company: body.company || "",
-          address1: body.address1,
-          address2: body.address2 || "",
-          city: body.city,
-          province: body.province || "",
-          provinceCode: body.provinceCode || "",
-          countryCode: body.countryCode || "IN",
-          zip: body.zip,
-          phone: body.phone || "",
+          firstName: address.firstName,
+          lastName: address.lastName,
+          address1: address.address1,
+          address2: address.address2 || undefined,
+          city: address.city,
+          province: address.province,
+          provinceCode: address.provinceCode,
+          zip: address.zip,
+          countryCode: address.countryCode,
+          phone: address.phone || undefined,
         },
+        customerId,
         setAsDefault: Boolean(body.setAsDefault),
       },
     });
 
-    const result = data.customerAddressCreate;
+    if (data?.errors?.length) {
+      throw new Error(
+        data.errors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
+      );
+    }
 
-    if (result.userErrors?.length) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: result.userErrors.map((item) => item.message).join(", "),
-        },
-        { status: 400 },
+    const payload = data?.data?.customerAddressCreate;
+
+    if (payload?.userErrors?.length) {
+      throw new Error(
+        payload.userErrors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
       );
     }
 
     return NextResponse.json({
       success: true,
-      address: result.address,
+      address: payload?.address || null,
     });
   } catch (error) {
-    console.error("CREATE ADDRESS ERROR:", error);
+    console.error("POST /api/account/addresses:", error);
 
     return NextResponse.json(
       {
         success: false,
         error:
-          error instanceof Error ? error.message : "Unable to create address.",
+          error instanceof Error ? error.message : "Unable to add address.",
       },
       { status: 500 },
     );
@@ -335,41 +316,29 @@ export async function POST(request: NextRequest) {
 }
 
 /* =========================================================
-   UPDATE ADDRESS
+   PATCH
+   Update address.
 ========================================================= */
 
 export async function PATCH(request: NextRequest) {
   try {
-    const customer = await getLoggedInCustomer(request);
-
-    if (!customer) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "You must be logged in.",
-        },
-        { status: 401 },
-      );
-    }
-
-    const customerId = await resolveCustomerId(customer);
+    const customerId = await getLoggedInCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer not found.",
+          error: "Customer session not found.",
         },
-        { status: 404 },
+        { status: 401 },
       );
     }
 
     const body = (await request.json()) as AddressInput & {
-      id?: string;
-      setAsDefault?: boolean;
+      addressId?: string;
     };
 
-    if (!body.id) {
+    if (!body.addressId) {
       return NextResponse.json(
         {
           success: false,
@@ -379,89 +348,111 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const data = await shopifyAdminFetch<{
-      customerAddressUpdate: {
-        address: any;
-        userErrors: {
-          field?: string[];
-          message: string;
-        }[];
-      };
-    }>({
-      query: `
-        mutation UpdateAddress(
-          $customerId: ID!
-          $addressId: ID!
-          $address: MailingAddressInput!
-          $setAsDefault: Boolean
-        ) {
-          customerAddressUpdate(
-            customerId: $customerId
-            addressId: $addressId
-            address: $address
-            setAsDefault: $setAsDefault
-          ) {
-            address {
-              id
-              firstName
-              lastName
-              company
-              address1
-              address2
-              city
-              province
-              provinceCode
-              country
-              countryCode
-              zip
-              phone
-            }
+    const address = cleanAddress(body);
+    const validationError = validateAddress(address);
 
-            userErrors {
-              field
-              message
-            }
-          }
-        }
-      `,
-      variables: {
-        customerId,
-        addressId: body.id,
-        address: {
-          firstName: body.firstName || "",
-          lastName: body.lastName || "",
-          company: body.company || "",
-          address1: body.address1 || "",
-          address2: body.address2 || "",
-          city: body.city || "",
-          province: body.province || "",
-          provinceCode: body.provinceCode || "",
-          countryCode: body.countryCode || "IN",
-          zip: body.zip || "",
-          phone: body.phone || "",
-        },
-        setAsDefault: Boolean(body.setAsDefault),
-      },
-    });
-
-    const result = data.customerAddressUpdate;
-
-    if (result.userErrors?.length) {
+    if (validationError) {
       return NextResponse.json(
         {
           success: false,
-          error: result.userErrors.map((item) => item.message).join(", "),
+          error: validationError,
         },
         { status: 400 },
       );
     }
 
+    const mutation = `
+      mutation UpdateCustomerAddress(
+        $address: MailingAddressInput!
+        $addressId: ID!
+        $customerId: ID!
+        $setAsDefault: Boolean
+      ) {
+        customerAddressUpdate(
+          address: $address
+          addressId: $addressId
+          customerId: $customerId
+          setAsDefault: $setAsDefault
+        ) {
+          address {
+            id
+            firstName
+            lastName
+            address1
+            address2
+            city
+            province
+            provinceCode
+            zip
+            country
+            countryCodeV2
+            phone
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const data = await shopifyAdminFetch<{
+      data?: {
+        customerAddressUpdate?: {
+          address?: any;
+          userErrors?: Array<{
+            field?: string[];
+            message?: string;
+          }>;
+        };
+      };
+      errors?: Array<{ message?: string }>;
+    }>(mutation, {
+      variables: {
+        address: {
+          firstName: address.firstName,
+          lastName: address.lastName,
+          address1: address.address1,
+          address2: address.address2 || undefined,
+          city: address.city,
+          province: address.province,
+          provinceCode: address.provinceCode,
+          zip: address.zip,
+          countryCode: address.countryCode,
+          phone: address.phone || undefined,
+        },
+        addressId: body.addressId,
+        customerId,
+        setAsDefault: Boolean(body.setAsDefault),
+      },
+    });
+
+    if (data?.errors?.length) {
+      throw new Error(
+        data.errors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
+      );
+    }
+
+    const payload = data?.data?.customerAddressUpdate;
+
+    if (payload?.userErrors?.length) {
+      throw new Error(
+        payload.userErrors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      address: result.address,
+      address: payload?.address || null,
     });
   } catch (error) {
-    console.error("UPDATE ADDRESS ERROR:", error);
+    console.error("PATCH /api/account/addresses:", error);
 
     return NextResponse.json(
       {
@@ -475,40 +466,25 @@ export async function PATCH(request: NextRequest) {
 }
 
 /* =========================================================
-   DELETE ADDRESS
+   DELETE
 ========================================================= */
 
 export async function DELETE(request: NextRequest) {
   try {
-    const customer = await getLoggedInCustomer(request);
-
-    if (!customer) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "You must be logged in.",
-        },
-        { status: 401 },
-      );
-    }
-
-    const customerId = await resolveCustomerId(customer);
+    const customerId = await getLoggedInCustomerId(request);
+    const body = await request.json();
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: "Customer not found.",
+          error: "Customer session not found.",
         },
-        { status: 404 },
+        { status: 401 },
       );
     }
 
-    const { searchParams } = new URL(request.url);
-
-    const addressId = searchParams.get("id");
-
-    if (!addressId) {
+    if (!body?.addressId) {
       return NextResponse.json(
         {
           success: false,
@@ -518,57 +494,68 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const data = await shopifyAdminFetch<{
-      customerAddressDelete: {
-        deletedAddressId: string | null;
-        userErrors: {
-          field?: string[];
-          message: string;
-        }[];
-      };
-    }>({
-      query: `
-        mutation DeleteAddress(
-          $customerId: ID!
-          $addressId: ID!
+    const mutation = `
+      mutation DeleteCustomerAddress(
+        $addressId: ID!
+        $customerId: ID!
+      ) {
+        customerAddressDelete(
+          addressId: $addressId
+          customerId: $customerId
         ) {
-          customerAddressDelete(
-            customerId: $customerId
-            addressId: $addressId
-          ) {
-            deletedAddressId
-
-            userErrors {
-              field
-              message
-            }
+          deletedAddressId
+          userErrors {
+            field
+            message
           }
         }
-      `,
+      }
+    `;
+
+    const data = await shopifyAdminFetch<{
+      data?: {
+        customerAddressDelete?: {
+          deletedAddressId?: string;
+          userErrors?: Array<{
+            field?: string[];
+            message?: string;
+          }>;
+        };
+      };
+      errors?: Array<{ message?: string }>;
+    }>(mutation, {
       variables: {
+        addressId: body.addressId,
         customerId,
-        addressId,
       },
     });
 
-    const result = data.customerAddressDelete;
+    if (data?.errors?.length) {
+      throw new Error(
+        data.errors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
+      );
+    }
 
-    if (result.userErrors?.length) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: result.userErrors.map((item) => item.message).join(", "),
-        },
-        { status: 400 },
+    const payload = data?.data?.customerAddressDelete;
+
+    if (payload?.userErrors?.length) {
+      throw new Error(
+        payload.userErrors
+          .map((item) => item.message)
+          .filter(Boolean)
+          .join(", "),
       );
     }
 
     return NextResponse.json({
       success: true,
-      deletedAddressId: result.deletedAddressId,
+      deletedAddressId: payload?.deletedAddressId || null,
     });
   } catch (error) {
-    console.error("DELETE ADDRESS ERROR:", error);
+    console.error("DELETE /api/account/addresses:", error);
 
     return NextResponse.json(
       {

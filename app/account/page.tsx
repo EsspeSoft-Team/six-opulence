@@ -23,6 +23,28 @@ export default function AccountPage() {
 
   const [wishlistCount, setWishlistCount] = useState(0);
 
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [addressEditingId, setAddressEditingId] = useState<string | null>(null);
+  const [addressSaving, setAddressSaving] = useState(false);
+  const [addressDeletingId, setAddressDeletingId] = useState<string | null>(
+    null,
+  );
+  const [addressError, setAddressError] = useState("");
+  const [addressSuccess, setAddressSuccess] = useState("");
+
+  const [addressForm, setAddressForm] = useState({
+    firstName: "",
+    lastName: "",
+    address1: "",
+    address2: "",
+    city: "",
+    province: "",
+    zip: "",
+    countryCode: "IN",
+    phone: "",
+    setAsDefault: false,
+  });
+
   const [editingName, setEditingName] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
@@ -229,6 +251,165 @@ export default function AccountPage() {
       .join(", ");
 
     return [lineOne, lineTwo].filter(Boolean).join(" • ");
+  };
+
+  /* =========================================================
+     ADDRESS MANAGEMENT
+  ========================================================= */
+
+  const resetAddressForm = () => {
+    setAddressForm({
+      firstName: firstName,
+      lastName: lastName,
+      address1: "",
+      address2: "",
+      city: "",
+      province: "",
+      zip: "",
+      countryCode: "IN",
+      phone: phone,
+      setAsDefault: addresses.length === 0,
+    });
+    setAddressEditingId(null);
+    setAddressError("");
+  };
+
+  const openAddAddress = () => {
+    resetAddressForm();
+    setAddressSuccess("");
+    setAddressModalOpen(true);
+  };
+
+  const openEditAddress = (address: any) => {
+    setAddressEditingId(address?.id || null);
+    setAddressError("");
+    setAddressSuccess("");
+    setAddressForm({
+      firstName: address?.firstName || firstName,
+      lastName: address?.lastName || lastName,
+      address1: address?.address1 || "",
+      address2: address?.address2 || "",
+      city: address?.city || "",
+      province: address?.province || address?.provinceCode || "",
+      zip: address?.zip || "",
+      countryCode: address?.countryCode || "IN",
+      phone: address?.phone || phone,
+      setAsDefault: Boolean(
+        customerData?.defaultAddress?.id &&
+        address?.id === customerData.defaultAddress.id,
+      ),
+    });
+    setAddressModalOpen(true);
+  };
+
+  const handleAddressChange = (
+    field: keyof typeof addressForm,
+    value: string | boolean,
+  ) => {
+    setAddressForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const handleAddressSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+
+    setAddressError("");
+    setAddressSuccess("");
+
+    if (
+      !addressForm.firstName.trim() ||
+      !addressForm.lastName.trim() ||
+      !addressForm.address1.trim() ||
+      !addressForm.city.trim() ||
+      !addressForm.province.trim() ||
+      !addressForm.zip.trim()
+    ) {
+      setAddressError(
+        "Please fill First Name, Last Name, Address, City, State and PIN Code.",
+      );
+      return;
+    }
+
+    try {
+      setAddressSaving(true);
+
+      const response = await fetch("/api/account/addresses", {
+        method: addressEditingId ? "PATCH" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          addressId: addressEditingId,
+          ...addressForm,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Unable to save address.");
+      }
+
+      setAddressSuccess(
+        addressEditingId
+          ? "Address updated successfully."
+          : "Address added successfully.",
+      );
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    } catch (error) {
+      setAddressError(
+        error instanceof Error ? error.message : "Unable to save address.",
+      );
+    } finally {
+      setAddressSaving(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    if (!window.confirm("Delete this saved address?")) {
+      return;
+    }
+
+    try {
+      setAddressDeletingId(addressId);
+      setAddressError("");
+      setAddressSuccess("");
+
+      const response = await fetch("/api/account/addresses", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          addressId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Unable to delete address.");
+      }
+
+      setAddressSuccess("Address deleted successfully.");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    } catch (error) {
+      setAddressError(
+        error instanceof Error ? error.message : "Unable to delete address.",
+      );
+    } finally {
+      setAddressDeletingId(null);
+    }
   };
 
   /* =========================================================
@@ -951,26 +1132,94 @@ export default function AccountPage() {
                   <h2>Saved Addresses</h2>
                 </div>
 
-                <a href="#addresses" className="section-link">
-                  Manage <span>↗</span>
-                </a>
+                <button
+                  type="button"
+                  className="section-link section-button"
+                  onClick={openAddAddress}
+                >
+                  Add new address <span>+</span>
+                </button>
               </div>
 
-              {defaultAddress ? (
-                <div className="account-address-card">
-                  <div className="address-mark">01</div>
+              {addressError && (
+                <p className="profile-message error">{addressError}</p>
+              )}
 
-                  <div className="address-content">
-                    <span>PRIMARY ADDRESS</span>
+              {addressSuccess && (
+                <p className="profile-message success">{addressSuccess}</p>
+              )}
 
-                    <h3>{defaultAddress.address1 || "Saved Address"}</h3>
+              {addresses.length > 0 ? (
+                <div className="account-address-list">
+                  {addresses.map(({ node }: any, index: number) => {
+                    if (!node) return null;
 
-                    <p>{getAddressText()}</p>
-                  </div>
+                    const isDefault =
+                      customerData?.defaultAddress?.id === node.id;
 
-                  <a href="#addresses" className="address-action">
-                    Edit <span>↗</span>
-                  </a>
+                    return (
+                      <div
+                        key={node.id || index}
+                        className="account-address-card"
+                      >
+                        <div className="address-mark">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+
+                        <div className="address-content">
+                          <div className="address-label-row">
+                            <span>
+                              {isDefault ? "PRIMARY ADDRESS" : "SAVED ADDRESS"}
+                            </span>
+
+                            {isDefault && (
+                              <b className="address-default-badge">DEFAULT</b>
+                            )}
+                          </div>
+
+                          <h3>
+                            {node.firstName || firstName}{" "}
+                            {node.lastName || lastName}
+                          </h3>
+
+                          <p>
+                            {[
+                              node.address1,
+                              node.address2,
+                              node.city,
+                              node.province,
+                              node.zip,
+                            ]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+
+                          {node.phone && <small>{node.phone}</small>}
+                        </div>
+
+                        <div className="address-actions">
+                          <button
+                            type="button"
+                            className="address-action"
+                            onClick={() => openEditAddress(node)}
+                          >
+                            Edit <span>↗</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            className="address-delete"
+                            disabled={addressDeletingId === node.id}
+                            onClick={() => handleDeleteAddress(node.id)}
+                          >
+                            {addressDeletingId === node.id
+                              ? "Deleting..."
+                              : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="account-address-card address-empty">
@@ -984,9 +1233,227 @@ export default function AccountPage() {
                     <p>Add an address for a faster checkout experience.</p>
                   </div>
 
-                  <a href="#addresses" className="address-action">
-                    Add <span>↗</span>
-                  </a>
+                  <button
+                    type="button"
+                    className="address-action"
+                    onClick={openAddAddress}
+                  >
+                    Add <span>+</span>
+                  </button>
+                </div>
+              )}
+
+              {addressModalOpen && (
+                <div
+                  className="address-modal-backdrop"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="address-modal-title"
+                  onMouseDown={(event) => {
+                    if (event.target === event.currentTarget) {
+                      setAddressModalOpen(false);
+                    }
+                  }}
+                >
+                  <div className="address-modal">
+                    <div className="address-modal-head">
+                      <div>
+                        <span className="section-eyebrow">
+                          DELIVERY INFORMATION
+                        </span>
+
+                        <h3 id="address-modal-title">
+                          {addressEditingId
+                            ? "Edit Address"
+                            : "Add New Address"}
+                        </h3>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="address-modal-close"
+                        onClick={() => setAddressModalOpen(false)}
+                        disabled={addressSaving}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <form
+                      className="address-form"
+                      onSubmit={handleAddressSubmit}
+                    >
+                      <div className="address-form-grid two">
+                        <label>
+                          <span>FIRST NAME</span>
+                          <input
+                            value={addressForm.firstName}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "firstName",
+                                event.target.value,
+                              )
+                            }
+                            autoComplete="given-name"
+                          />
+                        </label>
+
+                        <label>
+                          <span>LAST NAME</span>
+                          <input
+                            value={addressForm.lastName}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "lastName",
+                                event.target.value,
+                              )
+                            }
+                            autoComplete="family-name"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="address-form-grid">
+                        <label>
+                          <span>ADDRESS LINE 1</span>
+                          <input
+                            value={addressForm.address1}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "address1",
+                                event.target.value,
+                              )
+                            }
+                            autoComplete="address-line1"
+                          />
+                        </label>
+
+                        <label>
+                          <span>ADDRESS LINE 2</span>
+                          <input
+                            value={addressForm.address2}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "address2",
+                                event.target.value,
+                              )
+                            }
+                            autoComplete="address-line2"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="address-form-grid three">
+                        <label>
+                          <span>CITY</span>
+                          <input
+                            value={addressForm.city}
+                            onChange={(event) =>
+                              handleAddressChange("city", event.target.value)
+                            }
+                            autoComplete="address-level2"
+                          />
+                        </label>
+
+                        <label>
+                          <span>STATE</span>
+                          <input
+                            value={addressForm.province}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "province",
+                                event.target.value,
+                              )
+                            }
+                            autoComplete="address-level1"
+                          />
+                        </label>
+
+                        <label>
+                          <span>PIN CODE</span>
+                          <input
+                            value={addressForm.zip}
+                            onChange={(event) =>
+                              handleAddressChange("zip", event.target.value)
+                            }
+                            inputMode="numeric"
+                            autoComplete="postal-code"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="address-form-grid two">
+                        <label>
+                          <span>PHONE</span>
+                          <input
+                            value={addressForm.phone}
+                            onChange={(event) =>
+                              handleAddressChange("phone", event.target.value)
+                            }
+                            inputMode="tel"
+                            autoComplete="tel"
+                          />
+                        </label>
+
+                        <label>
+                          <span>COUNTRY</span>
+                          <select
+                            value={addressForm.countryCode}
+                            onChange={(event) =>
+                              handleAddressChange(
+                                "countryCode",
+                                event.target.value,
+                              )
+                            }
+                          >
+                            <option value="IN">India</option>
+                          </select>
+                        </label>
+                      </div>
+
+                      <label className="address-default-check">
+                        <input
+                          type="checkbox"
+                          checked={addressForm.setAsDefault}
+                          onChange={(event) =>
+                            handleAddressChange(
+                              "setAsDefault",
+                              event.target.checked,
+                            )
+                          }
+                        />
+
+                        <span>Set as default address</span>
+                      </label>
+
+                      {addressError && (
+                        <p className="profile-message error">{addressError}</p>
+                      )}
+
+                      <div className="address-form-actions">
+                        <button
+                          type="button"
+                          className="profile-cancel"
+                          onClick={() => setAddressModalOpen(false)}
+                          disabled={addressSaving}
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="submit"
+                          className="profile-save"
+                          disabled={addressSaving}
+                        >
+                          {addressSaving
+                            ? "Saving..."
+                            : addressEditingId
+                              ? "Update Address"
+                              : "Save Address"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
               )}
             </section>
