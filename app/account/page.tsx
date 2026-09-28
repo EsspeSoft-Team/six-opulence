@@ -8,23 +8,55 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/lib/auth-context";
 
+type TrackingItem = {
+  fulfillmentId?: string;
+  status?: string | null;
+  createdAt?: string;
+  company?: string | null;
+  number?: string | null;
+  url?: string | null;
+};
+
 export default function AccountPage() {
   const { customer, loading, logout } = useAuth();
   const router = useRouter();
 
   const [wishlistCount, setWishlistCount] = useState(0);
+
   const [editingName, setEditingName] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
+
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState("");
   const [profileSuccess, setProfileSuccess] = useState("");
+
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
+
+  const [tracking, setTracking] = useState<TrackingItem[]>([]);
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState("");
+
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
+    null,
+  );
+
+  const [cancelMessage, setCancelMessage] = useState("");
+  const [cancelError, setCancelError] = useState("");
+
+  /* =========================================================
+     REDIRECT IF NOT LOGGED IN
+  ========================================================= */
 
   useEffect(() => {
     if (!loading && !customer) {
       router.replace("/login");
     }
   }, [loading, customer, router]);
+
+  /* =========================================================
+     CUSTOMER DATA
+  ========================================================= */
 
   useEffect(() => {
     if (!customer) return;
@@ -43,11 +75,16 @@ export default function AccountPage() {
       }
 
       const parsed = JSON.parse(storedWishlist);
+
       setWishlistCount(Array.isArray(parsed) ? parsed.length : 0);
     } catch {
       setWishlistCount(0);
     }
   }, [customer]);
+
+  /* =========================================================
+     LOADING
+  ========================================================= */
 
   if (loading) {
     return (
@@ -67,11 +104,13 @@ export default function AccountPage() {
   const customerData = customer as any;
 
   const orders = customerData?.orders?.edges ?? [];
+
   const addresses = customerData?.addresses?.edges ?? [];
 
-  const recentOrders = orders.slice(0, 3);
+  const recentOrders = orders.slice(0, 5);
 
   const firstName = customerData?.firstName ?? "";
+
   const lastName = customerData?.lastName ?? "";
 
   const email =
@@ -86,6 +125,10 @@ export default function AccountPage() {
   const defaultAddress =
     customerData?.defaultAddress || addresses?.[0]?.node || null;
 
+  /* =========================================================
+     FORMAT DATE
+  ========================================================= */
+
   const formatDate = (date: string) => {
     if (!date) return "";
 
@@ -99,6 +142,10 @@ export default function AccountPage() {
       return "";
     }
   };
+
+  /* =========================================================
+     FORMAT CURRENCY
+  ========================================================= */
 
   const formatCurrency = (amount: string | number, currencyCode = "INR") => {
     if (amount === "" || amount === null || amount === undefined) {
@@ -116,6 +163,10 @@ export default function AccountPage() {
     }
   };
 
+  /* =========================================================
+     STATUS
+  ========================================================= */
+
   const getStatusClass = (status: string) => {
     const clean = String(status || "")
       .toLowerCase()
@@ -125,7 +176,7 @@ export default function AccountPage() {
       return "delivered";
     }
 
-    if (clean.includes("cancel") || clean.includes("refun")) {
+    if (clean.includes("cancel") || clean.includes("refund")) {
       return "cancelled";
     }
 
@@ -156,6 +207,10 @@ export default function AccountPage() {
     return String(status).toUpperCase();
   };
 
+  /* =========================================================
+     ADDRESS
+  ========================================================= */
+
   const getAddressText = () => {
     if (!defaultAddress) {
       return "No saved address";
@@ -176,6 +231,10 @@ export default function AccountPage() {
     return [lineOne, lineTwo].filter(Boolean).join(" • ");
   };
 
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -183,6 +242,10 @@ export default function AccountPage() {
       router.push("/");
     }
   };
+
+  /* =========================================================
+     PROFILE UPDATE
+  ========================================================= */
 
   const handleProfileSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -193,6 +256,7 @@ export default function AccountPage() {
     setProfileSuccess("");
 
     const first = editFirstName.trim().replace(/\s+/g, " ");
+
     const last = editLastName.trim().replace(/\s+/g, " ");
 
     if (!first) {
@@ -227,9 +291,11 @@ export default function AccountPage() {
 
       setProfileSuccess("Profile updated successfully.");
 
+      setEditingName(false);
+
       setTimeout(() => {
         window.location.reload();
-      }, 500);
+      }, 700);
     } catch (error) {
       setProfileError(
         error instanceof Error
@@ -241,11 +307,119 @@ export default function AccountPage() {
     }
   };
 
+  /* =========================================================
+     TRACK ORDER
+  ========================================================= */
+
+  const handleTrackOrder = async (orderId: string) => {
+    if (trackingOrderId === orderId) {
+      setTrackingOrderId(null);
+      setTracking([]);
+      setTrackingError("");
+      return;
+    }
+
+    try {
+      setTrackingOrderId(orderId);
+      setTrackingLoading(true);
+      setTrackingError("");
+      setTracking([]);
+
+      const response = await fetch(
+        `/api/account/order/tracking?id=${encodeURIComponent(orderId)}`,
+        {
+          cache: "no-store",
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Unable to load tracking information.");
+      }
+
+      setTracking(data.tracking || []);
+    } catch (error) {
+      setTrackingError(
+        error instanceof Error
+          ? error.message
+          : "Unable to load tracking information.",
+      );
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
+
+  /* =========================================================
+     CANCEL ORDER
+  ========================================================= */
+
+  const handleCancelOrder = async (orderId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this order?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setCancellingOrderId(orderId);
+
+      setCancelError("");
+      setCancelMessage("");
+
+      const response = await fetch("/api/account/order/cancel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Unable to cancel order.");
+      }
+
+      setCancelMessage("Order cancellation submitted successfully.");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } catch (error) {
+      setCancelError(
+        error instanceof Error ? error.message : "Unable to cancel order.",
+      );
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
+
+  /* =========================================================
+     DOWNLOAD INVOICE
+  ========================================================= */
+
+  const handleInvoice = (orderId: string) => {
+    window.open(
+      `/api/account/order/invoice?id=${encodeURIComponent(orderId)}`,
+      "_blank",
+    );
+  };
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
+
   return (
     <main className="account-page">
       <div className="account-shell">
-        {/* TOP ACCOUNT HEADER */}
-        <section className="account-welcome">
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
+
+        <section id="overview" className="account-welcome">
           <div>
             <span className="account-eyebrow">MY ACCOUNT</span>
 
@@ -266,18 +440,27 @@ export default function AccountPage() {
           </button>
         </section>
 
-        {/* MOBILE NAV */}
+        {/* =====================================================
+            MOBILE NAV
+        ===================================================== */}
+
         <nav className="account-mobile-nav">
-          <Link className="is-active" href="/account">
-            Overview
-          </Link>
-          <Link href="/account/orders">Orders</Link>
-          <Link href="/account/addresses">Addresses</Link>
+          <a href="#overview">Overview</a>
+
+          <a href="#orders">Orders</a>
+
+          <a href="#addresses">Addresses</a>
+
+          <a href="#profile">Profile</a>
+
           <Link href="/wishlist">Wishlist</Link>
         </nav>
 
         <div className="account-layout">
-          {/* SIDEBAR */}
+          {/* ===================================================
+              SIDEBAR
+          =================================================== */}
+
           <aside className="account-sidebar">
             <div className="account-profile-mini">
               <div className="account-avatar">
@@ -286,95 +469,133 @@ export default function AccountPage() {
 
               <div>
                 <strong>{fullName}</strong>
+
                 <span>{email || "OPULENCE Member"}</span>
               </div>
             </div>
 
             <nav className="account-nav">
-              <Link href="/account" className="account-nav-item is-active">
+              <a href="#overview" className="account-nav-item is-active">
                 <span className="nav-icon">01</span>
+
                 <span>Overview</span>
-                <span className="nav-arrow">↗</span>
-              </Link>
 
-              <Link href="/account/orders" className="account-nav-item">
+                <span className="nav-arrow">↗</span>
+              </a>
+
+              <a href="#orders" className="account-nav-item">
                 <span className="nav-icon">02</span>
-                <span>My Orders</span>
-                <span className="nav-arrow">↗</span>
-              </Link>
 
-              <Link href="/account/addresses" className="account-nav-item">
+                <span>My Orders</span>
+
+                <span className="nav-count">{orders.length}</span>
+              </a>
+
+              <a href="#addresses" className="account-nav-item">
                 <span className="nav-icon">03</span>
+
                 <span>Addresses</span>
-                <span className="nav-arrow">↗</span>
-              </Link>
+
+                <span className="nav-count">{addresses.length}</span>
+              </a>
 
               <Link href="/wishlist" className="account-nav-item">
                 <span className="nav-icon">04</span>
+
                 <span>Wishlist</span>
+
                 <span className="nav-count">{wishlistCount}</span>
               </Link>
             </nav>
 
             <div className="account-sidebar-note">
               <span>OPULENCE</span>
+
               <p>The art of affluence.</p>
             </div>
           </aside>
 
-          {/* MAIN */}
+          {/* ===================================================
+              MAIN
+          =================================================== */}
+
           <div className="account-main">
-            {/* QUICK STATS */}
+            {/* =================================================
+                QUICK STATS
+            ================================================= */}
+
             <section className="account-stat-grid">
-              <Link href="/account/orders" className="account-stat-card">
+              <a href="#orders" className="account-stat-card">
                 <span>ORDERS</span>
+
                 <strong>{orders.length}</strong>
+
                 <small>
                   {orders.length === 1 ? "Order placed" : "Orders placed"}
                 </small>
-                <b>↗</b>
-              </Link>
 
-              <Link href="/account/addresses" className="account-stat-card">
+                <b>↗</b>
+              </a>
+
+              <a href="#addresses" className="account-stat-card">
                 <span>ADDRESSES</span>
+
                 <strong>{addresses.length}</strong>
+
                 <small>
                   {addresses.length === 1 ? "Saved address" : "Saved addresses"}
                 </small>
+
                 <b>↗</b>
-              </Link>
+              </a>
 
               <Link href="/wishlist" className="account-stat-card dark">
                 <span>WISHLIST</span>
+
                 <strong>{wishlistCount}</strong>
+
                 <small>Saved pieces</small>
+
                 <b>↗</b>
               </Link>
             </section>
 
-            {/* ORDERS */}
-            <section className="account-section">
+            {/* =================================================
+                ORDERS
+            ================================================= */}
+
+            <section id="orders" className="account-section">
               <div className="account-section-head">
                 <div>
                   <span className="section-eyebrow">SHOPPING ACTIVITY</span>
-                  <h2>Recent Orders</h2>
+
+                  <h2>My Orders</h2>
                 </div>
 
-                {orders.length > 0 && (
-                  <Link href="/account/orders" className="section-link">
-                    View all <span>↗</span>
-                  </Link>
-                )}
+                <span className="section-link">
+                  {orders.length} {orders.length === 1 ? "Order" : "Orders"}
+                </span>
               </div>
+
+              {cancelMessage && (
+                <p className="profile-message success">{cancelMessage}</p>
+              )}
+
+              {cancelError && (
+                <p className="profile-message error">{cancelError}</p>
+              )}
 
               {recentOrders.length === 0 ? (
                 <div className="account-empty">
                   <span>NO ORDERS YET</span>
+
                   <h3>Your wardrobe awaits.</h3>
+
                   <p>
                     Discover the latest OPULENCE collection and find something
                     made for you.
                   </p>
+
                   <Link href="/" className="account-primary-btn">
                     Explore Collection
                   </Link>
@@ -382,7 +603,9 @@ export default function AccountPage() {
               ) : (
                 <div className="account-order-list">
                   {recentOrders.map(({ node }: any) => {
-                    if (!node) return null;
+                    if (!node) {
+                      return null;
+                    }
 
                     const orderNumber = node?.orderNumber ?? node?.name ?? "";
 
@@ -402,6 +625,10 @@ export default function AccountPage() {
                       firstLine?.variant?.image?.url ||
                       firstLine?.image?.url ||
                       "";
+
+                    const isCancelled = String(status)
+                      .toLowerCase()
+                      .includes("cancel");
 
                     return (
                       <article key={node.id} className="account-order-row">
@@ -436,6 +663,7 @@ export default function AccountPage() {
 
                         <div className="order-row-total">
                           <span>TOTAL</span>
+
                           <strong>{formatCurrency(total, currency)}</strong>
                         </div>
 
@@ -445,17 +673,126 @@ export default function AccountPage() {
                           )}`}
                         >
                           <i />
+
                           {getStatusText(status)}
                         </div>
 
-                        <Link
-                          href={`/account/orders?order=${encodeURIComponent(
-                            node.id,
-                          )}`}
-                          className="order-row-view"
-                        >
-                          View <span>↗</span>
-                        </Link>
+                        <div className="account-order-actions">
+                          {/* TRACK */}
+
+                          <button
+                            type="button"
+                            className="order-row-view"
+                            onClick={() => handleTrackOrder(node.id)}
+                          >
+                            {trackingOrderId === node.id ? "Close" : "Track"}
+                            <span>↗</span>
+                          </button>
+
+                          {/* INVOICE */}
+
+                          <button
+                            type="button"
+                            className="order-row-view"
+                            onClick={() => handleInvoice(node.id)}
+                          >
+                            Invoice
+                            <span>↓</span>
+                          </button>
+
+                          {/* CANCEL */}
+
+                          {!isCancelled && (
+                            <button
+                              type="button"
+                              className="order-row-cancel"
+                              disabled={cancellingOrderId === node.id}
+                              onClick={() => handleCancelOrder(node.id)}
+                            >
+                              {cancellingOrderId === node.id
+                                ? "Cancelling..."
+                                : "Cancel"}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* ===================================
+                              TRACKING PANEL
+                          =================================== */}
+
+                        {trackingOrderId === node.id && (
+                          <div className="order-tracking-panel">
+                            <div className="tracking-heading">
+                              <span>ORDER TRACKING</span>
+
+                              <strong>#{orderNumber}</strong>
+                            </div>
+
+                            {trackingLoading && (
+                              <p>Loading tracking information...</p>
+                            )}
+
+                            {trackingError && (
+                              <p className="profile-message error">
+                                {trackingError}
+                              </p>
+                            )}
+
+                            {!trackingLoading &&
+                              !trackingError &&
+                              tracking.length === 0 && (
+                                <div className="tracking-empty">
+                                  <strong>
+                                    Tracking information not available
+                                  </strong>
+
+                                  <p>
+                                    Tracking details will appear here once your
+                                    order has been shipped.
+                                  </p>
+                                </div>
+                              )}
+
+                            {!trackingLoading && tracking.length > 0 && (
+                              <div className="tracking-list">
+                                {tracking.map((item, index) => (
+                                  <div
+                                    className="tracking-item"
+                                    key={`${item.fulfillmentId}-${index}`}
+                                  >
+                                    <div className="tracking-dot" />
+
+                                    <div>
+                                      <strong>
+                                        {item.company || "Courier"}
+                                      </strong>
+
+                                      {item.number && (
+                                        <p>Tracking No: {item.number}</p>
+                                      )}
+
+                                      {item.createdAt && (
+                                        <small>
+                                          {formatDate(item.createdAt)}
+                                        </small>
+                                      )}
+
+                                      {item.url && (
+                                        <a
+                                          href={item.url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                        >
+                                          Track shipment ↗
+                                        </a>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </article>
                     );
                   })}
@@ -463,11 +800,15 @@ export default function AccountPage() {
               )}
             </section>
 
-            {/* PROFILE */}
-            <section className="account-section">
+            {/* =================================================
+                PROFILE
+            ================================================= */}
+
+            <section id="profile" className="account-section">
               <div className="account-section-head">
                 <div>
                   <span className="section-eyebrow">PERSONAL INFORMATION</span>
+
                   <h2>Profile</h2>
                 </div>
 
@@ -477,9 +818,12 @@ export default function AccountPage() {
                     className="section-link section-button"
                     onClick={() => {
                       setEditFirstName(firstName);
+
                       setEditLastName(lastName);
+
                       setProfileError("");
                       setProfileSuccess("");
+
                       setEditingName(true);
                     }}
                   >
@@ -505,16 +849,19 @@ export default function AccountPage() {
                 <div className="profile-grid">
                   <div className="profile-detail">
                     <span>FULL NAME</span>
+
                     <strong>{fullName}</strong>
                   </div>
 
                   <div className="profile-detail">
                     <span>EMAIL ADDRESS</span>
+
                     <strong>{email || "Not available"}</strong>
                   </div>
 
                   <div className="profile-detail">
                     <span>PHONE</span>
+
                     <strong>{phone || "Not available"}</strong>
                   </div>
                 </div>
@@ -526,6 +873,7 @@ export default function AccountPage() {
                   <div className="profile-edit-grid">
                     <label>
                       <span>FIRST NAME</span>
+
                       <input
                         type="text"
                         value={editFirstName}
@@ -540,6 +888,7 @@ export default function AccountPage() {
 
                     <label>
                       <span>LAST NAME</span>
+
                       <input
                         type="text"
                         value={editLastName}
@@ -567,6 +916,7 @@ export default function AccountPage() {
                       className="profile-cancel"
                       onClick={() => {
                         setEditingName(false);
+
                         setProfileError("");
                         setProfileSuccess("");
                       }}
@@ -581,6 +931,7 @@ export default function AccountPage() {
                       disabled={profileSaving}
                     >
                       {profileSaving ? "Saving..." : "Save Changes"}
+
                       {!profileSaving && <span>↗</span>}
                     </button>
                   </div>
@@ -588,12 +939,16 @@ export default function AccountPage() {
               )}
             </section>
 
-            {/* ADDRESS */}
-            <section className="account-section">
+            {/* =================================================
+                ADDRESSES
+            ================================================= */}
+
+            <section id="addresses" className="account-section">
               <div className="account-section-head">
                 <div>
                   <span className="section-eyebrow">DELIVERY INFORMATION</span>
-                  <h2>Saved Address</h2>
+
+                  <h2>Saved Addresses</h2>
                 </div>
 
                 <Link href="/account/addresses" className="section-link">
@@ -607,7 +962,9 @@ export default function AccountPage() {
 
                   <div className="address-content">
                     <span>PRIMARY ADDRESS</span>
+
                     <h3>{defaultAddress.address1 || "Saved Address"}</h3>
+
                     <p>{getAddressText()}</p>
                   </div>
 
@@ -621,7 +978,9 @@ export default function AccountPage() {
 
                   <div className="address-content">
                     <span>PRIMARY ADDRESS</span>
+
                     <h3>No saved address</h3>
+
                     <p>Add an address for a faster checkout experience.</p>
                   </div>
 
@@ -632,10 +991,45 @@ export default function AccountPage() {
               )}
             </section>
 
-            {/* BOTTOM BRAND NOTE */}
+            {/* =================================================
+                WISHLIST
+            ================================================= */}
+
+            <section id="wishlist" className="account-section">
+              <div className="account-section-head">
+                <div>
+                  <span className="section-eyebrow">SAVED PIECES</span>
+
+                  <h2>Wishlist</h2>
+                </div>
+
+                <Link href="/wishlist" className="section-link">
+                  View wishlist <span>↗</span>
+                </Link>
+              </div>
+
+              <div className="account-wishlist-card">
+                <div>
+                  <span>{wishlistCount}</span>
+
+                  <p>{wishlistCount === 1 ? "piece saved" : "pieces saved"}</p>
+                </div>
+
+                <Link href="/wishlist" className="account-primary-btn">
+                  View Wishlist
+                </Link>
+              </div>
+            </section>
+
+            {/* =================================================
+                BRAND NOTE
+            ================================================= */}
+
             <div className="account-brand-note">
               <span />
+
               <p>OPULENCE · THE ART OF AFFLUENCE</p>
+
               <span />
             </div>
           </div>

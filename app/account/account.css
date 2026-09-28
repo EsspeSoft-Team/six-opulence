@@ -1,28 +1,19 @@
 /* =========================================================
    OPULENCE ACCOUNT PAGE
-   PREMIUM / COMPACT E-COMMERCE DASHBOARD
-   Uses ONLY the site's global variables
+   Myntra-style functionality
+   OPULENCE luxury visual language
 ========================================================= */
 
 .account-page {
-  width: 100%;
   min-height: 100vh;
-  box-sizing: border-box;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
-  padding: 52px 24px 90px;
-}
-
-.account-page *,
-.account-page *::before,
-.account-page *::after {
-  box-sizing: border-box;
+  padding: 56px 0 100px;
 }
 
 .account-shell {
-  width: 100%;
-  max-width: 1280px;
+  width: min(1380px, calc(100% - 80px));
   margin: 0 auto;
 }
 
@@ -36,32 +27,35 @@
   align-items: center;
   justify-content: center;
   background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
 }
 
 .account-loader {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
 .account-loader span {
-  width: 30px;
-  height: 30px;
-  display: block;
-  margin: 0 auto 14px;
+  width: 22px;
+  height: 22px;
   border: 1px solid var(--color-border);
   border-top-color: var(--color-dark);
   border-radius: 50%;
-  animation: account-spin 0.8s linear infinite;
+  animation: opulence-spin 0.8s linear infinite;
 }
 
 .account-loader p {
   margin: 0;
-  color: var(--color-text-muted);
-  font-size: 9px;
-  letter-spacing: 0.15em;
+  font-size: 10px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
-@keyframes account-spin {
+@keyframes opulence-spin {
   to {
     transform: rotate(360deg);
   }
@@ -75,16 +69,17 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 30px;
-  padding: 18px 0 34px;
+  gap: 40px;
+  padding: 0 0 48px;
   border-bottom: 1px solid var(--color-border);
 }
 
 .account-eyebrow {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 13px;
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-family: var(--font-body);
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -94,44 +89,43 @@
   margin: 0;
   color: var(--color-dark);
   font-family: var(--font-heading);
-  font-size: clamp(40px, 4.6vw, 62px);
+  font-size: clamp(48px, 5vw, 76px);
   font-weight: 400;
-  line-height: 0.94;
-  letter-spacing: -0.025em;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
 }
 
 .account-welcome h1 em {
-  color: var(--color-dark);
   font-family: var(--font-display);
   font-weight: 400;
-  font-style: italic;
 }
 
 .account-welcome p {
-  margin: 16px 0 0;
+  margin: 22px 0 0;
   color: var(--color-text-muted);
-  font-size: 11px;
-  line-height: 1.6;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.7;
 }
 
 .account-logout {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  flex: 0 0 auto;
-  min-height: 38px;
-  padding: 0 15px;
+  gap: 12px;
+  padding: 13px 18px;
   border: 1px solid var(--color-border);
-  outline: none;
   background: transparent;
   color: var(--color-dark);
   font-family: var(--font-body);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: 0.25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .account-logout:hover {
@@ -141,7 +135,7 @@
 }
 
 .account-logout span {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* =========================================================
@@ -153,14 +147,14 @@
 }
 
 /* =========================================================
-   TWO COLUMN DASHBOARD
+   LAYOUT
 ========================================================= */
 
 .account-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 48px;
-  padding-top: 38px;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 56px;
+  padding-top: 48px;
 }
 
 /* =========================================================
@@ -169,144 +163,125 @@
 
 .account-sidebar {
   position: sticky;
-  top: 25px;
+  top: 30px;
   align-self: start;
 }
 
 .account-profile-mini {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 0 22px;
+  gap: 13px;
+  padding-bottom: 26px;
   border-bottom: 1px solid var(--color-border);
 }
 
 .account-avatar {
   width: 42px;
   height: 42px;
+  flex: 0 0 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 42px;
-  border: 1px solid var(--color-dark);
-  border-radius: 50%;
-  background: var(--color-white);
-  color: var(--color-dark);
+  background: var(--color-dark);
+  color: var(--color-white);
   font-family: var(--font-heading);
-  font-size: 19px;
+  font-size: 18px;
+  border-radius: 50%;
 }
 
 .account-profile-mini strong {
   display: block;
-  overflow: hidden;
+  margin-bottom: 5px;
   color: var(--color-dark);
   font-size: 11px;
   font-weight: 500;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .account-profile-mini span {
   display: block;
-  max-width: 155px;
-  margin-top: 4px;
+  max-width: 165px;
   overflow: hidden;
   color: var(--color-text-muted);
-  font-size: 8px;
-  line-height: 1.4;
+  font-size: 9px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .account-nav {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
+  padding-top: 16px;
 }
 
 .account-nav-item {
-  width: 100%;
-  min-height: 45px;
+  position: relative;
   display: grid;
-  grid-template-columns: 25px 1fr auto;
+  grid-template-columns: 30px 1fr auto;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+  min-height: 48px;
   padding: 0 10px;
-  border-left: 2px solid transparent;
-  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
   text-decoration: none;
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: 0.2s ease;
+  transition:
+    color 0.2s ease,
+    padding 0.2s ease,
+    background 0.2s ease;
 }
 
-.account-nav-item:hover {
-  background: var(--color-white);
-  color: var(--color-dark);
-}
-
+.account-nav-item:hover,
 .account-nav-item.is-active {
-  border-left-color: var(--color-dark);
-  background: var(--color-white);
+  padding-left: 15px;
+  background: var(--color-off-white);
   color: var(--color-dark);
 }
 
 .nav-icon {
-  color: var(--color-text-faint);
+  color: var(--color-text-muted);
   font-size: 8px;
-}
-
-.account-nav-item.is-active .nav-icon {
-  color: var(--color-dark);
+  letter-spacing: 0.08em;
 }
 
 .nav-arrow {
-  opacity: 0;
   font-size: 12px;
-  transform: translateX(-4px);
-  transition: 0.2s ease;
-}
-
-.account-nav-item:hover .nav-arrow,
-.account-nav-item.is-active .nav-arrow {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .nav-count {
   min-width: 20px;
   height: 20px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--color-border);
   border-radius: 50%;
-  background: var(--color-dark);
-  color: var(--color-white);
-  font-size: 7px;
+  color: var(--color-text-muted);
+  font-size: 8px;
 }
 
 .account-sidebar-note {
-  padding-top: 22px;
+  margin-top: 70px;
 }
 
 .account-sidebar-note span {
+  display: block;
+  margin-bottom: 5px;
   color: var(--color-dark);
-  font-family: var(--font-display);
-  font-size: 18px;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  letter-spacing: 0.05em;
 }
 
 .account-sidebar-note p {
-  margin: 3px 0 0;
+  margin: 0;
   color: var(--color-text-muted);
-  font-family: var(--font-heading);
-  font-size: 12px;
-  font-style: italic;
+  font-family: var(--font-display);
+  font-size: 14px;
 }
 
 /* =========================================================
-   MAIN CONTENT
+   MAIN
 ========================================================= */
 
 .account-main {
@@ -314,75 +289,78 @@
 }
 
 /* =========================================================
-   STATS
+   QUICK STATS
 ========================================================= */
 
 .account-stat-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 12px;
+  margin-bottom: 56px;
 }
 
 .account-stat-card {
   position: relative;
-  min-height: 132px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 19px;
-  overflow: hidden;
+  min-height: 145px;
+  padding: 23px;
   border: 1px solid var(--color-border);
   background: var(--color-white);
   color: var(--color-dark);
   text-decoration: none;
-  transition: 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .account-stat-card:hover {
+  transform: translateY(-3px);
   border-color: var(--color-dark);
 }
 
 .account-stat-card.dark {
-  border-color: var(--color-dark);
   background: var(--color-dark);
   color: var(--color-white);
+  border-color: var(--color-dark);
 }
 
-.account-stat-card > span {
+.account-stat-card span {
+  display: block;
+  margin-bottom: 17px;
   color: var(--color-text-muted);
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 500;
-  letter-spacing: 0.17em;
+  letter-spacing: 0.18em;
 }
 
-.account-stat-card.dark > span {
-  color: rgba(255, 255, 255, 0.58);
+.account-stat-card.dark span {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .account-stat-card strong {
-  margin-top: 12px;
+  display: block;
   color: inherit;
   font-family: var(--font-heading);
-  font-size: 42px;
+  font-size: 40px;
   font-weight: 400;
   line-height: 1;
 }
 
 .account-stat-card small {
+  display: block;
+  margin-top: 9px;
   color: var(--color-text-muted);
-  font-size: 8px;
+  font-size: 9px;
 }
 
 .account-stat-card.dark small {
-  color: rgba(255, 255, 255, 0.52);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .account-stat-card b {
   position: absolute;
-  right: 18px;
-  bottom: 17px;
-  color: inherit;
-  font-size: 13px;
+  right: 20px;
+  bottom: 20px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -391,24 +369,27 @@
 ========================================================= */
 
 .account-section {
-  margin-top: 62px;
+  scroll-margin-top: 35px;
+  margin-bottom: 72px;
 }
 
 .account-section-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 30px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .section-eyebrow {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--color-text-muted);
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 500;
-  letter-spacing: 0.19em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
@@ -416,76 +397,119 @@
   margin: 0;
   color: var(--color-dark);
   font-family: var(--font-heading);
-  font-size: 35px;
+  font-size: clamp(32px, 3vw, 44px);
   font-weight: 400;
   line-height: 1;
+  letter-spacing: -0.025em;
 }
 
 .section-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
+  gap: 7px;
+  flex-shrink: 0;
   color: var(--color-dark);
+  background: transparent;
+  border: 0;
   font-family: var(--font-body);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.13em;
-  text-decoration: none;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.section-link span {
-  font-size: 12px;
-  transition: transform 0.2s ease;
+.section-link:hover {
+  opacity: 0.55;
 }
 
-.section-link:hover span {
-  transform: translate(2px, -2px);
-}
-
-.section-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.section-button {
+  padding: 0;
 }
 
 /* =========================================================
-   ORDERS
+   EMPTY
+========================================================= */
+
+.account-empty {
+  padding: 52px 30px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  text-align: center;
+}
+
+.account-empty > span {
+  display: block;
+  margin-bottom: 13px;
+  color: var(--color-text-muted);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+.account-empty h3 {
+  margin: 0;
+  color: var(--color-dark);
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 400;
+}
+
+.account-empty p {
+  max-width: 420px;
+  margin: 12px auto 24px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.account-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 20px;
+  background: var(--color-dark);
+  color: var(--color-white);
+  border: 1px solid var(--color-dark);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.account-primary-btn:hover {
+  background: transparent;
+  color: var(--color-dark);
+}
+
+/* =========================================================
+   ORDER LIST
 ========================================================= */
 
 .account-order-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  border-top: 1px solid var(--color-border);
 }
 
 .account-order-row {
-  width: 100%;
-  min-height: 91px;
+  position: relative;
   display: grid;
-  grid-template-columns: 66px minmax(170px, 1fr) 95px 100px 55px;
+  grid-template-columns: 74px minmax(160px, 1fr) 110px 115px minmax(220px, auto);
   align-items: center;
-  gap: 15px;
-  padding: 9px 13px 9px 9px;
-  border: 1px solid var(--color-border);
-  background: var(--color-white);
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.account-order-row:hover {
-  border-color: #d5d0c6;
-  transform: translateY(-1px);
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .order-product-image {
-  width: 66px;
-  height: 72px;
+  width: 74px;
+  height: 92px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,158 +525,255 @@
 }
 
 .order-product-image span {
-  color: var(--color-dark);
-  font-family: var(--font-display);
-  font-size: 17px;
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+  font-size: 20px;
 }
 
 .order-row-info {
   min-width: 0;
 }
 
-.order-row-info > span {
+.order-row-info > span,
+.order-row-total > span {
+  display: block;
+  margin-bottom: 7px;
   color: var(--color-text-muted);
   font-size: 7px;
   font-weight: 500;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.16em;
 }
 
 .order-row-info h3 {
-  margin: 6px 0 4px;
   overflow: hidden;
+  margin: 0;
   color: var(--color-dark);
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .order-row-info p {
-  margin: 0;
+  margin: 7px 0 0;
   color: var(--color-text-muted);
-  font-size: 8px;
-}
-
-.order-row-total {
-  min-width: 0;
-}
-
-.order-row-total > span {
-  color: var(--color-text-muted);
-  font-size: 7px;
-  font-weight: 500;
-  letter-spacing: 0.13em;
+  font-size: 9px;
 }
 
 .order-row-total strong {
-  display: block;
-  margin-top: 5px;
   color: var(--color-dark);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
 }
 
 .order-row-status {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--color-text-muted);
-  font-size: 7px;
+  justify-content: flex-start;
+  gap: 7px;
+  color: var(--color-text);
+  font-size: 8px;
   font-weight: 500;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .order-row-status i {
-  width: 5px;
-  height: 5px;
-  display: block;
-  flex: 0 0 5px;
+  width: 6px;
+  height: 6px;
+  display: inline-block;
   border-radius: 50%;
   background: var(--color-text-muted);
 }
 
-.order-row-status.delivered {
-  color: var(--color-dark);
-}
-
 .order-row-status.delivered i {
-  background: var(--color-dark);
-}
-
-.order-row-status.cancelled {
-  color: var(--color-error);
+  background: #3d7a4d;
 }
 
 .order-row-status.cancelled i {
   background: var(--color-error);
 }
 
-.order-row-view {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  color: var(--color-dark);
-  font-size: 7px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.order-row-view span {
-  font-size: 11px;
+.order-row-status.processing i {
+  background: #b28b45;
 }
 
 /* =========================================================
-   EMPTY ORDERS
+   ORDER ACTIONS
 ========================================================= */
 
-.account-empty {
-  padding: 54px 25px;
-  border: 1px solid var(--color-border);
-  background: var(--color-white);
-  text-align: center;
+.account-order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
 }
 
-.account-empty > span {
-  color: var(--color-text-muted);
+.order-row-view,
+.order-row-cancel {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-dark);
+  font-family: var(--font-body);
   font-size: 7px;
   font-weight: 500;
-  letter-spacing: 0.17em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.account-empty h3 {
-  margin: 12px 0 7px;
-  color: var(--color-dark);
-  font-family: var(--font-heading);
-  font-size: 30px;
-  font-weight: 400;
+.order-row-view span {
+  margin-left: 5px;
 }
 
-.account-empty p {
-  max-width: 390px;
-  margin: 0 auto 21px;
-  color: var(--color-text-muted);
-  font-size: 10px;
-  line-height: 1.7;
-}
-
-.account-primary-btn {
-  display: inline-flex;
-  min-height: 38px;
-  align-items: center;
-  padding: 0 18px;
+.order-row-view:hover {
+  border-color: var(--color-dark);
   background: var(--color-dark);
   color: var(--color-white);
+}
+
+.order-row-cancel {
+  border-color: rgba(192, 57, 43, 0.25);
+  color: var(--color-error);
+}
+
+.order-row-cancel:hover {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  color: var(--color-white);
+}
+
+.order-row-cancel:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   TRACKING
+========================================================= */
+
+.order-tracking-panel {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+  padding: 24px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-off-white);
+}
+
+.tracking-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.tracking-heading span {
+  color: var(--color-text-muted);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.tracking-heading strong {
+  color: var(--color-dark);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tracking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tracking-item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding: 0 0 20px;
+}
+
+.tracking-item:last-child {
+  padding-bottom: 0;
+}
+
+.tracking-dot {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--color-dark);
+}
+
+.tracking-item:not(:last-child) .tracking-dot::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 4px;
+  width: 1px;
+  height: calc(100% + 20px);
+  background: var(--color-border);
+}
+
+.tracking-item strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-dark);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tracking-item p {
+  margin: 0 0 4px;
+  color: var(--color-text-muted);
+  font-size: 9px;
+}
+
+.tracking-item small {
+  display: block;
+  color: var(--color-text-faint);
+  font-size: 8px;
+}
+
+.tracking-item a {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--color-dark);
   font-size: 8px;
   font-weight: 500;
-  letter-spacing: 0.13em;
-  text-decoration: none;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.tracking-empty {
+  padding: 5px 0;
+}
+
+.tracking-empty strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-dark);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tracking-empty p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.6;
 }
 
 /* =========================================================
@@ -662,48 +783,35 @@
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
   border: 1px solid var(--color-border);
-  background: var(--color-white);
+  background: var(--color-border);
 }
 
 .profile-detail {
-  min-height: 92px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 17px 19px;
-  border-right: 1px solid var(--color-border);
+  min-height: 112px;
+  padding: 22px;
+  background: var(--color-white);
 }
 
-.profile-detail:last-child {
-  border-right: 0;
-}
-
-.profile-detail > span {
+.profile-detail span {
+  display: block;
+  margin-bottom: 12px;
   color: var(--color-text-muted);
   font-size: 7px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
 }
 
 .profile-detail strong {
   display: block;
-  margin-top: 8px;
-  overflow: hidden;
   color: var(--color-dark);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
-  line-height: 1.4;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
-/* =========================================================
-   PROFILE EDIT
-========================================================= */
-
 .profile-edit-card {
-  padding: 23px;
+  padding: 25px;
   border: 1px solid var(--color-border);
   background: var(--color-white);
 }
@@ -711,69 +819,55 @@
 .profile-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 15px;
 }
 
-.profile-edit-card label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.profile-edit-grid label {
+  display: block;
 }
 
-.profile-edit-card label > span {
+.profile-edit-grid label > span {
+  display: block;
+  margin-bottom: 8px;
   color: var(--color-text-muted);
   font-size: 7px;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.15em;
 }
 
-.profile-edit-card input {
+.profile-edit-grid input {
   width: 100%;
-  height: 45px;
-  padding: 0 12px;
+  height: 46px;
+  box-sizing: border-box;
+  padding: 0 13px;
   border: 1px solid var(--color-border);
   outline: none;
   background: var(--color-white);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 11px;
-  transition: 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.profile-edit-card input:focus {
+.profile-edit-grid input:focus {
   border-color: var(--color-dark);
   box-shadow: 0 0 0 1px var(--color-dark);
 }
 
-.profile-edit-card input:disabled {
-  opacity: 0.55;
-}
-
-.profile-message {
-  margin: 12px 0 0;
-  font-size: 9px;
-}
-
-.profile-message.error {
-  color: var(--color-error);
-}
-
-.profile-message.success {
-  color: var(--color-dark);
-}
-
 .profile-edit-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 18px;
+  gap: 9px;
+  margin-top: 20px;
 }
 
 .profile-cancel,
 .profile-save {
-  min-height: 39px;
-  padding: 0 16px;
-  border: 1px solid var(--color-dark);
+  min-height: 40px;
+  padding: 0 18px;
   font-family: var(--font-body);
   font-size: 8px;
   font-weight: 500;
@@ -783,7 +877,7 @@
 }
 
 .profile-cancel {
-  border-color: var(--color-border);
+  border: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-dark);
 }
@@ -791,7 +885,8 @@
 .profile-save {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+  border: 1px solid var(--color-dark);
   background: var(--color-dark);
   color: var(--color-white);
 }
@@ -800,14 +895,24 @@
   background: var(--color-dark-2);
 }
 
-.profile-save span {
-  font-size: 12px;
-}
-
-.profile-cancel:disabled,
-.profile-save:disabled {
+.profile-save:disabled,
+.profile-cancel:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.profile-message {
+  margin: 15px 0 0;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.profile-message.success {
+  color: #3d7a4d;
+}
+
+.profile-message.error {
+  color: var(--color-error);
 }
 
 /* =========================================================
@@ -815,76 +920,113 @@
 ========================================================= */
 
 .account-address-card {
-  min-height: 105px;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px;
-  padding: 18px;
+  gap: 20px;
+  padding: 25px;
   border: 1px solid var(--color-border);
   background: var(--color-white);
 }
 
 .address-mark {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--color-border);
   border-radius: 50%;
   color: var(--color-text-muted);
-  font-size: 7px;
+  font-size: 8px;
 }
 
 .address-content > span {
+  display: block;
+  margin-bottom: 8px;
   color: var(--color-text-muted);
   font-size: 7px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
 }
 
 .address-content h3 {
-  margin: 7px 0 5px;
+  margin: 0 0 6px;
   color: var(--color-dark);
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 400;
-  line-height: 1.1;
 }
 
 .address-content p {
+  max-width: 700px;
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 8px;
-  line-height: 1.6;
+  font-size: 10px;
+  line-height: 1.7;
 }
 
 .address-action {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 7px;
   color: var(--color-dark);
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 500;
   letter-spacing: 0.12em;
-  text-decoration: none;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
-.address-action span {
-  font-size: 11px;
+.address-action:hover {
+  opacity: 0.55;
+}
+
+.address-empty {
+  background: var(--color-off-white);
 }
 
 /* =========================================================
-   BRAND FOOTER
+   WISHLIST
+========================================================= */
+
+.account-wishlist-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.account-wishlist-card > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.account-wishlist-card > div > span {
+  color: var(--color-dark);
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 400;
+}
+
+.account-wishlist-card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+/* =========================================================
+   BRAND NOTE
 ========================================================= */
 
 .account-brand-note {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 65px;
+  gap: 18px;
+  margin: 90px 0 15px;
 }
 
 .account-brand-note span {
@@ -894,46 +1036,55 @@
 }
 
 .account-brand-note p {
+  flex-shrink: 0;
   margin: 0;
-  color: var(--color-text-muted);
+  color: var(--color-text-faint);
+  font-family: var(--font-body);
   font-size: 7px;
-  letter-spacing: 0.17em;
-  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.18em;
 }
 
 /* =========================================================
-   1100
+   RESPONSIVE
 ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
+  .account-shell {
+    width: min(100% - 48px, 1100px);
+  }
+
   .account-layout {
-    grid-template-columns: 195px minmax(0, 1fr);
-    gap: 32px;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 35px;
   }
 
   .account-order-row {
-    grid-template-columns: 62px minmax(150px, 1fr) 82px 85px 48px;
-    gap: 11px;
+    grid-template-columns: 64px minmax(130px, 1fr) 90px 100px;
   }
 
-  .order-product-image {
-    width: 62px;
-    height: 69px;
+  .account-order-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+
+  .order-tracking-panel {
+    grid-column: 1 / -1;
   }
 }
 
-/* =========================================================
-   800
-========================================================= */
-
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .account-page {
-    padding: 32px 18px 65px;
+    padding-top: 35px;
+  }
+
+  .account-shell {
+    width: min(100% - 32px, 760px);
   }
 
   .account-layout {
     display: block;
-    padding-top: 25px;
+    padding-top: 30px;
   }
 
   .account-sidebar {
@@ -942,11 +1093,10 @@
 
   .account-mobile-nav {
     display: flex;
-    width: 100%;
-    margin-top: 17px;
+    gap: 6px;
     overflow-x: auto;
-    border: 1px solid var(--color-border);
-    background: var(--color-white);
+    margin-top: 20px;
+    padding: 5px 0;
     scrollbar-width: none;
   }
 
@@ -955,217 +1105,201 @@
   }
 
   .account-mobile-nav a {
-    flex: 1 0 25%;
-    min-width: 90px;
-    padding: 13px 12px;
-    color: var(--color-text-muted);
-    font-size: 7px;
+    flex-shrink: 0;
+    padding: 11px 14px;
+    border: 1px solid var(--color-border);
+    color: var(--color-dark);
+    background: var(--color-white);
+    font-size: 8px;
     font-weight: 500;
     letter-spacing: 0.1em;
-    text-align: center;
     text-decoration: none;
     text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .account-mobile-nav a.is-active {
-    background: var(--color-dark);
-    color: var(--color-white);
   }
 
   .account-stat-grid {
-    gap: 6px;
-  }
-
-  .account-stat-card {
-    min-height: 115px;
-    padding: 15px;
-  }
-
-  .account-stat-card strong {
-    font-size: 34px;
-  }
-
-  .account-order-row {
-    grid-template-columns: 62px minmax(0, 1fr) auto;
-  }
-
-  .order-row-total,
-  .order-row-status {
-    display: none;
-  }
-
-  .order-row-view {
-    justify-self: end;
+    margin-bottom: 45px;
   }
 }
 
-/* =========================================================
-   600
-========================================================= */
-
-@media (max-width: 600px) {
+@media (max-width: 680px) {
   .account-page {
-    padding: 24px 13px 55px;
+    padding: 28px 0 65px;
+  }
+
+  .account-shell {
+    width: calc(100% - 24px);
   }
 
   .account-welcome {
     align-items: flex-start;
     flex-direction: column;
-    gap: 20px;
-    padding: 15px 0 25px;
+    gap: 25px;
+    padding-bottom: 30px;
   }
 
   .account-welcome h1 {
-    font-size: 38px;
+    font-size: 48px;
   }
 
   .account-welcome p {
-    max-width: 310px;
-    font-size: 10px;
+    max-width: 320px;
   }
 
   .account-logout {
-    min-height: 36px;
+    width: 100%;
+    justify-content: center;
   }
 
   .account-stat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 45px;
   }
 
   .account-stat-card {
-    min-height: 104px;
-    padding: 12px;
-  }
-
-  .account-stat-card > span {
-    font-size: 6px;
-  }
-
-  .account-stat-card strong {
-    font-size: 27px;
-  }
-
-  .account-stat-card small {
-    max-width: 62px;
-    font-size: 7px;
-    line-height: 1.35;
-  }
-
-  .account-stat-card b {
-    right: 10px;
-    bottom: 10px;
-    font-size: 11px;
+    min-height: 110px;
   }
 
   .account-section {
-    margin-top: 48px;
+    margin-bottom: 52px;
   }
 
   .account-section-head {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .account-section-head h2 {
-    font-size: 29px;
+    font-size: 36px;
   }
 
   .section-link {
-    margin-top: 4px;
+    align-self: flex-start;
   }
 
   .account-order-row {
-    grid-template-columns: 55px minmax(0, 1fr);
-    gap: 12px;
-    padding: 8px;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 14px;
+    padding: 15px 0;
   }
 
   .order-product-image {
-    width: 55px;
-    height: 66px;
+    width: 58px;
+    height: 74px;
   }
 
   .order-row-info h3 {
     font-size: 16px;
   }
 
-  .order-row-info p {
-    font-size: 8px;
+  .order-row-total {
+    grid-column: 2;
   }
 
-  .order-row-view {
+  .order-row-status {
     grid-column: 2;
-    justify-self: start;
-    margin-top: -2px;
+  }
+
+  .account-order-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 4px;
+  }
+
+  .order-tracking-panel {
+    grid-column: 1 / -1;
+    padding: 18px;
   }
 
   .profile-grid {
     grid-template-columns: 1fr;
   }
 
-  .profile-detail {
-    min-height: 70px;
-    border-right: 0;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .profile-detail:last-child {
-    border-bottom: 0;
-  }
-
   .profile-edit-grid {
     grid-template-columns: 1fr;
   }
 
+  .profile-edit-card {
+    padding: 18px;
+  }
+
   .profile-edit-actions {
-    flex-direction: column-reverse;
+    justify-content: stretch;
   }
 
   .profile-cancel,
   .profile-save {
-    width: 100%;
+    flex: 1;
   }
 
   .account-address-card {
     grid-template-columns: 38px minmax(0, 1fr);
-    gap: 12px;
+    gap: 13px;
+    padding: 18px;
   }
 
   .address-action {
     grid-column: 2;
     justify-self: start;
+    margin-top: 4px;
+  }
+
+  .account-wishlist-card {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px;
+  }
+
+  .account-wishlist-card .account-primary-btn {
+    width: 100%;
   }
 
   .account-brand-note {
-    margin-top: 50px;
+    margin-top: 55px;
+  }
+
+  .account-brand-note p {
+    font-size: 6px;
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .account-welcome h1 {
+    font-size: 42px;
+  }
+
+  .account-section-head h2 {
+    font-size: 32px;
+  }
+
+  .account-mobile-nav a {
+    padding: 10px 11px;
+    font-size: 7px;
+  }
+
+  .order-row-view,
+  .order-row-cancel {
+    padding: 0 9px;
+    font-size: 6.5px;
   }
 }
 
 /* =========================================================
-   400
+   REDUCED MOTION
 ========================================================= */
 
-@media (max-width: 400px) {
-  .account-welcome h1 {
-    font-size: 34px;
-  }
-
-  .account-stat-card {
-    min-height: 96px;
-    padding: 10px;
-  }
-
-  .account-stat-card strong {
-    font-size: 24px;
-  }
-
-  .account-section-head h2 {
-    font-size: 27px;
-  }
-
-  .account-mobile-nav a {
-    min-width: 80px;
-    padding-left: 8px;
-    padding-right: 8px;
+@media (prefers-reduced-motion: reduce) {
+  .account-loader span,
+  .account-stat-card,
+  .account-nav-item,
+  .account-logout,
+  .order-row-view,
+  .order-row-cancel {
+    animation: none;
+    transition: none;
   }
 }
