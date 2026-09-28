@@ -1,21 +1,14 @@
 /* =========================================================
-   OPULENCE - ACCOUNT PAGE
-   Uses ONLY global design tokens
+   OPULENCE ACCOUNT PAGE
+   Uses global design variables only
 ========================================================= */
 
-/* =========================
-   PAGE
-========================= */
-
 .account-page {
-  width: 100%;
   min-height: 100vh;
-  padding: 72px 24px 90px;
-
   background: var(--color-bg);
   color: var(--color-text);
-
   font-family: var(--font-body);
+  padding: 80px 24px;
 }
 
 .account-container {
@@ -24,21 +17,71 @@
   margin: 0 auto;
 }
 
-/* =========================
-   ACCOUNT HEADER
-========================= */
+/* =========================================================
+   LOADING
+========================================================= */
 
-.account-header {
-  margin-bottom: 48px;
+.account-loading {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
 }
 
-.account-eyebrow {
-  display: block;
-  margin-bottom: 12px;
+.account-loader {
+  text-align: center;
+}
 
+.account-loader span {
+  width: 28px;
+  height: 28px;
+  display: block;
+  margin: 0 auto 14px;
+  border: 1px solid var(--color-border);
+  border-top-color: var(--color-dark);
+  border-radius: 50%;
+  animation: accountSpin 0.8s linear infinite;
+}
+
+.account-loader p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@keyframes accountSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.account-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  padding-bottom: 55px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.account-header-content {
+  max-width: 700px;
+}
+
+.account-eyebrow,
+.section-eyebrow {
+  display: block;
+  margin-bottom: 14px;
   color: var(--color-text-muted);
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.18em;
   line-height: 1.4;
@@ -46,232 +89,240 @@
 }
 
 .account-header h1 {
-  margin: 0 0 10px;
-
+  margin: 0;
   color: var(--color-dark);
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: clamp(42px, 5vw, 68px);
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.02em;
 }
 
-.account-welcome {
-  margin: 0;
+.account-header h1 em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: italic;
+}
 
+.account-header p {
+  margin: 20px 0 0;
   color: var(--color-text-muted);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
-/* =========================
+.account-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 17px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-dark);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.account-logout span {
+  font-size: 13px;
+}
+
+.account-logout:hover {
+  background: var(--color-dark);
+  border-color: var(--color-dark);
+  color: var(--color-white);
+}
+
+/* =========================================================
    SUMMARY CARDS
-========================= */
+========================================================= */
 
 .account-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-
-  margin-bottom: 78px;
-
+  margin-top: 55px;
   background: var(--color-border);
   border: 1px solid var(--color-border);
 }
 
-.account-summary-card {
-  position: relative;
-
+.summary-card {
+  min-height: 215px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   justify-content: space-between;
-
-  min-height: 150px;
-  padding: 28px 30px;
-
+  padding: 25px;
   background: var(--color-white);
-
-  text-decoration: none;
   color: var(--color-text);
-
+  text-decoration: none;
   transition:
     background 0.25s ease,
     color 0.25s ease;
 }
 
-.account-summary-card:hover {
+.summary-card:hover {
   background: var(--color-dark);
   color: var(--color-white);
+}
+
+.summary-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-number {
+  color: var(--color-text-muted);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.summary-card:hover .summary-number {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.summary-arrow {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .summary-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
-.summary-content span {
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 10px;
+.summary-label {
+  margin-bottom: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.16em;
-  line-height: 1.4;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-
-  transition: color 0.25s ease;
+  opacity: 0.65;
 }
 
 .summary-content strong {
-  color: var(--color-dark);
-
+  color: inherit;
   font-family: var(--font-heading);
-  font-size: 27px;
+  font-size: 48px;
   font-weight: 400;
-  line-height: 1.1;
-
-  transition: color 0.25s ease;
-}
-
-.account-summary-card:hover .summary-content span {
-  color: var(--color-text-faint);
-}
-
-.account-summary-card:hover .summary-content strong {
-  color: var(--color-white);
-}
-
-.summary-arrow {
-  color: var(--color-text-muted);
-
-  font-size: 18px;
   line-height: 1;
-
-  transition:
-    transform 0.25s ease,
-    color 0.25s ease;
 }
 
-.account-summary-card:hover .summary-arrow {
-  color: var(--color-white);
-  transform: translate(4px, -4px);
+.summary-content p {
+  margin: 7px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
 }
 
-/* =========================
-   SECTION
-========================= */
-
-.account-section {
-  margin-bottom: 72px;
+.summary-card:hover .summary-content p {
+  color: rgba(255, 255, 255, 0.55);
 }
 
-.section-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
+/* =========================================================
+   COMMON SECTION
+========================================================= */
 
-  margin-bottom: 24px;
+.recent-orders,
+.details-section,
+.address-section {
+  margin-top: 90px;
 }
 
 .section-heading {
-  margin: 0;
-}
-
-.section-eyebrow {
-  display: block;
-  margin-bottom: 8px;
-
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 28px;
 }
 
 .section-heading h2 {
   margin: 0;
-
   color: var(--color-dark);
-
   font-family: var(--font-heading);
-  font-size: 34px;
+  font-size: clamp(32px, 4vw, 46px);
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1;
 }
 
-.section-link {
+.view-all,
+.edit-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
-  padding-bottom: 5px;
-
-  border-bottom: 1px solid var(--color-dark);
-
+  border: 0;
+  background: transparent;
   color: var(--color-dark);
-
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;
-
-  transition: opacity 0.25s ease;
+  cursor: pointer;
 }
 
-.section-link:hover {
-  opacity: 0.55;
+.view-all span,
+.edit-link span {
+  font-size: 13px;
+  transition: transform 0.2s ease;
 }
 
-/* =========================
+.view-all:hover span,
+.edit-link:hover span {
+  transform: translate(2px, -2px);
+}
+
+/* =========================================================
    ORDERS
-========================= */
+========================================================= */
 
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .order-card {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 0.8fr 0.8fr;
-  align-items: center;
-  gap: 24px;
-
-  min-height: 150px;
-  padding: 28px 30px;
-
-  background: var(--color-white);
+  padding: 24px 26px;
   border: 1px solid var(--color-border);
-
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+  background: var(--color-white);
 }
 
-.order-card:hover {
-  border-color: var(--color-border-dark);
+.order-card-top,
+.order-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.order-info {
-  min-width: 0;
+.order-card-top {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.order-label {
-  display: block;
-  margin-bottom: 7px;
+.order-main-info {
+  display: flex;
+  align-items: baseline;
+  gap: 13px;
+}
 
+.order-label,
+.order-total span,
+.detail-label,
+.address-type {
   color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -279,519 +330,581 @@
 
 .order-main-info h3 {
   margin: 0;
-
   color: var(--color-dark);
-
   font-family: var(--font-heading);
-  font-size: 23px;
+  font-size: 25px;
   font-weight: 400;
-  line-height: 1.2;
 }
 
 .order-date {
+  margin-left: auto;
   color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 10px;
 }
 
 .order-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: fit-content;
-  padding: 7px 12px;
-
+  padding: 7px 10px;
   border: 1px solid var(--color-border);
-
-  color: var(--color-text);
-
-  font-family: var(--font-body);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  line-height: 1;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
 
-  border-radius: var(--radius-pill);
+.order-status.delivered {
+  border-color: var(--color-dark);
+  color: var(--color-dark);
+}
+
+.order-status.processing {
+  color: var(--color-text-muted);
+}
+
+.order-status.cancelled {
+  color: var(--color-error);
+}
+
+.order-card-bottom {
+  padding-top: 18px;
 }
 
 .order-total {
-  text-align: right;
-}
-
-.order-total span {
-  display: block;
-  margin-bottom: 5px;
-
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .order-total strong {
   color: var(--color-dark);
-
-  font-family: var(--font-heading);
-  font-size: 22px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .order-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 9px;
+  align-items: center;
+  gap: 20px;
 }
 
-.order-view {
+.order-view,
+.invoice-link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-
-  min-width: 100px;
-  padding: 10px 16px;
-
-  background: var(--color-dark);
-  color: var(--color-white);
-
-  border: 1px solid var(--color-dark);
-
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  transition:
-    background 0.25s ease,
-    color 0.25s ease;
-}
-
-.order-view:hover {
-  background: var(--color-white);
+  gap: 7px;
   color: var(--color-dark);
-}
-
-.order-invoice {
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-decoration: none;
-
-  transition: color 0.25s ease;
-}
-
-.order-invoice:hover {
-  color: var(--color-dark);
-}
-
-/* =========================
-   EMPTY ORDERS
-========================= */
-
-.orders-empty {
-  padding: 55px 30px;
-
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-
-  text-align: center;
-}
-
-.orders-empty p {
-  margin: 0 0 20px;
-
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.orders-empty a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 12px 22px;
-
-  background: var(--color-dark);
-  color: var(--color-white);
-
-  font-family: var(--font-body);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-decoration: none;
   text-transform: uppercase;
 }
 
-/* =========================
-   ACCOUNT DETAILS
-========================= */
-
-.account-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.invoice-link {
+  color: var(--color-text-muted);
 }
 
-.details-card {
-  padding: 34px 32px;
+.order-view span,
+.invoice-link span {
+  font-size: 12px;
+}
 
-  background: var(--color-white);
+/* =========================================================
+   EMPTY ORDERS
+========================================================= */
+
+.orders-empty {
+  padding: 65px 30px;
   border: 1px solid var(--color-border);
+  background: var(--color-white);
+  text-align: center;
 }
 
-.details-card h3 {
-  margin: 0 0 28px;
+.empty-label {
+  color: var(--color-text-muted);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+}
 
+.orders-empty h3 {
+  margin: 15px 0 10px;
   color: var(--color-dark);
-
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 34px;
   font-weight: 400;
 }
 
-.details-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.detail-label {
+.orders-empty p {
+  max-width: 420px;
+  margin: 0 auto 25px;
   color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
 
-  font-family: var(--font-body);
+.empty-button {
+  display: inline-flex;
+  padding: 12px 20px;
+  background: var(--color-dark);
+  color: var(--color-white);
   font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   ACCOUNT DETAILS
+========================================================= */
+
+.details-card {
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.detail-row {
+  min-height: 75px;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 0 25px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-row:last-child {
+  border-bottom: 0;
+}
+
+.detail-row strong {
+  color: var(--color-dark);
+  font-size: 13px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.account-edit-button {
+  appearance: none;
+}
+
+/* =========================================================
+   INLINE NAME EDIT
+========================================================= */
+
+.details-card-editing {
+  padding: 28px;
+}
+
+.account-name-edit-form {
+  width: 100%;
+}
+
+.account-name-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.account-name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.account-name-field > span {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 8px;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.detail-value {
+.account-name-field input {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  outline: none;
+  background: var(--color-white);
   color: var(--color-text);
-
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 13px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.account-name-field input:focus {
+  border-color: var(--color-dark);
+  box-shadow: 0 0 0 1px var(--color-dark);
+}
+
+.account-name-field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-profile-message {
+  margin: 14px 0 0;
+  font-size: 10px;
   line-height: 1.5;
 }
 
-.details-footer {
+.account-profile-error {
+  color: var(--color-error);
+}
+
+.account-profile-success {
+  color: var(--color-dark);
+}
+
+.account-name-edit-actions {
   display: flex;
   justify-content: flex-end;
-
-  margin-top: 30px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
 }
 
-.edit-link {
+.account-name-cancel,
+.account-name-save {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--color-dark);
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.account-name-cancel {
+  border-color: var(--color-border);
+  background: transparent;
+  color: var(--color-dark);
+}
+
+.account-name-cancel:hover {
+  background: var(--color-off-white);
+}
+
+.account-name-save {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-
-  color: var(--color-dark);
-
-  font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  border-bottom: 1px solid var(--color-dark);
-  padding-bottom: 4px;
+  background: var(--color-dark);
+  color: var(--color-white);
 }
 
-.edit-link:hover {
-  opacity: 0.55;
+.account-name-save:hover {
+  background: var(--color-dark-2);
 }
 
-/* =========================
-   SAVED ADDRESS
-========================= */
+.account-name-save span {
+  font-size: 13px;
+}
+
+.account-name-cancel:disabled,
+.account-name-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   ADDRESSES
+========================================================= */
 
 .address-card {
-  padding: 34px 32px;
-
-  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 28px;
   border: 1px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.address-card-left {
+  min-width: 0;
+}
+
+.address-type {
+  display: block;
+  margin-bottom: 12px;
 }
 
 .address-card h3 {
-  margin: 0 0 24px;
-
-  color: var(--color-dark);
-
-  font-family: var(--font-heading);
-  font-size: 26px;
-  font-weight: 400;
-}
-
-.address-content {
-  color: var(--color-text);
-
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.address-content strong {
-  display: block;
-  margin-bottom: 4px;
-
-  color: var(--color-dark);
-
-  font-family: var(--font-heading);
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.address-content p {
   margin: 0;
-
-  color: var(--color-text-muted);
-}
-
-.address-actions {
-  display: flex;
-  justify-content: flex-end;
-
-  margin-top: 28px;
-}
-
-/* =========================
-   ACCOUNT FOOTER MESSAGE
-========================= */
-
-.account-thankyou {
-  padding-top: 20px;
-
-  border-top: 1px solid var(--color-border);
-
-  text-align: center;
-}
-
-.account-thankyou p {
-  margin: 0;
-
-  color: var(--color-text-muted);
-
+  color: var(--color-dark);
   font-family: var(--font-heading);
-  font-size: 21px;
+  font-size: 25px;
   font-weight: 400;
-  line-height: 1.5;
 }
 
-/* =========================
-   LOADING
-========================= */
+.address-card p {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
 
-.account-loading {
-  display: flex;
+.address-pin {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--color-dark);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.address-edit {
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-
-  min-height: 60vh;
-
-  background: var(--color-bg);
-  color: var(--color-text-muted);
-
-  font-family: var(--font-body);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  gap: 7px;
+  color: var(--color-dark);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-decoration: none;
   text-transform: uppercase;
 }
 
-/* =========================
-   MOBILE
-========================= */
+.address-edit span {
+  font-size: 13px;
+}
+
+.address-empty {
+  min-height: 100px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.account-footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 100px;
+  padding-top: 35px;
+  border-top: 1px solid var(--color-border);
+}
+
+.account-footer span {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.account-footer p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
 
 @media (max-width: 900px) {
   .account-page {
-    padding: 55px 20px 70px;
+    padding: 60px 20px;
+  }
+
+  .account-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    min-height: 175px;
+  }
+
+  .recent-orders,
+  .details-section,
+  .address-section {
+    margin-top: 70px;
+  }
+
+  .account-name-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+  .account-page {
+    padding: 42px 15px;
   }
 
   .account-header {
-    margin-bottom: 38px;
-  }
-
-  .account-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .account-summary-card {
-    min-height: 120px;
-  }
-
-  .account-section {
-    margin-bottom: 58px;
-  }
-
-  .order-card {
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-  }
-
-  .order-status {
-    justify-self: start;
-  }
-
-  .order-total {
-    text-align: left;
-  }
-
-  .order-actions {
-    align-items: flex-start;
-  }
-
-  .account-details-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .account-page {
-    padding: 42px 16px 60px;
+    display: block;
+    padding-bottom: 35px;
   }
 
   .account-header h1 {
-    font-size: 46px;
+    font-size: 42px;
   }
 
-  .account-welcome {
-    max-width: 320px;
-    font-size: 13px;
+  .account-header p {
+    margin-top: 16px;
+    font-size: 12px;
+  }
+
+  .account-logout {
+    margin-top: 25px;
   }
 
   .account-summary {
-    margin-bottom: 55px;
+    margin-top: 35px;
   }
 
-  .account-summary-card {
-    min-height: 105px;
-    padding: 22px 20px;
+  .summary-card {
+    min-height: 150px;
+    padding: 20px;
   }
 
   .summary-content strong {
-    font-size: 24px;
-  }
-
-  .section-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .section-heading h2 {
-    font-size: 29px;
-  }
-
-  .order-card {
-    grid-template-columns: 1fr;
-    gap: 18px;
-
-    padding: 23px 20px;
-  }
-
-  .order-total {
-    text-align: left;
-  }
-
-  .order-actions {
-    align-items: flex-start;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .order-view {
-    min-width: auto;
-  }
-
-  .details-card,
-  .address-card {
-    padding: 27px 22px;
-  }
-
-  .details-card h3,
-  .address-card h3 {
-    font-size: 24px;
-  }
-
-  .account-thankyou p {
-    font-size: 18px;
-  }
-}
-
-/* =========================
-   SMALL MOBILE
-========================= */
-
-@media (max-width: 380px) {
-  .account-page {
-    padding-left: 13px;
-    padding-right: 13px;
-  }
-
-  .account-header h1 {
     font-size: 40px;
   }
 
-  .account-summary-card {
-    padding: 20px 17px;
-  }
-
-  .summary-content strong {
-    font-size: 22px;
+  .section-heading {
+    align-items: flex-start;
   }
 
   .section-heading h2 {
-    font-size: 26px;
+    font-size: 34px;
+  }
+
+  .view-all,
+  .edit-link {
+    margin-top: 8px;
+    white-space: nowrap;
   }
 
   .order-card {
-    padding: 20px 17px;
+    padding: 18px;
   }
 
-  .details-card,
+  .order-card-top {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .order-main-info {
+    width: 100%;
+  }
+
+  .order-date {
+    margin-left: 0;
+  }
+
+  .order-status {
+    margin-left: auto;
+  }
+
+  .order-card-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .order-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .orders-empty {
+    padding: 45px 20px;
+  }
+
+  .orders-empty h3 {
+    font-size: 29px;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 17px 18px;
+  }
+
+  .detail-row strong {
+    font-size: 12px;
+  }
+
+  .details-card-editing {
+    padding: 20px;
+  }
+
+  .account-name-edit-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .account-name-edit-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .account-name-cancel,
+  .account-name-save {
+    width: 100%;
+  }
+
   .address-card {
-    padding: 24px 18px;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .address-edit {
+    margin-top: 5px;
+  }
+
+  .account-footer {
+    margin-top: 70px;
+    gap: 10px;
+  }
+
+  .account-footer p {
+    font-size: 8px;
+    line-height: 1.5;
   }
 }
 
-/* =========================
-   ACCESSIBILITY
-========================= */
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
 
-.account-page a:focus-visible,
-.account-page button:focus-visible {
-  outline: 2px solid var(--color-dark);
-  outline-offset: 3px;
-}
+@media (max-width: 380px) {
+  .account-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 
-/* =========================
-   REDUCED MOTION
-========================= */
+  .account-header h1 {
+    font-size: 36px;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .account-page *,
-  .account-page *::before,
-  .account-page *::after {
-    transition: none !important;
-    animation: none !important;
+  .section-heading h2 {
+    font-size: 30px;
+  }
+
+  .order-main-info h3 {
+    font-size: 22px;
   }
 }

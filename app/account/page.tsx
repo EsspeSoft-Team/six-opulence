@@ -2,7 +2,7 @@
 
 import "./account.css";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -11,6 +11,22 @@ import { useAuth } from "@/lib/auth-context";
 export default function AccountPage() {
   const { customer, loading, logout } = useAuth();
   const router = useRouter();
+
+  const [editingName, setEditingName] = useState(false);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState("");
+
+  useEffect(() => {
+    if (customer) {
+      const data = customer as any;
+
+      setEditFirstName(data?.firstName ?? "");
+      setEditLastName(data?.lastName ?? "");
+    }
+  }, [customer]);
 
   /*
    * LOGIN REQUIRED
@@ -419,30 +435,187 @@ export default function AccountPage() {
               <h2>Account Details</h2>
             </div>
 
-            <Link href="/account/profile" className="edit-link">
-              Edit Profile
-              <span>↗</span>
-            </Link>
+            {!editingName ? (
+              <button
+                type="button"
+                className="edit-link account-edit-button"
+                onClick={() => {
+                  setEditFirstName(firstName);
+                  setEditLastName(lastName);
+                  setProfileError("");
+                  setProfileSuccess("");
+                  setEditingName(true);
+                }}
+              >
+                Edit Profile
+                <span>↗</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="edit-link account-edit-button"
+                onClick={() => {
+                  setEditingName(false);
+                  setProfileError("");
+                  setProfileSuccess("");
+                }}
+                disabled={profileSaving}
+              >
+                Cancel
+              </button>
+            )}
           </div>
 
-          <div className="details-card">
-            <div className="detail-row">
-              <span className="detail-label">NAME</span>
+          <div
+            className={`details-card ${editingName ? "details-card-editing" : ""}`}
+          >
+            {!editingName ? (
+              <>
+                <div className="detail-row">
+                  <span className="detail-label">NAME</span>
 
-              <strong>{fullName}</strong>
-            </div>
+                  <strong>{fullName}</strong>
+                </div>
 
-            <div className="detail-row">
-              <span className="detail-label">EMAIL</span>
+                <div className="detail-row">
+                  <span className="detail-label">EMAIL</span>
 
-              <strong>{email || "Not available"}</strong>
-            </div>
+                  <strong>{email || "Not available"}</strong>
+                </div>
 
-            <div className="detail-row">
-              <span className="detail-label">PHONE</span>
+                <div className="detail-row">
+                  <span className="detail-label">PHONE</span>
 
-              <strong>{phone || "Not available"}</strong>
-            </div>
+                  <strong>{phone || "Not available"}</strong>
+                </div>
+              </>
+            ) : (
+              <form
+                className="account-name-edit-form"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+
+                  setProfileError("");
+                  setProfileSuccess("");
+
+                  const first = editFirstName.trim().replace(/\s+/g, " ");
+                  const last = editLastName.trim().replace(/\s+/g, " ");
+
+                  if (!first) {
+                    setProfileError("Please enter your first name.");
+                    return;
+                  }
+
+                  if (first.length > 60 || last.length > 60) {
+                    setProfileError("Name must be 60 characters or less.");
+                    return;
+                  }
+
+                  try {
+                    setProfileSaving(true);
+
+                    const response = await fetch("/api/account/profile", {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        firstName: first,
+                        lastName: last,
+                      }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data?.success) {
+                      throw new Error(
+                        data?.error || "Unable to update your profile.",
+                      );
+                    }
+
+                    setProfileSuccess("Profile updated successfully.");
+
+                    /*
+                     * Reload the account data so the new Shopify
+                     * customer name is reflected everywhere.
+                     */
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 500);
+                  } catch (error) {
+                    setProfileError(
+                      error instanceof Error
+                        ? error.message
+                        : "Unable to update your profile.",
+                    );
+                  } finally {
+                    setProfileSaving(false);
+                  }
+                }}
+              >
+                <div className="account-name-edit-grid">
+                  <label className="account-name-field">
+                    <span>FIRST NAME</span>
+                    <input
+                      type="text"
+                      value={editFirstName}
+                      onChange={(event) => setEditFirstName(event.target.value)}
+                      maxLength={60}
+                      autoComplete="given-name"
+                      disabled={profileSaving}
+                    />
+                  </label>
+
+                  <label className="account-name-field">
+                    <span>LAST NAME</span>
+                    <input
+                      type="text"
+                      value={editLastName}
+                      onChange={(event) => setEditLastName(event.target.value)}
+                      maxLength={60}
+                      autoComplete="family-name"
+                      disabled={profileSaving}
+                    />
+                  </label>
+                </div>
+
+                {profileError && (
+                  <p className="account-profile-message account-profile-error">
+                    {profileError}
+                  </p>
+                )}
+
+                {profileSuccess && (
+                  <p className="account-profile-message account-profile-success">
+                    {profileSuccess}
+                  </p>
+                )}
+
+                <div className="account-name-edit-actions">
+                  <button
+                    type="button"
+                    className="account-name-cancel"
+                    onClick={() => {
+                      setEditingName(false);
+                      setProfileError("");
+                      setProfileSuccess("");
+                    }}
+                    disabled={profileSaving}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="account-name-save"
+                    disabled={profileSaving}
+                  >
+                    {profileSaving ? "Saving..." : "Save Changes"}
+                    {!profileSaving && <span>↗</span>}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </section>
 
