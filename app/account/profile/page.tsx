@@ -12,20 +12,16 @@ export default function ProfilePage() {
   const { customer, loading } = useAuth();
   const router = useRouter();
 
-  const customerData = customer as any;
+  const [firstName, setFirstName] = useState("");
 
-  const currentFirstName = customerData?.firstName ?? "";
+  const [lastName, setLastName] = useState("");
 
-  const currentLastName = customerData?.lastName ?? "";
-
-  const email =
-    customerData?.email ?? customerData?.emailAddress?.emailAddress ?? "";
-
-  const [firstName, setFirstName] = useState(currentFirstName);
-  const [lastName, setLastName] = useState(currentLastName);
+  const [email, setEmail] = useState("");
 
   const [saving, setSaving] = useState(false);
+
   const [message, setMessage] = useState("");
+
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -35,206 +31,126 @@ export default function ProfilePage() {
   }, [loading, customer, router]);
 
   useEffect(() => {
-    if (customer) {
-      const data = customer as any;
+    if (!customer) return;
 
-      setFirstName(data?.firstName ?? "");
-      setLastName(data?.lastName ?? "");
-    }
+    const data = customer as any;
+
+    setFirstName(data.firstName || "");
+
+    setLastName(data.lastName || "");
+
+    setEmail(data.email || data.emailAddress?.emailAddress || "");
   }, [customer]);
 
-  if (loading) {
-    return (
-      <main className="profile-loading">
-        <div className="profile-loader">
-          <span />
-          <p>Loading your profile</p>
-        </div>
-      </main>
-    );
+  if (loading || !customer) {
+    return <main className="profile-loading">Loading...</main>;
   }
 
-  if (!customer) {
-    return null;
-  }
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
+    setSaving(true);
     setMessage("");
     setError("");
 
-    const cleanFirstName = firstName.trim().replace(/\s+/g, " ");
-    const cleanLastName = lastName.trim().replace(/\s+/g, " ");
-
-    if (!cleanFirstName) {
-      setError("Please enter your first name.");
-      return;
-    }
-
-    if (cleanFirstName.length > 60) {
-      setError("First name is too long.");
-      return;
-    }
-
-    if (cleanLastName.length > 60) {
-      setError("Last name is too long.");
-      return;
-    }
-
     try {
-      setSaving(true);
-
       const response = await fetch("/api/account/profile", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          firstName: cleanFirstName,
-          lastName: cleanLastName,
+          firstName,
+          lastName,
         }),
       });
 
       const data = await response.json();
 
-      if (!response.ok || !data?.success) {
-        throw new Error(data?.error || "Unable to update your profile.");
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to update profile.");
       }
-
-      setFirstName(data.customer?.firstName ?? cleanFirstName);
-      setLastName(data.customer?.lastName ?? cleanLastName);
 
       setMessage("Profile updated successfully.");
 
-      /*
-       * Full navigation reloads the auth context, so the new
-       * name is immediately reflected everywhere in the account.
-       */
       setTimeout(() => {
-        window.location.href = "/account";
+        router.push("/account");
+        router.refresh();
       }, 700);
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "Unable to update your profile.",
+        error instanceof Error ? error.message : "Unable to update profile.",
       );
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   return (
     <main className="profile-page">
       <div className="profile-container">
-        <header className="profile-header">
-          <div>
-            <span className="profile-eyebrow">PERSONAL INFORMATION</span>
+        <div className="profile-header">
+          <span className="profile-eyebrow">MY ACCOUNT</span>
 
-            <h1>
-              Edit <em>Profile</em>
-            </h1>
+          <h1>
+            Edit <em>Profile</em>
+          </h1>
 
-            <p>
-              Update your name and keep your OPULENCE account details current.
-            </p>
-          </div>
-
-          <Link href="/account" className="profile-back">
-            <span>←</span>
-            Back to Account
-          </Link>
-        </header>
-
-        <section className="profile-card">
-          <div className="profile-card-heading">
-            <div>
-              <span className="profile-card-number">01</span>
-
-              <h2>Personal Details</h2>
-            </div>
-
-            <span className="profile-card-note">EDITABLE</span>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="profile-fields">
-              <div className="profile-field">
-                <label htmlFor="firstName">FIRST NAME</label>
-
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(event) => setFirstName(event.target.value)}
-                  placeholder="Enter first name"
-                  autoComplete="given-name"
-                  maxLength={60}
-                  disabled={saving}
-                />
-              </div>
-
-              <div className="profile-field">
-                <label htmlFor="lastName">LAST NAME</label>
-
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
-                  placeholder="Enter last name"
-                  autoComplete="family-name"
-                  maxLength={60}
-                  disabled={saving}
-                />
-              </div>
-
-              <div className="profile-field profile-field-full">
-                <label htmlFor="email">EMAIL ADDRESS</label>
-
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  readOnly
-                  disabled
-                />
-
-                <span className="profile-readonly">
-                  Email is managed by your account login.
-                </span>
-              </div>
-            </div>
-
-            {error && (
-              <div className="profile-message profile-message-error">
-                {error}
-              </div>
-            )}
-
-            {message && (
-              <div className="profile-message profile-message-success">
-                {message}
-              </div>
-            )}
-
-            <div className="profile-actions">
-              <Link href="/account" className="profile-cancel">
-                Cancel
-              </Link>
-
-              <button type="submit" className="profile-save" disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
-                {!saving && <span>↗</span>}
-              </button>
-            </div>
-          </form>
-        </section>
-
-        <div className="profile-footer">
-          <span />
-          <p>OPULENCE ACCOUNT</p>
-          <span />
+          <p>Update your personal account information.</p>
         </div>
+
+        <form className="profile-card" onSubmit={handleSubmit}>
+          <div className="profile-card-heading">
+            <span className="profile-card-number">01</span>
+
+            <h2>Personal Information</h2>
+          </div>
+
+          <div className="profile-fields">
+            <div className="profile-field">
+              <label htmlFor="firstName">First Name</label>
+
+              <input
+                id="firstName"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                required
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="lastName">Last Name</label>
+
+              <input
+                id="lastName"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+              />
+            </div>
+
+            <div className="profile-field profile-field-full">
+              <label htmlFor="email">Email Address</label>
+
+              <input id="email" value={email} readOnly />
+
+              <small>Email address cannot be changed from here.</small>
+            </div>
+          </div>
+
+          {message && <div className="profile-success">{message}</div>}
+
+          {error && <div className="profile-error">{error}</div>}
+
+          <div className="profile-actions">
+            <Link href="/account" className="profile-cancel">
+              Cancel
+            </Link>
+
+            <button type="submit" className="profile-save" disabled={saving}>
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
       </div>
     </main>
   );

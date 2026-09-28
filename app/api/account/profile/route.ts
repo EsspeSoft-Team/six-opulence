@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { shopifyAdminFetch } from "@/lib/shopify-admin";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
-type MeResponse = {
-  customer?: {
-    id?: string | null;
-    firstName?: string | null;
-    lastName?: string | null;
-    email?: string | null;
-    emailAddress?: {
-      emailAddress?: string | null;
-    } | null;
-  } | null;
+type AuthCustomer = {
+  id?: string;
+  email?: string;
+  emailAddress?: {
+    emailAddress?: string;
+  };
+};
+
+type AuthResponse = {
+  customer?: AuthCustomer | null;
 };
 
 type CustomerUpdateResponse = {
@@ -22,6 +21,7 @@ type CustomerUpdateResponse = {
       id: string;
       firstName: string | null;
       lastName: string | null;
+      email: string | null;
     } | null;
     userErrors: {
       field?: string[];
@@ -30,131 +30,144 @@ type CustomerUpdateResponse = {
   };
 };
 
-type CustomerSearchResponse = {
-  customers: {
-    edges: {
-      node: {
-        id: string;
-        email: string | null;
-      };
-    }[];
-  };
-};
+/* =========================================================
+   GET LOGGED-IN CUSTOMER
+========================================================= */
 
-function jsonError(message: string, status = 400) {
-  return NextResponse.json(
-    {
-      success: false,
-      error: message,
+async function getLoggedInCustomer(request: NextRequest) {
+  const response = await fetch(new URL("/api/auth/me", request.url), {
+    method: "GET",
+    headers: {
+      cookie: request.headers.get("cookie") || "",
     },
-    { status },
-  );
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = (await response.json()) as AuthResponse;
+
+  return data.customer || null;
 }
 
-function cleanName(value: unknown) {
-  return String(value ?? "")
-    .trim()
-    .replace(/\s+/g, " ");
-}
+/* =========================================================
+   PATCH PROFILE
+========================================================= */
 
 export async function PATCH(request: NextRequest) {
   try {
+    const customer = await getLoggedInCustomer(request);
+
+    if (!customer) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "You must be logged in.",
+        },
+        { status: 401 },
+      );
+    }
+
     const body = await request.json();
 
-    const firstName = cleanName(body?.firstName);
-    const lastName = cleanName(body?.lastName);
+    const firstName = String(body.firstName || "").trim();
+    const lastName = String(body.lastName || "").trim();
 
     if (!firstName) {
-      return jsonError("Please enter your first name.");
+      return NextResponse.json(
+        {
+          success: false,
+          error: "First name is required.",
+        },
+        { status: 400 },
+      );
     }
 
-    if (firstName.length > 60) {
-      return jsonError("First name is too long.");
+    if (firstName.length > 50 || lastName.length > 50) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Name is too long.",
+        },
+        { status: 400 },
+      );
     }
 
-    if (lastName.length > 60) {
-      return jsonError("Last name is too long.");
-    }
+    let customerId = customer.id;
 
     /*
-     * IMPORTANT:
-     * Do not trust a customer ID sent from the browser.
-     * We first ask the existing authenticated /api/auth/me route
-     * who is currently logged in, forwarding the current cookies.
+     * If auth/me does not return Shopify customer ID,
+     * find customer by email.
      */
-    const meResponse = await fetch(new URL("/api/auth/me", request.url), {
-      method: "GET",
-      headers: {
-        cookie: request.headers.get("cookie") || "",
-      },
-      cache: "no-store",
-    });
 
-    if (!meResponse.ok) {
-      return jsonError("Your session has expired. Please log in again.", 401);
-    }
-
-    const me = (await meResponse.json()) as MeResponse;
-    const currentCustomer = me?.customer;
-
-    if (!currentCustomer) {
-      return jsonError("You must be logged in to edit your profile.", 401);
-    }
-
-    let customerId = currentCustomer.id || null;
-
-    /*
-     * Customer Account API normally gives us the Shopify customer ID.
-     * If the current auth response does not include it, safely resolve
-     * the ID from the authenticated customer's email through Admin API.
-     */
-    if (!customerId || !customerId.startsWith("gid://shopify/Customer/")) {
-      const email =
-        currentCustomer.email ||
-        currentCustomer.emailAddress?.emailAddress ||
-        "";
+    if (!customerId) {
+      const email = customer.email || customer.emailAddress?.emailAddress || "";
 
       if (!email) {
-        return jsonError(
-          "Unable to identify your Shopify customer account.",
-          400,
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Customer email was not found.",
+          },
+          { status: 400 },
         );
       }
 
-      const searchData = await shopifyAdminFetch<CustomerSearchResponse>({
+      const searchData = await shopifyAdminFetch<{
+        customers: {
+          edges: {
+            node: {
+              id: string;
+              email: string | null;
+            };
+          }[];
+        };
+      }>({
         query: `
-            query FindCustomer($query: String!) {
-              customers(first: 1, query: $query) {
-                edges {
-                  node {
-                    id
-                    email
-                  }
+          query FindCustomer($query: String!) {
+            customers(first: 1, query: $query) {
+              edges {
+                node {
+                  id
+                  email
                 }
               }
             }
-          `,
+          }
+        `,
         variables: {
-          query: `email:${JSON.stringify(email)}`,
+          query: `email:${email}`,
         },
       });
 
-      customerId = searchData.customers.edges[0]?.node?.id || null;
+      customerId = searchData.customers.edges[0]?.node?.id;
     }
 
-    if (!customerId || !customerId.startsWith("gid://shopify/Customer/")) {
-      return jsonError("Unable to find your Shopify customer record.", 404);
+    if (!customerId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Shopify customer was not found.",
+        },
+        { status: 404 },
+      );
     }
 
-    const updateData = await shopifyAdminFetch<CustomerUpdateResponse>({
+    const data = await shopifyAdminFetch<CustomerUpdateResponse>({
       query: `
-          mutation UpdateCustomerName($input: CustomerInput!) {
+          mutation CustomerUpdate(
+            $input: CustomerInput!
+          ) {
             customerUpdate(input: $input) {
               customer {
                 id
                 firstName
                 lastName
+                email
               }
+
               userErrors {
                 field
                 message
@@ -171,30 +184,32 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    const result = updateData.customerUpdate;
+    const result = data.customerUpdate;
 
     if (result.userErrors?.length) {
-      return jsonError(
-        result.userErrors.map((error) => error.message).join(", "),
-        400,
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.userErrors.map((item) => item.message).join(", "),
+        },
+        { status: 400 },
       );
-    }
-
-    if (!result.customer) {
-      return jsonError("Shopify did not return the updated customer.", 500);
     }
 
     return NextResponse.json({
       success: true,
       customer: result.customer,
-      message: "Profile updated successfully.",
     });
   } catch (error) {
-    console.error("PROFILE_UPDATE_ERROR:", error);
+    console.error("PROFILE UPDATE ERROR:", error);
 
-    return jsonError(
-      error instanceof Error ? error.message : "Unable to update your profile.",
-      500,
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Unable to update profile.",
+      },
+      { status: 500 },
     );
   }
 }
