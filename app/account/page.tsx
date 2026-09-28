@@ -3,8 +3,8 @@
 import "./account.css";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/lib/auth-context";
 
@@ -12,6 +12,7 @@ export default function AccountPage() {
   const { customer, loading, logout } = useAuth();
   const router = useRouter();
 
+  const [wishlistCount, setWishlistCount] = useState(0);
   const [editingName, setEditingName] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
@@ -20,26 +21,34 @@ export default function AccountPage() {
   const [profileSuccess, setProfileSuccess] = useState("");
 
   useEffect(() => {
-    if (customer) {
-      const data = customer as any;
-
-      setEditFirstName(data?.firstName ?? "");
-      setEditLastName(data?.lastName ?? "");
-    }
-  }, [customer]);
-
-  /*
-   * LOGIN REQUIRED
-   */
-  useEffect(() => {
     if (!loading && !customer) {
       router.replace("/login");
     }
   }, [loading, customer, router]);
 
-  /*
-   * LOADING
-   */
+  useEffect(() => {
+    if (!customer) return;
+
+    const data = customer as any;
+
+    setEditFirstName(data?.firstName ?? "");
+    setEditLastName(data?.lastName ?? "");
+
+    try {
+      const storedWishlist = localStorage.getItem("opulence-wishlist");
+
+      if (!storedWishlist) {
+        setWishlistCount(0);
+        return;
+      }
+
+      const parsed = JSON.parse(storedWishlist);
+      setWishlistCount(Array.isArray(parsed) ? parsed.length : 0);
+    } catch {
+      setWishlistCount(0);
+    }
+  }, [customer]);
+
   if (loading) {
     return (
       <main className="account-loading">
@@ -51,81 +60,44 @@ export default function AccountPage() {
     );
   }
 
-  /*
-   * NOT LOGGED IN
-   */
   if (!customer) {
     return null;
   }
 
   const customerData = customer as any;
 
-  /*
-   * SHOPIFY DATA
-   */
   const orders = customerData?.orders?.edges ?? [];
   const addresses = customerData?.addresses?.edges ?? [];
 
-  /*
-   * Recent 3 orders
-   */
   const recentOrders = orders.slice(0, 3);
 
-  /*
-   * CUSTOMER
-   */
   const firstName = customerData?.firstName ?? "";
   const lastName = customerData?.lastName ?? "";
+
   const email =
     customerData?.email ?? customerData?.emailAddress?.emailAddress ?? "";
+
   const phone = customerData?.phone ?? "";
 
   const displayName = firstName || email?.split("@")[0] || "Account";
 
   const fullName = `${firstName} ${lastName}`.trim() || displayName;
 
-  /*
-   * ADDRESS
-   */
   const defaultAddress =
     customerData?.defaultAddress || addresses?.[0]?.node || null;
 
-  /*
-   * WISHLIST
-   *
-   * Wishlist system is separate from Shopify customer API.
-   * If your existing wishlist page stores the count in localStorage,
-   * this will read it.
-   */
-  let wishlistCount = 0;
-
-  if (typeof window !== "undefined") {
-    try {
-      const storedWishlist = localStorage.getItem("opulence-wishlist");
-
-      if (storedWishlist) {
-        const parsed = JSON.parse(storedWishlist);
-
-        if (Array.isArray(parsed)) {
-          wishlistCount = parsed.length;
-        }
-      }
-    } catch {
-      wishlistCount = 0;
-    }
-  }
-
-  /*
-   * HELPERS
-   */
   const formatDate = (date: string) => {
     if (!date) return "";
 
-    return new Date(date).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    try {
+      return new Date(date).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return "";
+    }
   };
 
   const formatCurrency = (amount: string | number, currencyCode = "INR") => {
@@ -157,10 +129,6 @@ export default function AccountPage() {
       return "cancelled";
     }
 
-    if (clean.includes("process") || clean.includes("pending")) {
-      return "processing";
-    }
-
     return "processing";
   };
 
@@ -181,7 +149,7 @@ export default function AccountPage() {
       return "REFUNDED";
     }
 
-    if (clean.includes("process")) {
+    if (clean.includes("process") || clean.includes("pending")) {
       return "PROCESSING";
     }
 
@@ -193,26 +161,21 @@ export default function AccountPage() {
       return "No saved address";
     }
 
-    const parts = [defaultAddress.city, defaultAddress.province].filter(
-      Boolean,
-    );
+    const lineOne = [defaultAddress.address1, defaultAddress.address2]
+      .filter(Boolean)
+      .join(", ");
 
-    if (parts.length) {
-      return parts.join(", ");
-    }
-
-    return [
-      defaultAddress.address1,
-      defaultAddress.address2,
+    const lineTwo = [
+      defaultAddress.city,
+      defaultAddress.province,
       defaultAddress.zip,
     ]
       .filter(Boolean)
       .join(", ");
+
+    return [lineOne, lineTwo].filter(Boolean).join(" • ");
   };
 
-  /*
-   * LOGOUT
-   */
   const handleLogout = async () => {
     try {
       await logout();
@@ -221,22 +184,76 @@ export default function AccountPage() {
     }
   };
 
+  const handleProfileSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+
+    setProfileError("");
+    setProfileSuccess("");
+
+    const first = editFirstName.trim().replace(/\s+/g, " ");
+    const last = editLastName.trim().replace(/\s+/g, " ");
+
+    if (!first) {
+      setProfileError("Please enter your first name.");
+      return;
+    }
+
+    if (first.length > 60 || last.length > 60) {
+      setProfileError("Name must be 60 characters or less.");
+      return;
+    }
+
+    try {
+      setProfileSaving(true);
+
+      const response = await fetch("/api/account/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: first,
+          lastName: last,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Unable to update your profile.");
+      }
+
+      setProfileSuccess("Profile updated successfully.");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      setProfileError(
+        error instanceof Error
+          ? error.message
+          : "Unable to update your profile.",
+      );
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
   return (
     <main className="account-page">
-      <div className="account-container">
-        {/* ==================================================
-            HEADER
-        ================================================== */}
-
-        <header className="account-header">
-          <div className="account-header-content">
+      <div className="account-shell">
+        {/* TOP ACCOUNT HEADER */}
+        <section className="account-welcome">
+          <div>
             <span className="account-eyebrow">MY ACCOUNT</span>
 
             <h1>
               Welcome, <em>{displayName}</em>
             </h1>
 
-            <p>Manage your orders, addresses and saved pieces.</p>
+            <p>Manage your orders, profile, addresses and saved pieces.</p>
           </div>
 
           <button
@@ -247,354 +264,231 @@ export default function AccountPage() {
             Logout
             <span>↗</span>
           </button>
-        </header>
-
-        {/* ==================================================
-            ACCOUNT SUMMARY
-        ================================================== */}
-
-        <section className="account-summary">
-          {/* ORDER HISTORY */}
-
-          <Link href="/account/orders" className="summary-card">
-            <div className="summary-card-top">
-              <span className="summary-number">01</span>
-
-              <span className="summary-arrow">↗</span>
-            </div>
-
-            <div className="summary-content">
-              <span className="summary-label">ORDER HISTORY</span>
-
-              <strong>{orders.length}</strong>
-
-              <p>{orders.length === 1 ? "Order" : "Orders"}</p>
-            </div>
-          </Link>
-
-          {/* ADDRESSES */}
-
-          <Link href="/account/addresses" className="summary-card">
-            <div className="summary-card-top">
-              <span className="summary-number">02</span>
-
-              <span className="summary-arrow">↗</span>
-            </div>
-
-            <div className="summary-content">
-              <span className="summary-label">ADDRESSES</span>
-
-              <strong>{addresses.length}</strong>
-
-              <p>{addresses.length === 1 ? "Address" : "Addresses"}</p>
-            </div>
-          </Link>
-
-          {/* WISHLIST */}
-
-          <Link href="/wishlist" className="summary-card">
-            <div className="summary-card-top">
-              <span className="summary-number">03</span>
-
-              <span className="summary-arrow">↗</span>
-            </div>
-
-            <div className="summary-content">
-              <span className="summary-label">WISHLIST</span>
-
-              <strong>{wishlistCount}</strong>
-
-              <p>Saved</p>
-            </div>
-          </Link>
         </section>
 
-        {/* ==================================================
-            YOUR PURCHASES
-        ================================================== */}
+        {/* MOBILE NAV */}
+        <nav className="account-mobile-nav">
+          <Link className="is-active" href="/account">
+            Overview
+          </Link>
+          <Link href="/account/orders">Orders</Link>
+          <Link href="/account/addresses">Addresses</Link>
+          <Link href="/wishlist">Wishlist</Link>
+        </nav>
 
-        <section className="recent-orders">
-          <div className="section-heading">
-            <div>
-              <span className="section-eyebrow">YOUR PURCHASES</span>
+        <div className="account-layout">
+          {/* SIDEBAR */}
+          <aside className="account-sidebar">
+            <div className="account-profile-mini">
+              <div className="account-avatar">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
 
-              <h2>Recent Orders</h2>
+              <div>
+                <strong>{fullName}</strong>
+                <span>{email || "OPULENCE Member"}</span>
+              </div>
             </div>
 
-            {orders.length > 0 && (
-              <Link href="/account/orders" className="view-all">
-                View all
-                <span>↗</span>
+            <nav className="account-nav">
+              <Link href="/account" className="account-nav-item is-active">
+                <span className="nav-icon">01</span>
+                <span>Overview</span>
+                <span className="nav-arrow">↗</span>
               </Link>
-            )}
-          </div>
 
-          {/* NO ORDERS */}
-
-          {recentOrders.length === 0 ? (
-            <div className="orders-empty">
-              <span className="empty-label">NO ORDERS YET</span>
-
-              <h3>Your wardrobe awaits.</h3>
-
-              <p>
-                Discover our latest collection and find something made for you.
-              </p>
-
-              <Link href="/" className="empty-button">
-                Explore Collection
+              <Link href="/account/orders" className="account-nav-item">
+                <span className="nav-icon">02</span>
+                <span>My Orders</span>
+                <span className="nav-arrow">↗</span>
               </Link>
+
+              <Link href="/account/addresses" className="account-nav-item">
+                <span className="nav-icon">03</span>
+                <span>Addresses</span>
+                <span className="nav-arrow">↗</span>
+              </Link>
+
+              <Link href="/wishlist" className="account-nav-item">
+                <span className="nav-icon">04</span>
+                <span>Wishlist</span>
+                <span className="nav-count">{wishlistCount}</span>
+              </Link>
+            </nav>
+
+            <div className="account-sidebar-note">
+              <span>OPULENCE</span>
+              <p>The art of affluence.</p>
             </div>
-          ) : (
-            <div className="orders-list">
-              {recentOrders.map(({ node }: any) => {
-                if (!node) {
-                  return null;
-                }
+          </aside>
 
-                const orderNumber = node?.orderNumber ?? node?.name ?? "";
+          {/* MAIN */}
+          <div className="account-main">
+            {/* QUICK STATS */}
+            <section className="account-stat-grid">
+              <Link href="/account/orders" className="account-stat-card">
+                <span>ORDERS</span>
+                <strong>{orders.length}</strong>
+                <small>
+                  {orders.length === 1 ? "Order placed" : "Orders placed"}
+                </small>
+                <b>↗</b>
+              </Link>
 
-                const total = node?.currentTotalPrice?.amount ?? "";
+              <Link href="/account/addresses" className="account-stat-card">
+                <span>ADDRESSES</span>
+                <strong>{addresses.length}</strong>
+                <small>
+                  {addresses.length === 1 ? "Saved address" : "Saved addresses"}
+                </small>
+                <b>↗</b>
+              </Link>
 
-                const currency = node?.currentTotalPrice?.currencyCode ?? "INR";
+              <Link href="/wishlist" className="account-stat-card dark">
+                <span>WISHLIST</span>
+                <strong>{wishlistCount}</strong>
+                <small>Saved pieces</small>
+                <b>↗</b>
+              </Link>
+            </section>
 
-                const date = formatDate(node?.processedAt);
+            {/* ORDERS */}
+            <section className="account-section">
+              <div className="account-section-head">
+                <div>
+                  <span className="section-eyebrow">SHOPPING ACTIVITY</span>
+                  <h2>Recent Orders</h2>
+                </div>
 
-                const status =
-                  node?.fulfillmentStatus ||
-                  node?.financialStatus ||
-                  "Processing";
+                {orders.length > 0 && (
+                  <Link href="/account/orders" className="section-link">
+                    View all <span>↗</span>
+                  </Link>
+                )}
+              </div>
 
-                return (
-                  <article key={node.id} className="order-card">
-                    {/* TOP */}
+              {recentOrders.length === 0 ? (
+                <div className="account-empty">
+                  <span>NO ORDERS YET</span>
+                  <h3>Your wardrobe awaits.</h3>
+                  <p>
+                    Discover the latest OPULENCE collection and find something
+                    made for you.
+                  </p>
+                  <Link href="/" className="account-primary-btn">
+                    Explore Collection
+                  </Link>
+                </div>
+              ) : (
+                <div className="account-order-list">
+                  {recentOrders.map(({ node }: any) => {
+                    if (!node) return null;
 
-                    <div className="order-card-top">
-                      <div className="order-main-info">
-                        <span className="order-label">ORDER</span>
+                    const orderNumber = node?.orderNumber ?? node?.name ?? "";
 
-                        <h3>#{orderNumber}</h3>
-                      </div>
+                    const total = node?.currentTotalPrice?.amount ?? "";
 
-                      <div className="order-date">{date}</div>
+                    const currency =
+                      node?.currentTotalPrice?.currencyCode ?? "INR";
 
-                      <span
-                        className={`order-status ${getStatusClass(status)}`}
-                      >
-                        {getStatusText(status)}
-                      </span>
-                    </div>
+                    const status =
+                      node?.fulfillmentStatus ||
+                      node?.financialStatus ||
+                      "Processing";
 
-                    {/* BOTTOM */}
+                    const firstLine = node?.lineItems?.edges?.[0]?.node;
 
-                    <div className="order-card-bottom">
-                      <div className="order-total">
-                        <span>TOTAL</span>
+                    const productImage =
+                      firstLine?.variant?.image?.url ||
+                      firstLine?.image?.url ||
+                      "";
 
-                        <strong>{formatCurrency(total, currency)}</strong>
-                      </div>
+                    return (
+                      <article key={node.id} className="account-order-row">
+                        <div className="order-product-image">
+                          {productImage ? (
+                            <img
+                              src={productImage}
+                              alt={firstLine?.title || "OPULENCE product"}
+                            />
+                          ) : (
+                            <span>OP</span>
+                          )}
+                        </div>
 
-                      <div className="order-actions">
+                        <div className="order-row-info">
+                          <span>ORDER #{orderNumber}</span>
+
+                          <h3>
+                            {firstLine?.title ||
+                              `${firstLine?.quantity || 1} item${
+                                firstLine?.quantity === 1 ? "" : "s"
+                              }`}
+                          </h3>
+
+                          <p>
+                            {formatDate(node?.processedAt)}
+                            {" • "}
+                            {firstLine?.quantity || 1} item
+                            {firstLine?.quantity === 1 ? "" : "s"}
+                          </p>
+                        </div>
+
+                        <div className="order-row-total">
+                          <span>TOTAL</span>
+                          <strong>{formatCurrency(total, currency)}</strong>
+                        </div>
+
+                        <div
+                          className={`order-row-status ${getStatusClass(
+                            status,
+                          )}`}
+                        >
+                          <i />
+                          {getStatusText(status)}
+                        </div>
+
                         <Link
                           href={`/account/orders?order=${encodeURIComponent(
                             node.id,
                           )}`}
-                          className="order-view"
+                          className="order-row-view"
                         >
-                          View Order
-                          <span>↗</span>
+                          View <span>↗</span>
                         </Link>
-
-                        <Link
-                          href={`/account/invoice?order=${encodeURIComponent(
-                            node.id,
-                          )}`}
-                          className="invoice-link"
-                        >
-                          Invoice
-                          <span>↓</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
-
-        {/* ==================================================
-            ACCOUNT DETAILS
-        ================================================== */}
-
-        <section className="details-section">
-          <div className="section-heading">
-            <div>
-              <span className="section-eyebrow">PERSONAL INFORMATION</span>
-
-              <h2>Account Details</h2>
-            </div>
-
-            {!editingName ? (
-              <button
-                type="button"
-                className="edit-link account-edit-button"
-                onClick={() => {
-                  setEditFirstName(firstName);
-                  setEditLastName(lastName);
-                  setProfileError("");
-                  setProfileSuccess("");
-                  setEditingName(true);
-                }}
-              >
-                Edit Profile
-                <span>↗</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="edit-link account-edit-button"
-                onClick={() => {
-                  setEditingName(false);
-                  setProfileError("");
-                  setProfileSuccess("");
-                }}
-                disabled={profileSaving}
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-
-          <div
-            className={`details-card ${editingName ? "details-card-editing" : ""}`}
-          >
-            {!editingName ? (
-              <>
-                <div className="detail-row">
-                  <span className="detail-label">NAME</span>
-
-                  <strong>{fullName}</strong>
-                </div>
-
-                <div className="detail-row">
-                  <span className="detail-label">EMAIL</span>
-
-                  <strong>{email || "Not available"}</strong>
-                </div>
-
-                <div className="detail-row">
-                  <span className="detail-label">PHONE</span>
-
-                  <strong>{phone || "Not available"}</strong>
-                </div>
-              </>
-            ) : (
-              <form
-                className="account-name-edit-form"
-                onSubmit={async (event) => {
-                  event.preventDefault();
-
-                  setProfileError("");
-                  setProfileSuccess("");
-
-                  const first = editFirstName.trim().replace(/\s+/g, " ");
-                  const last = editLastName.trim().replace(/\s+/g, " ");
-
-                  if (!first) {
-                    setProfileError("Please enter your first name.");
-                    return;
-                  }
-
-                  if (first.length > 60 || last.length > 60) {
-                    setProfileError("Name must be 60 characters or less.");
-                    return;
-                  }
-
-                  try {
-                    setProfileSaving(true);
-
-                    const response = await fetch("/api/account/profile", {
-                      method: "PATCH",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        firstName: first,
-                        lastName: last,
-                      }),
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok || !data?.success) {
-                      throw new Error(
-                        data?.error || "Unable to update your profile.",
-                      );
-                    }
-
-                    setProfileSuccess("Profile updated successfully.");
-
-                    /*
-                     * Reload the account data so the new Shopify
-                     * customer name is reflected everywhere.
-                     */
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 500);
-                  } catch (error) {
-                    setProfileError(
-                      error instanceof Error
-                        ? error.message
-                        : "Unable to update your profile.",
+                      </article>
                     );
-                  } finally {
-                    setProfileSaving(false);
-                  }
-                }}
-              >
-                <div className="account-name-edit-grid">
-                  <label className="account-name-field">
-                    <span>FIRST NAME</span>
-                    <input
-                      type="text"
-                      value={editFirstName}
-                      onChange={(event) => setEditFirstName(event.target.value)}
-                      maxLength={60}
-                      autoComplete="given-name"
-                      disabled={profileSaving}
-                    />
-                  </label>
+                  })}
+                </div>
+              )}
+            </section>
 
-                  <label className="account-name-field">
-                    <span>LAST NAME</span>
-                    <input
-                      type="text"
-                      value={editLastName}
-                      onChange={(event) => setEditLastName(event.target.value)}
-                      maxLength={60}
-                      autoComplete="family-name"
-                      disabled={profileSaving}
-                    />
-                  </label>
+            {/* PROFILE */}
+            <section className="account-section">
+              <div className="account-section-head">
+                <div>
+                  <span className="section-eyebrow">PERSONAL INFORMATION</span>
+                  <h2>Profile</h2>
                 </div>
 
-                {profileError && (
-                  <p className="account-profile-message account-profile-error">
-                    {profileError}
-                  </p>
-                )}
-
-                {profileSuccess && (
-                  <p className="account-profile-message account-profile-success">
-                    {profileSuccess}
-                  </p>
-                )}
-
-                <div className="account-name-edit-actions">
+                {!editingName ? (
                   <button
                     type="button"
-                    className="account-name-cancel"
+                    className="section-link section-button"
+                    onClick={() => {
+                      setEditFirstName(firstName);
+                      setEditLastName(lastName);
+                      setProfileError("");
+                      setProfileSuccess("");
+                      setEditingName(true);
+                    }}
+                  >
+                    Edit profile <span>↗</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="section-link section-button"
                     onClick={() => {
                       setEditingName(false);
                       setProfileError("");
@@ -604,87 +498,148 @@ export default function AccountPage() {
                   >
                     Cancel
                   </button>
-
-                  <button
-                    type="submit"
-                    className="account-name-save"
-                    disabled={profileSaving}
-                  >
-                    {profileSaving ? "Saving..." : "Save Changes"}
-                    {!profileSaving && <span>↗</span>}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </section>
-
-        {/* ==================================================
-            SAVED ADDRESSES
-        ================================================== */}
-
-        <section className="address-section">
-          <div className="section-heading">
-            <div>
-              <span className="section-eyebrow">DELIVERY INFORMATION</span>
-
-              <h2>Saved Addresses</h2>
-            </div>
-
-            <Link href="/account/addresses" className="edit-link">
-              Manage
-              <span>↗</span>
-            </Link>
-          </div>
-
-          {defaultAddress ? (
-            <div className="address-card">
-              <div className="address-card-left">
-                <span className="address-type">HOME</span>
-
-                <h3>{defaultAddress.address1 || "Saved Address"}</h3>
-
-                <p>{getAddressText()}</p>
-
-                {defaultAddress.zip && (
-                  <span className="address-pin">{defaultAddress.zip}</span>
                 )}
               </div>
 
-              <Link href="/account/addresses" className="address-edit">
-                Edit
-                <span>↗</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="address-card address-empty">
-              <div>
-                <span className="address-type">HOME</span>
+              {!editingName ? (
+                <div className="profile-grid">
+                  <div className="profile-detail">
+                    <span>FULL NAME</span>
+                    <strong>{fullName}</strong>
+                  </div>
 
-                <h3>No saved address</h3>
+                  <div className="profile-detail">
+                    <span>EMAIL ADDRESS</span>
+                    <strong>{email || "Not available"}</strong>
+                  </div>
 
-                <p>Add an address for faster checkout.</p>
+                  <div className="profile-detail">
+                    <span>PHONE</span>
+                    <strong>{phone || "Not available"}</strong>
+                  </div>
+                </div>
+              ) : (
+                <form
+                  className="profile-edit-card"
+                  onSubmit={handleProfileSubmit}
+                >
+                  <div className="profile-edit-grid">
+                    <label>
+                      <span>FIRST NAME</span>
+                      <input
+                        type="text"
+                        value={editFirstName}
+                        onChange={(event) =>
+                          setEditFirstName(event.target.value)
+                        }
+                        maxLength={60}
+                        autoComplete="given-name"
+                        disabled={profileSaving}
+                      />
+                    </label>
+
+                    <label>
+                      <span>LAST NAME</span>
+                      <input
+                        type="text"
+                        value={editLastName}
+                        onChange={(event) =>
+                          setEditLastName(event.target.value)
+                        }
+                        maxLength={60}
+                        autoComplete="family-name"
+                        disabled={profileSaving}
+                      />
+                    </label>
+                  </div>
+
+                  {profileError && (
+                    <p className="profile-message error">{profileError}</p>
+                  )}
+
+                  {profileSuccess && (
+                    <p className="profile-message success">{profileSuccess}</p>
+                  )}
+
+                  <div className="profile-edit-actions">
+                    <button
+                      type="button"
+                      className="profile-cancel"
+                      onClick={() => {
+                        setEditingName(false);
+                        setProfileError("");
+                        setProfileSuccess("");
+                      }}
+                      disabled={profileSaving}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="profile-save"
+                      disabled={profileSaving}
+                    >
+                      {profileSaving ? "Saving..." : "Save Changes"}
+                      {!profileSaving && <span>↗</span>}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </section>
+
+            {/* ADDRESS */}
+            <section className="account-section">
+              <div className="account-section-head">
+                <div>
+                  <span className="section-eyebrow">DELIVERY INFORMATION</span>
+                  <h2>Saved Address</h2>
+                </div>
+
+                <Link href="/account/addresses" className="section-link">
+                  Manage <span>↗</span>
+                </Link>
               </div>
 
-              <Link href="/account/addresses" className="address-edit">
-                Add
-                <span>↗</span>
-              </Link>
+              {defaultAddress ? (
+                <div className="account-address-card">
+                  <div className="address-mark">01</div>
+
+                  <div className="address-content">
+                    <span>PRIMARY ADDRESS</span>
+                    <h3>{defaultAddress.address1 || "Saved Address"}</h3>
+                    <p>{getAddressText()}</p>
+                  </div>
+
+                  <Link href="/account/addresses" className="address-action">
+                    Edit <span>↗</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="account-address-card address-empty">
+                  <div className="address-mark">01</div>
+
+                  <div className="address-content">
+                    <span>PRIMARY ADDRESS</span>
+                    <h3>No saved address</h3>
+                    <p>Add an address for a faster checkout experience.</p>
+                  </div>
+
+                  <Link href="/account/addresses" className="address-action">
+                    Add <span>↗</span>
+                  </Link>
+                </div>
+              )}
+            </section>
+
+            {/* BOTTOM BRAND NOTE */}
+            <div className="account-brand-note">
+              <span />
+              <p>OPULENCE · THE ART OF AFFLUENCE</p>
+              <span />
             </div>
-          )}
-        </section>
-
-        {/* ==================================================
-            FOOTER
-        ================================================== */}
-
-        <footer className="account-footer">
-          <span />
-
-          <p>Thank you for being part of OPULENCE.</p>
-
-          <span />
-        </footer>
+          </div>
+        </div>
       </div>
     </main>
   );
