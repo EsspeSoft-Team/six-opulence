@@ -17,6 +17,8 @@ type Customer = {
 
   lastName?: string | null;
 
+  email?: string | null;
+
   emailAddress?: {
     emailAddress: string;
   } | null;
@@ -44,10 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [loading, setLoading] = useState(true);
 
+  /* ============================================================
+     LOAD CURRENT CUSTOMER
+  ============================================================ */
+
   async function loadCustomer() {
     try {
       const response = await fetch("/api/auth/me", {
         method: "GET",
+        credentials: "include",
         cache: "no-store",
       });
 
@@ -58,11 +65,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
 
-      if (data.authenticated && data.customer) {
+      if (data?.authenticated && data?.customer) {
         setCustomer(data.customer);
-      } else {
-        setCustomer(null);
+        return;
       }
+
+      if (data?.customer) {
+        setCustomer(data.customer);
+        return;
+      }
+
+      if (data?.user) {
+        setCustomer(data.user);
+        return;
+      }
+
+      setCustomer(null);
     } catch (error) {
       console.error("Load customer error:", error);
 
@@ -72,35 +90,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /* ============================================================
+     INITIAL AUTH CHECK
+  ============================================================ */
+
   useEffect(() => {
     loadCustomer();
   }, []);
+
+  /* ============================================================
+     LOGIN
+  ============================================================ */
 
   async function login(email?: string) {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
 
+        credentials: "include",
+
         headers: {
           "Content-Type": "application/json",
         },
 
         body: JSON.stringify({
-          email: email || "",
+          email: email?.trim() || "",
         }),
       });
 
       const data = await response.json();
 
-      if (!response.ok || !data.url) {
+      if (!response.ok || !data?.url) {
         return {
           success: false,
-
-          error: data.error || "Unable to start login.",
+          error: data?.error || "Unable to start login.",
         };
       }
 
-      window.location.href = data.url;
+      /*
+       * Shopify Customer Account OAuth login.
+       *
+       * Do not save the OAuth access token in localStorage.
+       * The server-side auth flow should keep the session secure.
+       */
+
+      window.location.assign(data.url);
 
       return {
         success: true,
@@ -110,35 +144,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return {
         success: false,
-
         error: "Unable to start login.",
       };
     }
   }
 
+  /* ============================================================
+     LOGOUT
+  ============================================================ */
+
   async function logout() {
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: "include",
+        cache: "no-store",
       });
 
-      const data = await response.json();
+      let data: any = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       setCustomer(null);
 
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        window.location.href = "/login";
+      /*
+       * Shopify Customer Account logout URL.
+       */
+
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
       }
+
+      window.location.assign("/login");
     } catch (error) {
       console.error("Logout error:", error);
 
       setCustomer(null);
 
-      window.location.href = "/login";
+      window.location.assign("/login");
     }
   }
+
+  /* ============================================================
+     CONTEXT
+  ============================================================ */
 
   return (
     <AuthContext.Provider

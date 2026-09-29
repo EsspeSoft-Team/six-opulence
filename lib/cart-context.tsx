@@ -22,11 +22,17 @@ type CartContextType = {
   cart: any;
   loading: boolean;
   cartCount: number;
+
   addItem: (variantId: string, quantity?: number) => Promise<void>;
+
   removeItem: (lineId: string) => Promise<void>;
+
   updateItem: (lineId: string, quantity: number) => Promise<void>;
+
   refreshCart: () => Promise<void>;
+
   clearCart: () => void;
+
   proceedToCheckout: () => Promise<void>;
 };
 
@@ -61,7 +67,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   */
 
   const saveCartId = useCallback((cartId: string) => {
-    if (!cartId) return;
+    if (!cartId) {
+      return;
+    }
 
     try {
       localStorage.setItem(CART_ID_KEY, cartId);
@@ -96,6 +104,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         new CustomEvent("shopify-cart-updated", {
           detail: {
             cart: updatedCart,
+
             count:
               updatedCart?.lines?.edges?.reduce(
                 (total: number, edge: any) =>
@@ -129,14 +138,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         const fetchedCart = await getCart(existingCartId);
 
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
 
         if (fetchedCart) {
           setCart(fetchedCart);
+
           dispatchCartUpdate(fetchedCart);
         } else {
           removeCartId();
+
           setCart(null);
+
           dispatchCartUpdate(null);
         }
       } catch (error) {
@@ -144,7 +158,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         if (!cancelled) {
           removeCartId();
+
           setCart(null);
+
           dispatchCartUpdate(null);
         }
       }
@@ -180,7 +196,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         /*
         --------------------------------------------------------
-        CREATE SHOPIFY CART IF NONE EXISTS
+        CREATE CART IF NONE EXISTS
         --------------------------------------------------------
         */
 
@@ -198,7 +214,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         /*
         --------------------------------------------------------
-        ADD SHOPIFY VARIANT
+        ADD PRODUCT
         --------------------------------------------------------
         */
 
@@ -210,7 +226,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         /*
         --------------------------------------------------------
-        SAVE UPDATED CART
+        SAVE CART
         --------------------------------------------------------
         */
 
@@ -253,13 +269,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoading(true);
 
       try {
-        /*
-        --------------------------------------------------------
-        IMPORTANT:
-        Shopify removeFromCart expects string[]
-        --------------------------------------------------------
-        */
-
         const updatedCart = await removeFromCartApi(cartId, [lineId]);
 
         if (!updatedCart) {
@@ -368,7 +377,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         dispatchCartUpdate(fetchedCart);
       } else {
         removeCartId();
+
         setCart(null);
+
         dispatchCartUpdate(null);
       }
     } catch (error) {
@@ -386,7 +397,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => {
     removeCartId();
+
     setCart(null);
+
     dispatchCartUpdate(null);
   }, [removeCartId, dispatchCartUpdate]);
 
@@ -403,10 +416,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       let currentCart = cart;
 
       /*
-    ============================================================
-    RESTORE CART IF NEEDED
-    ============================================================
-    */
+        --------------------------------------------------------
+        RESTORE CART IF REQUIRED
+        --------------------------------------------------------
+        */
 
       if (!currentCart?.id) {
         const cartId = localStorage.getItem(CART_ID_KEY);
@@ -419,7 +432,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         if (!currentCart) {
           removeCartId();
+
           setCart(null);
+
           dispatchCartUpdate(null);
 
           throw new Error("Your cart could not be found.");
@@ -429,10 +444,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
 
       /*
-    ============================================================
-    CHECK CART QUANTITY
-    ============================================================
-    */
+        --------------------------------------------------------
+        REFRESH CART BEFORE CHECKOUT
+        --------------------------------------------------------
+
+        Always fetch the latest cart from Shopify before
+        redirecting to checkout.
+
+        This makes sure we use the latest checkoutUrl.
+        --------------------------------------------------------
+        */
+
+      if (currentCart?.id) {
+        const freshCart = await getCart(currentCart.id);
+
+        if (freshCart) {
+          currentCart = freshCart;
+
+          setCart(freshCart);
+
+          if (freshCart.id) {
+            saveCartId(freshCart.id);
+          }
+
+          dispatchCartUpdate(freshCart);
+        }
+      }
+
+      /*
+        --------------------------------------------------------
+        CHECK CART QUANTITY
+        --------------------------------------------------------
+        */
 
       const totalQuantity = Number(
         currentCart?.totalQuantity ??
@@ -449,10 +492,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
 
       /*
-    ============================================================
-    SHOPIFY CHECKOUT URL
-    ============================================================
-    */
+        --------------------------------------------------------
+        GET SHOPIFY CHECKOUT URL
+        --------------------------------------------------------
+        */
 
       const checkoutUrl = currentCart?.checkoutUrl;
 
@@ -463,26 +506,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
 
       /*
-    ============================================================
-    GO TO SHOPIFY CHECKOUT
-    ============================================================
+        ========================================================
+        CUSTOMER ACCOUNT SSO
+        ========================================================
 
-    Keep the Shopify checkout URL exactly as Shopify generated it.
+        The customer is authenticated through the Shopify
+        Customer Account OAuth flow.
 
-    IMPORTANT:
-    Customer Account OAuth authentication is handled by the
-    Customer Account login/callback flow. We should not append
-    arbitrary query parameters to checkoutUrl here.
+        sso=silent tells Shopify Checkout to silently check
+        the active Customer Account session instead of
+        unnecessarily asking the customer to sign in again.
+        ========================================================
+        */
 
-    This keeps the existing checkout flow unchanged and avoids
-    breaking Shopify's hosted checkout URL.
-    */
+      const checkout = new URL(checkoutUrl);
 
-      const checkoutWithSSO = checkoutUrl.includes("?")
-        ? `${checkoutUrl}&sso=silent`
-        : `${checkoutUrl}?sso=silent`;
+      checkout.searchParams.set("sso", "silent");
 
-      window.location.assign(checkoutWithSSO);
+      /*
+        --------------------------------------------------------
+        REDIRECT TO SHOPIFY CHECKOUT
+        --------------------------------------------------------
+        */
+
+      window.location.assign(checkout.toString());
     } catch (error) {
       console.error("Proceed to checkout failed:", error);
 
@@ -490,7 +537,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [cart, removeCartId, dispatchCartUpdate]);
+  }, [cart, removeCartId, saveCartId, dispatchCartUpdate]);
 
   /*
   ============================================================
