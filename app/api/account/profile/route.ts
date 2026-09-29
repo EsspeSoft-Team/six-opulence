@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { shopifyAdminFetch } from "@/lib/shopify-admin";
+
+import { shopifyAccountAdminFetch } from "@/lib/shopify-account-admin";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,9 @@ type AuthCustomer = {
 };
 
 type AuthResponse = {
+  authenticated?: boolean;
   customer?: AuthCustomer | null;
+  user?: AuthCustomer | null;
 };
 
 type CustomerUpdateResponse = {
@@ -30,31 +33,88 @@ type CustomerUpdateResponse = {
   };
 };
 
-/* =========================================================
+type CustomerSearchResponse = {
+  customers: {
+    edges: {
+      node: {
+        id: string;
+        email: string | null;
+      };
+    }[];
+  };
+};
+
+/* ============================================================
    GET LOGGED-IN CUSTOMER
-========================================================= */
+   ============================================================ */
 
-async function getLoggedInCustomer(request: NextRequest) {
-  const response = await fetch(new URL("/api/auth/me", request.url), {
-    method: "GET",
-    headers: {
-      cookie: request.headers.get("cookie") || "",
-    },
-    cache: "no-store",
-  });
+async function getLoggedInCustomer(
+  request: NextRequest,
+): Promise<AuthCustomer | null> {
+  try {
+    const cookie = request.headers.get("cookie") || "";
 
-  if (!response.ok) {
+    if (!cookie) {
+      return null;
+    }
+
+    const authUrl = new URL("/api/auth/me", request.url);
+
+    const response = await fetch(authUrl.toString(), {
+      method: "GET",
+      headers: {
+        cookie,
+      },
+      cache: "no-store",
+    });
+
+    const rawText = await response.text();
+
+    if (!response.ok) {
+      console.error(
+        "PROFILE API: /api/auth/me failed:",
+        response.status,
+        rawText,
+      );
+
+      return null;
+    }
+
+    let data: AuthResponse | null = null;
+
+    try {
+      data = JSON.parse(rawText) as AuthResponse;
+    } catch {
+      console.error(
+        "PROFILE API: /api/auth/me returned invalid JSON:",
+        rawText,
+      );
+
+      return null;
+    }
+
+    if (data?.authenticated && data.customer) {
+      return data.customer;
+    }
+
+    if (data?.customer) {
+      return data.customer;
+    }
+
+    if (data?.user) {
+      return data.user;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("PROFILE AUTH ERROR:", error);
     return null;
   }
-
-  const data = (await response.json()) as AuthResponse;
-
-  return data.customer || null;
 }
 
-/* =========================================================
+/* ============================================================
    PATCH PROFILE
-========================================================= */
+   ============================================================ */
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -72,8 +132,8 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
 
-    const firstName = String(body.firstName || "").trim();
-    const lastName = String(body.lastName || "").trim();
+    const firstName = String(body?.firstName || "").trim();
+    const lastName = String(body?.lastName || "").trim();
 
     if (!firstName) {
       return NextResponse.json(
@@ -95,11 +155,15 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    let customerId = customer.id;
+    /* ========================================================
+       GET CUSTOMER ID
+       ======================================================== */
+
+    let customerId = customer.id || "";
 
     /*
-     * If auth/me does not return Shopify customer ID,
-     * find customer by email.
+     * If /api/auth/me does not return the Shopify
+     * customer ID, find the customer using email.
      */
 
     if (!customerId) {
@@ -115,34 +179,27 @@ export async function PATCH(request: NextRequest) {
         );
       }
 
-      const searchData = await shopifyAdminFetch<{
-        customers: {
-          edges: {
-            node: {
-              id: string;
-              email: string | null;
-            };
-          }[];
-        };
-      }>({
-        query: `
-          query FindCustomer($query: String!) {
-            customers(first: 1, query: $query) {
-              edges {
-                node {
-                  id
-                  email
+      const searchData = await shopifyAccountAdminFetch<CustomerSearchResponse>(
+        {
+          query: `
+            query FindCustomer($query: String!) {
+              customers(first: 1, query: $query) {
+                edges {
+                  node {
+                    id
+                    email
+                  }
                 }
               }
             }
-          }
-        `,
-        variables: {
-          query: `email:${email}`,
+          `,
+          variables: {
+            query: `email:${email}`,
+          },
         },
-      });
+      );
 
-      customerId = searchData.customers.edges[0]?.node?.id;
+      customerId = searchData.customers.edges[0]?.node?.id || "";
     }
 
     if (!customerId) {
@@ -155,7 +212,11 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const data = await shopifyAdminFetch<CustomerUpdateResponse>({
+    /* ========================================================
+       UPDATE CUSTOMER
+       ======================================================== */
+
+    const data = await shopifyAccountAdminFetch<CustomerUpdateResponse>({
       query: `
           mutation CustomerUpdate(
             $input: CustomerInput!
@@ -184,13 +245,24 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    const result = data.customerUpdate;
+    const result = data?.customerUpdate;
+
+    if (!result) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Shopify did not return a customer update response.",
+        },
+        { status: 500 },
+      );
+    }
 
     if (result.userErrors?.length) {
       return NextResponse.json(
         {
           success: false,
           error: result.userErrors.map((item) => item.message).join(", "),
+          errors: result.userErrors,
         },
         { status: 400 },
       );
@@ -198,6 +270,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      message: "Profile updated successfully.",
       customer: result.customer,
     });
   } catch (error) {

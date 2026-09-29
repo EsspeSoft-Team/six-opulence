@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { shopifyAdminFetch } from "@/lib/shopify-admin";
+import { shopifyAccountAdminFetch } from "@/lib/shopify-account-admin";
 
 export const runtime = "nodejs";
 
@@ -88,7 +88,7 @@ async function adminGraphQL<T>(
   query: string,
   variables?: Record<string, unknown>,
 ): Promise<T> {
-  return shopifyAdminFetch<T>({
+  return shopifyAccountAdminFetch<T>({
     query,
     variables,
   });
