@@ -478,7 +478,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     breaking Shopify's hosted checkout URL.
     */
 
-      window.location.assign(checkoutUrl);
+      const checkoutWithSSO = checkoutUrl.includes("?")
+        ? `${checkoutUrl}&sso=silent`
+        : `${checkoutUrl}?sso=silent`;
+
+      window.location.assign(checkoutWithSSO);
     } catch (error) {
       console.error("Proceed to checkout failed:", error);
 
