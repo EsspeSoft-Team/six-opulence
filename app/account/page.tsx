@@ -23,6 +23,11 @@ export default function AccountPage() {
 
   const [wishlistCount, setWishlistCount] = useState(0);
 
+  const [savedAddresses, setSavedAddresses] = useState<any[] | null>(null);
+  const [savedDefaultAddressId, setSavedDefaultAddressId] = useState<
+    string | null
+  >(null);
+
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [addressEditingId, setAddressEditingId] = useState<string | null>(null);
   const [addressSaving, setAddressSaving] = useState(false);
@@ -105,6 +110,52 @@ export default function AccountPage() {
   }, [customer]);
 
   /* =========================================================
+     LOAD SAVED ADDRESSES
+  ========================================================= */
+
+  useEffect(() => {
+    if (!customer) {
+      setSavedAddresses([]);
+      setSavedDefaultAddressId(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSavedAddresses = async () => {
+      try {
+        const response = await fetch("/api/account/addresses", {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        const data = await response.json();
+
+        if (cancelled) return;
+
+        if (!response.ok || !data?.success) {
+          throw new Error(data?.error || "Unable to load saved addresses.");
+        }
+
+        setSavedAddresses(Array.isArray(data.addresses) ? data.addresses : []);
+        setSavedDefaultAddressId(data.defaultAddressId || null);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error("ACCOUNT ADDRESS LOAD ERROR:", error);
+        setSavedAddresses(null);
+        setSavedDefaultAddressId(null);
+      }
+    };
+
+    loadSavedAddresses();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customer]);
+
+  /* =========================================================
      LOADING
   ========================================================= */
 
@@ -127,7 +178,10 @@ export default function AccountPage() {
 
   const orders = customerData?.orders?.edges ?? [];
 
-  const addresses = customerData?.addresses?.edges ?? [];
+  const addresses =
+    savedAddresses !== null
+      ? savedAddresses.map((address) => ({ node: address }))
+      : (customerData?.addresses?.edges ?? []);
 
   const recentOrders = orders.slice(0, 5);
 
@@ -145,7 +199,13 @@ export default function AccountPage() {
   const fullName = `${firstName} ${lastName}`.trim() || displayName;
 
   const defaultAddress =
-    customerData?.defaultAddress || addresses?.[0]?.node || null;
+    savedAddresses !== null
+      ? savedAddresses.find(
+          (address) => address?.id === savedDefaultAddressId,
+        ) ||
+        savedAddresses?.[0] ||
+        null
+      : customerData?.defaultAddress || addresses?.[0]?.node || null;
 
   /* =========================================================
      FORMAT DATE
@@ -294,10 +354,12 @@ export default function AccountPage() {
       zip: address?.zip || "",
       countryCode: address?.countryCode || "IN",
       phone: address?.phone || phone,
-      setAsDefault: Boolean(
-        customerData?.defaultAddress?.id &&
-        address?.id === customerData.defaultAddress.id,
-      ),
+      setAsDefault: savedDefaultAddressId
+        ? address?.id === savedDefaultAddressId
+        : Boolean(
+            customerData?.defaultAddress?.id &&
+            address?.id === customerData.defaultAddress.id,
+          ),
     });
     setAddressModalOpen(true);
   };
@@ -354,15 +416,33 @@ export default function AccountPage() {
         throw new Error(data?.error || "Unable to save address.");
       }
 
+      try {
+        const addressResponse = await fetch("/api/account/addresses", {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        const addressData = await addressResponse.json();
+
+        if (addressResponse.ok && addressData?.success) {
+          setSavedAddresses(
+            Array.isArray(addressData.addresses) ? addressData.addresses : [],
+          );
+          setSavedDefaultAddressId(addressData.defaultAddressId || null);
+        }
+      } catch (refreshError) {
+        console.error("ADDRESS LIST REFRESH ERROR:", refreshError);
+      }
+
       setAddressSuccess(
         addressEditingId
           ? "Address updated successfully."
           : "Address added successfully.",
       );
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 600);
+      setAddressModalOpen(false);
+      setAddressEditingId(null);
+      resetAddressForm();
     } catch (error) {
       setAddressError(
         error instanceof Error ? error.message : "Unable to save address.",
@@ -398,11 +478,25 @@ export default function AccountPage() {
         throw new Error(data?.error || "Unable to delete address.");
       }
 
-      setAddressSuccess("Address deleted successfully.");
+      try {
+        const addressResponse = await fetch("/api/account/addresses", {
+          method: "GET",
+          cache: "no-store",
+        });
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 600);
+        const addressData = await addressResponse.json();
+
+        if (addressResponse.ok && addressData?.success) {
+          setSavedAddresses(
+            Array.isArray(addressData.addresses) ? addressData.addresses : [],
+          );
+          setSavedDefaultAddressId(addressData.defaultAddressId || null);
+        }
+      } catch (refreshError) {
+        console.error("ADDRESS LIST REFRESH ERROR:", refreshError);
+      }
+
+      setAddressSuccess("Address deleted successfully.");
     } catch (error) {
       setAddressError(
         error instanceof Error ? error.message : "Unable to delete address.",
@@ -1154,8 +1248,9 @@ export default function AccountPage() {
                   {addresses.map(({ node }: any, index: number) => {
                     if (!node) return null;
 
-                    const isDefault =
-                      customerData?.defaultAddress?.id === node.id;
+                    const isDefault = savedDefaultAddressId
+                      ? savedDefaultAddressId === node.id
+                      : customerData?.defaultAddress?.id === node.id;
 
                     return (
                       <div

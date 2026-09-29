@@ -98,6 +98,7 @@
 .account-welcome h1 em {
   font-family: var(--font-display);
   font-weight: 400;
+  text-transform: capitalize;
 }
 
 .account-welcome p {
