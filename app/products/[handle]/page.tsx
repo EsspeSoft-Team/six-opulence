@@ -15,23 +15,82 @@ type ProductPageProps = {
   }>;
 };
 
+/* ============================================================
+   METAFIELD HELPER
+============================================================ */
+
+function getMetafieldValue(product: any, key: string): string {
+  return (
+    product?.metafields
+      ?.find(
+        (field: any) => field?.namespace === "custom" && field?.key === key,
+      )
+      ?.value?.trim?.() || ""
+  );
+}
+
+/* ============================================================
+   FORMAT METAFIELD
+============================================================ */
+
+function formatMetafieldValue(value: string): string {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+
+    const extractText = (node: any): string => {
+      if (!node) {
+        return "";
+      }
+
+      if (typeof node === "string") {
+        return node;
+      }
+
+      if (node.type === "text") {
+        return node.value || "";
+      }
+
+      if (Array.isArray(node.children)) {
+        return node.children.map(extractText).join("");
+      }
+
+      if (Array.isArray(node.content)) {
+        return node.content.map(extractText).join("");
+      }
+
+      return "";
+    };
+
+    const text = extractText(parsed);
+
+    if (text.trim()) {
+      return text.trim();
+    }
+  } catch {
+    // Plain text metafield
+  }
+
+  return value;
+}
+
+/* ============================================================
+   PRODUCT PAGE
+============================================================ */
+
 export default async function ProductPage({ params }: ProductPageProps) {
-  /* =========================================================
-     GET HANDLE
-  ========================================================= */
-
   const { handle } = await params;
-  const productHandle = decodeURIComponent(handle).trim();
 
-  /* =========================================================
-     GET SHOPIFY PRODUCT
-  ========================================================= */
+  const productHandle = decodeURIComponent(handle).trim();
 
   const product = await getProductByHandle(productHandle);
 
-  /* =========================================================
-     PRODUCT NOT FOUND
-  ========================================================= */
+  /* ==========================================================
+     NOT FOUND
+  ========================================================== */
 
   if (!product) {
     return (
@@ -56,36 +115,41 @@ export default async function ProductPage({ params }: ProductPageProps) {
     );
   }
 
-  /* =========================================================
+  /* ==========================================================
      VARIANTS
-  ========================================================= */
+  ========================================================== */
 
   const variants =
     product?.variants?.edges?.map(({ node }: any) => ({
       id: node.id,
+
       title: node.title,
+
       availableForSale: node.availableForSale,
+
       price: node.price,
+
       selectedOptions: node.selectedOptions || [],
+
       image: node.image || null,
     })) || [];
 
-  /* =========================================================
+  /* ==========================================================
      FIRST AVAILABLE VARIANT
-  ========================================================= */
+  ========================================================== */
 
   const firstAvailableVariant =
     variants.find((variant: any) => variant.availableForSale) || variants[0];
 
-  /* =========================================================
-     PRODUCT IMAGES
-  ========================================================= */
+  /* ==========================================================
+     IMAGES
+  ========================================================== */
 
   const productImages = product?.images?.edges?.slice(0, 50) || [];
 
-  /* =========================================================
+  /* ==========================================================
      PRICE
-  ========================================================= */
+  ========================================================== */
 
   const price =
     firstAvailableVariant?.price?.amount ||
@@ -97,45 +161,132 @@ export default async function ProductPage({ params }: ProductPageProps) {
     product?.priceRange?.minVariantPrice?.currencyCode ||
     "INR";
 
-  /* =========================================================
-     FIRST AVAILABLE VARIANT COLOR
-  ========================================================= */
+  /* ==========================================================
+     VARIANT COLOR
+  ========================================================== */
 
   const firstAvailableVariantColor =
     firstAvailableVariant?.selectedOptions?.find(
-      (option: any) => option.name?.toLowerCase() === "color",
+      (option: any) =>
+        option.name?.toLowerCase() === "color" ||
+        option.name?.toLowerCase() === "colour",
     )?.value || "";
 
-  /* =========================================================
-     RENDER
-  ========================================================= */
+  /* ==========================================================
+     SPECIFICATIONS
+  ========================================================== */
+
+  const fit = formatMetafieldValue(getMetafieldValue(product, "fit"));
+
+  const fabric = formatMetafieldValue(getMetafieldValue(product, "fabric"));
+
+  const material = formatMetafieldValue(getMetafieldValue(product, "material"));
+
+  const care = formatMetafieldValue(getMetafieldValue(product, "care"));
+
+  const country = formatMetafieldValue(getMetafieldValue(product, "country"));
+
+  const gender = formatMetafieldValue(getMetafieldValue(product, "gender"));
+
+  const occasion = formatMetafieldValue(getMetafieldValue(product, "occasion"));
+
+  const productDisclosure = formatMetafieldValue(
+    getMetafieldValue(product, "product_disclosure"),
+  );
+
+  const returnPolicy = formatMetafieldValue(
+    getMetafieldValue(product, "return_policy"),
+  );
+
+  const returnExchangeDetails = formatMetafieldValue(
+    getMetafieldValue(product, "return_exchange_details"),
+  );
+
+  /* ==========================================================
+     SPECIFICATION LIST
+  ========================================================== */
+
+  const specifications = [
+    {
+      label: "Fit",
+      value: fit,
+    },
+
+    {
+      label: "Fabric",
+      value: fabric,
+    },
+
+    {
+      label: "Material",
+      value: material,
+    },
+
+    {
+      label: "Care",
+      value: care,
+    },
+
+    {
+      label: "Country",
+      value: country,
+    },
+
+    {
+      label: "Gender",
+      value: gender,
+    },
+
+    {
+      label: "Occasion",
+      value: occasion,
+    },
+  ].filter((item) => item.value);
+
+  /* ==========================================================
+     COLLECTION
+  ========================================================== */
+
+  const firstCollection = product?.collections?.edges?.[0]?.node || null;
 
   return (
     <main className="container-fluid">
-      {/* =====================================================
+      {/* ====================================================
           BREADCRUMB
-      ===================================================== */}
+      ==================================================== */}
 
       <nav className="pdp-breadcrumb" aria-label="Breadcrumb">
         <Link href="/">Home</Link>
 
         <span>/</span>
 
-        <Link href="/collections/all">Shop</Link>
+        {firstCollection ? (
+          <>
+            <Link href={`/collections/${firstCollection.handle}`}>
+              {firstCollection.title}
+            </Link>
 
-        <span>/</span>
+            <span>/</span>
+          </>
+        ) : (
+          <>
+            <Link href="/collections/all">Shop</Link>
+
+            <span>/</span>
+          </>
+        )}
 
         <span>{product.title}</span>
       </nav>
 
-      {/* =====================================================
-          PRODUCT AREA
-      ===================================================== */}
+      {/* ====================================================
+          PRODUCT
+      ==================================================== */}
 
       <div className="pdp">
-        {/* ===================================================
-            LEFT - PRODUCT IMAGES
-        =================================================== */}
+        {/* ==================================================
+            GALLERY
+        ================================================== */}
 
         <ProductGallery
           productTitle={product.title}
@@ -145,15 +296,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
           firstAvailableVariantColor={firstAvailableVariantColor}
         />
 
-        {/* ===================================================
-            RIGHT - PRODUCT INFORMATION
-        =================================================== */}
+        {/* ==================================================
+            RIGHT SIDE
+        ================================================== */}
 
         <aside className="page-right">
-          <div className="pdp-brand">OPULENCE</div>
+          {/* BRAND */}
+          <div className="pdp-brand">{product.vendor || "OPULENCE"}</div>
 
+          {/* TITLE */}
           <h1 className="pdp-title">{product.title}</h1>
 
+          {/* PRICE */}
           <p className="pdp-price">
             {currency} {price}
           </p>
@@ -166,119 +320,122 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <ProductOptions
               product={{
                 id: product.id,
+
                 title: product.title,
+
                 handle: product.handle,
+
+                vendor: product.vendor || "",
+
+                metafields: product.metafields || [],
               }}
               variants={variants}
             />
           )}
 
           {/* =================================================
-              PRODUCT DESCRIPTION
+              DESCRIPTION
           ================================================= */}
 
-          <details className="pdp-accordion" open>
-            <summary>
-              <span>Product Description</span>
+          {(product.descriptionHtml || product.description) && (
+            <details className="pdp-accordion" open>
+              <summary>
+                <span>Product Description</span>
 
-              <span className="pdp-accordion-icon">−</span>
-            </summary>
+                <span className="pdp-accordion-icon">−</span>
+              </summary>
 
-            <div className="pdp-accordion-content">
-              {product.descriptionHtml ? (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: product.descriptionHtml,
-                  }}
-                />
-              ) : product.description ? (
-                <p>{product.description}</p>
-              ) : (
-                <>
-                  <p>
-                    This piece is designed with premium materials, refined
-                    construction and a considered silhouette for everyday wear.
-                  </p>
-
-                  <p>
-                    Designed for the modern man, combining comfort, quality and
-                    timeless Opulence styling.
-                  </p>
-                </>
-              )}
-            </div>
-          </details>
+              <div className="pdp-accordion-content">
+                {product.descriptionHtml ? (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: product.descriptionHtml,
+                    }}
+                  />
+                ) : (
+                  <p>{product.description}</p>
+                )}
+              </div>
+            </details>
+          )}
 
           {/* =================================================
               SPECIFICATIONS
           ================================================= */}
 
-          <details className="pdp-accordion">
-            <summary>
-              <span>Product Specifications</span>
+          {specifications.length > 0 && (
+            <details className="pdp-accordion">
+              <summary>
+                <span>Product Specifications</span>
 
-              <span className="pdp-accordion-icon">+</span>
-            </summary>
+                <span className="pdp-accordion-icon">+</span>
+              </summary>
 
-            <div className="pdp-accordion-content">
-              <div className="pdp-spec-row">
-                <span>Fit</span>
-                <span>Regular Fit</span>
+              <div className="pdp-accordion-content">
+                {specifications.map((item) => (
+                  <div className="pdp-spec-row" key={item.label}>
+                    <span>{item.label}</span>
+
+                    <span>{item.value}</span>
+                  </div>
+                ))}
               </div>
-
-              <div className="pdp-spec-row">
-                <span>Fabric</span>
-                <span>Premium Cotton</span>
-              </div>
-
-              <div className="pdp-spec-row">
-                <span>Care</span>
-                <span>Machine Wash</span>
-              </div>
-
-              <div className="pdp-spec-row">
-                <span>Country</span>
-                <span>Made in India</span>
-              </div>
-            </div>
-          </details>
+            </details>
+          )}
 
           {/* =================================================
-              DISCLOSURE
+              RETURN & EXCHANGE
           ================================================= */}
 
-          <details className="pdp-accordion" id="return-info">
-            <summary>
-              <span>Product Disclosure</span>
+          {(returnPolicy || returnExchangeDetails) && (
+            <details className="pdp-accordion" id="return-info">
+              <summary>
+                <span>Return & Exchange</span>
 
-              <span className="pdp-accordion-icon">+</span>
-            </summary>
+                <span className="pdp-accordion-icon">+</span>
+              </summary>
 
-            <div className="pdp-accordion-content">
-              <p>
-                Colours may vary slightly depending on your screen settings and
-                lighting conditions.
-              </p>
+              <div className="pdp-accordion-content">
+                {returnExchangeDetails ? (
+                  <p style={{ whiteSpace: "pre-line" }}>
+                    {returnExchangeDetails}
+                  </p>
+                ) : (
+                  <p>{returnPolicy}</p>
+                )}
+              </div>
+            </details>
+          )}
 
-              <p>
-                Product measurements may have minor variations due to the nature
-                of garment production.
-              </p>
-            </div>
-          </details>
+          {/* =================================================
+              PRODUCT DISCLOSURE
+          ================================================= */}
+
+          {productDisclosure && (
+            <details className="pdp-accordion">
+              <summary>
+                <span>Product Disclosure</span>
+
+                <span className="pdp-accordion-icon">+</span>
+              </summary>
+
+              <div className="pdp-accordion-content">
+                <p>{productDisclosure}</p>
+              </div>
+            </details>
+          )}
         </aside>
       </div>
 
-      {/* =====================================================
-          PRODUCT REVIEWS
-          Reviews appear BEFORE Related Products
-      ===================================================== */}
+      {/* ====================================================
+          REVIEWS
+      ==================================================== */}
 
       <ProductReviews productId={product.id} productHandle={product.handle} />
 
-      {/* =====================================================
+      {/* ====================================================
           RELATED PRODUCTS
-      ===================================================== */}
+      ==================================================== */}
 
       <RelatedProducts
         productId={product.id}

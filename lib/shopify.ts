@@ -227,15 +227,24 @@ export async function getProductByHandle(handle: string) {
         title
         handle
         productType
+        vendor
+
         description
         descriptionHtml
+
+        tags
+
+        seo {
+          title
+          description
+        }
 
         featuredImage {
           url
           altText
         }
 
-        images(first: 10) {
+        images(first: 50) {
           edges {
             node {
               url
@@ -249,6 +258,92 @@ export async function getProductByHandle(handle: string) {
             amount
             currencyCode
           }
+
+          maxVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+
+        options {
+          name
+          values
+        }
+
+        collections(first: 5) {
+          edges {
+            node {
+              id
+              title
+              handle
+            }
+          }
+        }
+
+        metafields(
+          identifiers: [
+            {
+              namespace: "custom"
+              key: "fit"
+            }
+            {
+              namespace: "custom"
+              key: "fabric"
+            }
+            {
+              namespace: "custom"
+              key: "material"
+            }
+            {
+              namespace: "custom"
+              key: "care"
+            }
+            {
+              namespace: "custom"
+              key: "country"
+            }
+            {
+              namespace: "custom"
+              key: "gender"
+            }
+            {
+              namespace: "custom"
+              key: "occasion"
+            }
+            {
+              namespace: "custom"
+              key: "size_guide"
+            }
+            {
+              namespace: "custom"
+              key: "product_disclosure"
+            }
+            {
+              namespace: "custom"
+              key: "coupon_code"
+            }
+            {
+              namespace: "custom"
+              key: "coupon_text"
+            }
+            {
+              namespace: "custom"
+              key: "return_policy"
+            }
+            {
+              namespace: "custom"
+              key: "return_exchange_details"
+            }
+            {
+              namespace: "custom"
+              key: "delivery_info"
+            }
+          ]
+        ) {
+          namespace
+          key
+          value
+          type
         }
 
         ${PRODUCT_VARIANTS_FRAGMENT}

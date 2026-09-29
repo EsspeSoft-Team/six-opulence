@@ -919,7 +919,7 @@
   height: auto;
   max-height: 50px;
   object-fit: contain;
-  display: block;
+  display: none;
 }
 
 .search-close {

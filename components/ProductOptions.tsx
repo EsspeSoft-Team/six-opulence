@@ -27,10 +27,19 @@ type Variant = {
   } | null;
 };
 
+type ProductMetafield = {
+  namespace?: string | null;
+  key?: string | null;
+  value?: string | null;
+  type?: string | null;
+} | null;
+
 type Product = {
   id: string;
   title: string;
   handle: string;
+  vendor?: string | null;
+  metafields?: ProductMetafield[] | null;
 };
 
 type ProductOptionsProps = {
@@ -48,18 +57,14 @@ function ShareIcon() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle cx="18" cy="5" r="2.2" stroke="currentColor" strokeWidth="1.4" />
-
       <circle cx="6" cy="12" r="2.2" stroke="currentColor" strokeWidth="1.4" />
-
       <circle cx="18" cy="19" r="2.2" stroke="currentColor" strokeWidth="1.4" />
-
       <path
         d="M8 10.9L15.9 6.2"
         stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"
       />
-
       <path
         d="M8 13.1L15.9 17.8"
         stroke="currentColor"
@@ -90,35 +95,43 @@ function HeartIcon({ active }: { active: boolean }) {
   );
 }
 
+/*
+ * IMPORTANT:
+ * Shopify can return null entries inside metafields.
+ * Never access item.namespace/item.key before checking item.
+ */
+function getMetafieldValue(product: Product, key: string): string {
+  const metafields = Array.isArray(product?.metafields)
+    ? product.metafields.filter(Boolean)
+    : [];
+
+  const field = metafields.find(
+    (item) => item?.namespace === "custom" && item?.key === key,
+  );
+
+  return typeof field?.value === "string" ? field.value.trim() : "";
+}
+
 export default function ProductOptions({
   product,
   variants,
 }: ProductOptionsProps) {
   const router = useRouter();
-
   const { addItem } = useCart();
-
   const { toggleWishlist, isWishlisted } = useWishlist();
 
-  /* =========================================================
-     VARIANT DATA
-  ========================================================= */
-
-  const availableVariants = useMemo(() => {
-    return variants.filter((variant) => variant.availableForSale);
-  }, [variants]);
+  const availableVariants = useMemo(
+    () => variants.filter((variant) => variant.availableForSale),
+    [variants],
+  );
 
   const getOptionValue = (variant: Variant, optionName: string) => {
     return (
       variant.selectedOptions?.find(
-        (option) => option.name.toLowerCase() === optionName.toLowerCase(),
+        (option) => option?.name?.toLowerCase() === optionName.toLowerCase(),
       )?.value || ""
     );
   };
-
-  /* =========================================================
-     AVAILABLE SIZES
-  ========================================================= */
 
   const sizeOptions = useMemo(() => {
     const sizes: string[] = [];
@@ -131,18 +144,15 @@ export default function ProductOptions({
       }
     });
 
-    return sizes.length ? sizes : ["S", "M", "L", "XL", "XXL"];
+    return sizes;
   }, [variants]);
-
-  /* =========================================================
-     AVAILABLE COLORS
-  ========================================================= */
 
   const colorOptions = useMemo(() => {
     const colors: string[] = [];
 
     variants.forEach((variant) => {
-      const color = getOptionValue(variant, "Color");
+      const color =
+        getOptionValue(variant, "Color") || getOptionValue(variant, "Colour");
 
       if (color && !colors.includes(color)) {
         colors.push(color);
@@ -152,38 +162,49 @@ export default function ProductOptions({
     return colors;
   }, [variants]);
 
-  /* =========================================================
-     DEFAULT SELECTION
-  ========================================================= */
-
   const firstAvailable = availableVariants[0] || variants[0];
 
   const initialSize = firstAvailable
     ? getOptionValue(firstAvailable, "Size")
-    : sizeOptions[0] || "S";
+    : "";
 
   const initialColor = firstAvailable
-    ? getOptionValue(firstAvailable, "Color")
-    : colorOptions[0] || "";
+    ? getOptionValue(firstAvailable, "Color") ||
+      getOptionValue(firstAvailable, "Colour")
+    : "";
 
-  const [selectedSize, setSelectedSize] = useState(
-    initialSize || sizeOptions[0] || "S",
-  );
-
-  const [selectedColor, setSelectedColor] = useState(
-    initialColor || colorOptions[0] || "",
-  );
-
-  /* =========================================================
-     PERSIST SELECTED SIZE + COLOR
-  ========================================================= */
+  const [selectedSize, setSelectedSize] = useState(initialSize);
+  const [selectedColor, setSelectedColor] = useState(initialColor);
 
   const colorStorageKey = `opulence:selected-color:${product.handle}`;
   const sizeStorageKey = `opulence:selected-size:${product.handle}`;
 
   const [selectionLoaded, setSelectionLoaded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [buying, setBuying] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
+  const [couponCopied, setCouponCopied] = useState(false);
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
+  const [deliveryPincode, setDeliveryPincode] = useState("");
 
-  /* Restore the last selected variant after page reload. */
+  /*
+   * Dynamic Shopify metafields.
+   * If a metafield is not configured, the existing UI text is used.
+   */
+  const couponCode = getMetafieldValue(product, "coupon_code");
+
+  const couponText = getMetafieldValue(product, "coupon_text");
+
+  const hasCoupon = Boolean(couponCode);
+
+  const returnPolicy = getMetafieldValue(product, "return_policy");
+
+  const deliveryInfo =
+    getMetafieldValue(product, "delivery_info") || "Delivery Details";
+
+  const sizeGuideRaw = getMetafieldValue(product, "size_guide");
+
   useEffect(() => {
     try {
       const savedSize = localStorage.getItem(sizeStorageKey);
@@ -203,7 +224,6 @@ export default function ProductOptions({
     }
   }, [sizeStorageKey, colorStorageKey, sizeOptions, colorOptions]);
 
-  /* Save the current selection for the next reload. */
   useEffect(() => {
     if (!selectionLoaded) return;
 
@@ -226,38 +246,6 @@ export default function ProductOptions({
     colorStorageKey,
   ]);
 
-  /* =========================================================
-     QUANTITY
-  ========================================================= */
-
-  const [quantity, setQuantity] = useState(1);
-
-  /* =========================================================
-     LOADING
-  ========================================================= */
-
-  const [adding, setAdding] = useState(false);
-
-  const [buying, setBuying] = useState(false);
-
-  /* =========================================================
-     SHARE
-  ========================================================= */
-
-  const [shareMessage, setShareMessage] = useState("");
-
-  /* =========================================================
-     COUPON
-  ========================================================= */
-
-  const [couponCopied, setCouponCopied] = useState(false);
-
-  /* =========================================================
-     SIZE CHART
-  ========================================================= */
-
-  const [sizeChartOpen, setSizeChartOpen] = useState(false);
-
   useEffect(() => {
     if (!sizeChartOpen) return;
 
@@ -268,6 +256,7 @@ export default function ProductOptions({
     };
 
     const previousOverflow = document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
 
@@ -277,19 +266,13 @@ export default function ProductOptions({
     };
   }, [sizeChartOpen]);
 
-  /* =========================================================
-     CURRENT VARIANT
-  ========================================================= */
-
   const selectedVariant = useMemo(() => {
-    if (!variants.length) {
-      return null;
-    }
+    if (!variants.length) return null;
 
     const exactMatch = variants.find((variant) => {
       const size = getOptionValue(variant, "Size");
-
-      const color = getOptionValue(variant, "Color");
+      const color =
+        getOptionValue(variant, "Color") || getOptionValue(variant, "Colour");
 
       const sizeMatches = !selectedSize || !size || size === selectedSize;
 
@@ -301,20 +284,9 @@ export default function ProductOptions({
     return exactMatch || null;
   }, [variants, selectedSize, selectedColor]);
 
-  /* =========================================================
-     AVAILABLE CHECK
-  ========================================================= */
-
   const selectedVariantAvailable = Boolean(selectedVariant?.availableForSale);
 
-  /* =========================================================
-     VARIANT IMAGE SYNC
-     Product detail page can listen to this event and update
-     the main product image when color/size changes.
-  ========================================================= */
-
   useEffect(() => {
-    if (typeof window === "undefined") return;
     if (!selectedVariant) return;
 
     window.dispatchEvent(
@@ -328,29 +300,31 @@ export default function ProductOptions({
     );
   }, [selectedVariant]);
 
-  /* =========================================================
-     RESET INVALID SELECTION
-  ========================================================= */
-
   useEffect(() => {
     if (!variants.length) return;
 
-    const validSize = sizeOptions.includes(selectedSize);
-
-    if (!validSize) {
+    if (
+      selectedSize &&
+      sizeOptions.length > 0 &&
+      !sizeOptions.includes(selectedSize)
+    ) {
       setSelectedSize(sizeOptions[0] || "");
     }
-  }, [sizeOptions, selectedSize, variants.length]);
 
-  /* =========================================================
-     SIZE AVAILABILITY
-  ========================================================= */
+    if (
+      selectedColor &&
+      colorOptions.length > 0 &&
+      !colorOptions.includes(selectedColor)
+    ) {
+      setSelectedColor(colorOptions[0] || "");
+    }
+  }, [variants.length, sizeOptions, colorOptions, selectedSize, selectedColor]);
 
   function isSizeAvailable(size: string) {
     return variants.some((variant) => {
       const variantSize = getOptionValue(variant, "Size");
-
-      const variantColor = getOptionValue(variant, "Color");
+      const variantColor =
+        getOptionValue(variant, "Color") || getOptionValue(variant, "Colour");
 
       const sizeMatch = variantSize === size;
 
@@ -361,13 +335,10 @@ export default function ProductOptions({
     });
   }
 
-  /* =========================================================
-     COLOR AVAILABILITY
-  ========================================================= */
-
   function isColorAvailable(color: string) {
     return variants.some((variant) => {
-      const variantColor = getOptionValue(variant, "Color");
+      const variantColor =
+        getOptionValue(variant, "Color") || getOptionValue(variant, "Colour");
 
       const variantSize = getOptionValue(variant, "Size");
 
@@ -380,33 +351,15 @@ export default function ProductOptions({
     });
   }
 
-  /* =========================================================
-     SIZE CHANGE
-  ========================================================= */
-
   function handleSizeChange(size: string) {
-    if (!isSizeAvailable(size)) {
-      return;
-    }
-
+    if (!isSizeAvailable(size)) return;
     setSelectedSize(size);
   }
 
-  /* =========================================================
-     COLOR CHANGE
-  ========================================================= */
-
   function handleColorChange(color: string) {
-    if (!isColorAvailable(color)) {
-      return;
-    }
-
+    if (!isColorAvailable(color)) return;
     setSelectedColor(color);
   }
-
-  /* =========================================================
-     QUANTITY
-  ========================================================= */
 
   function decreaseQuantity() {
     setQuantity((current) => Math.max(1, current - 1));
@@ -416,19 +369,7 @@ export default function ProductOptions({
     setQuantity((current) => Math.min(99, current + 1));
   }
 
-  /* =========================================================
-     WISHLIST
-  ========================================================= */
-
   const wishlisted = isWishlisted(product.handle);
-
-  function handleWishlist() {
-    toggleWishlist(product.handle);
-  }
-
-  /* =========================================================
-     ADD TO CART
-  ========================================================= */
 
   async function handleAddToCart() {
     if (!selectedVariant) {
@@ -445,20 +386,14 @@ export default function ProductOptions({
 
     try {
       setAdding(true);
-
       await addItem(selectedVariant.id, quantity);
     } catch (error) {
       console.error("Add to cart failed:", error);
-
       alert("Unable to add this product to cart. Please try again.");
     } finally {
       setAdding(false);
     }
   }
-
-  /* =========================================================
-     BUY NOW
-  ========================================================= */
 
   async function handleBuyNow() {
     if (!selectedVariant) {
@@ -488,10 +423,6 @@ export default function ProductOptions({
     }
   }
 
-  /* =========================================================
-     SHARE
-  ========================================================= */
-
   async function handleShare() {
     try {
       const url = window.location.href;
@@ -518,13 +449,9 @@ export default function ProductOptions({
     }
   }
 
-  /* =========================================================
-     COPY COUPON
-  ========================================================= */
-
   async function handleCopyCoupon() {
     try {
-      await navigator.clipboard.writeText("OPULENCE10");
+      await navigator.clipboard.writeText(couponCode);
 
       setCouponCopied(true);
 
@@ -536,68 +463,126 @@ export default function ProductOptions({
     }
   }
 
-  /* =========================================================
-     COLOR DOT
-  ========================================================= */
-
   function getColorDot(color: string) {
-    const value = color.toLowerCase();
+    const value = color.toLowerCase().trim();
 
-    if (value === "white") {
-      return "#ffffff";
+    const colors: Record<string, string> = {
+      white: "#ffffff",
+      black: "#111111",
+      olive: "#708238",
+      navy: "#18243d",
+      red: "#9e2020",
+      blue: "#315d9b",
+      green: "#3d7048",
+      grey: "#8b8b8b",
+      gray: "#8b8b8b",
+      beige: "#d8c8ad",
+      brown: "#75543c",
+      cream: "#eee5d4",
+      maroon: "#6d1d2b",
+      pink: "#d99aaa",
+      purple: "#70518d",
+      yellow: "#d6b83f",
+      orange: "#c87532",
+    };
+
+    return colors[value] || color;
+  }
+
+  function renderSizeChart() {
+    if (!sizeGuideRaw) {
+      return (
+        <div className="size-chart-table">
+          <div className="size-chart-row size-chart-head">
+            <span>Size</span>
+            <span>Chest</span>
+            <span>Length</span>
+          </div>
+
+          <div className="size-chart-row">
+            <span>S</span>
+            <span>38"</span>
+            <span>27"</span>
+          </div>
+
+          <div className="size-chart-row">
+            <span>M</span>
+            <span>40"</span>
+            <span>28"</span>
+          </div>
+
+          <div className="size-chart-row">
+            <span>L</span>
+            <span>42"</span>
+            <span>29"</span>
+          </div>
+
+          <div className="size-chart-row">
+            <span>XL</span>
+            <span>44"</span>
+            <span>30"</span>
+          </div>
+
+          <div className="size-chart-row">
+            <span>XXL</span>
+            <span>46"</span>
+            <span>31"</span>
+          </div>
+        </div>
+      );
     }
 
-    if (value === "black") {
-      return "#111111";
+    try {
+      const parsed = JSON.parse(sizeGuideRaw);
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const columns = Object.keys(parsed[0] || {});
+
+        return (
+          <div className="size-chart-table">
+            <div className="size-chart-row size-chart-head">
+              {columns.map((column) => (
+                <span key={column}>{column}</span>
+              ))}
+            </div>
+
+            {parsed.map((row, index) => (
+              <div className="size-chart-row" key={index}>
+                {columns.map((column) => (
+                  <span key={column}>{String(row?.[column] ?? "")}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+        );
+      }
+    } catch {
+      return (
+        <div className="size-chart-table">
+          <div className="size-chart-row" style={{ display: "block" }}>
+            {sizeGuideRaw}
+          </div>
+        </div>
+      );
     }
 
-    if (value === "olive") {
-      return "#708238";
-    }
-
-    if (value === "navy") {
-      return "#18243d";
-    }
-
-    if (value === "red") {
-      return "#9e2020";
-    }
-
-    if (value === "blue") {
-      return "#315d9b";
-    }
-
-    if (value === "green") {
-      return "#3d7048";
-    }
-
-    if (value === "grey" || value === "gray") {
-      return "#8b8b8b";
-    }
-
-    if (value === "beige") {
-      return "#d8c8ad";
-    }
-
-    if (value === "brown") {
-      return "#75543c";
-    }
-
-    return color;
+    return (
+      <div className="size-chart-table">
+        <div className="size-chart-row" style={{ display: "block" }}>
+          {sizeGuideRaw}
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
-      {/* =====================================================
-          WISHLIST + SHARE
-      ====================================================== */}
-
       <div className="pdp-top-actions">
         <button
           type="button"
           className={`pdp-icon-button ${wishlisted ? "wishlist-active" : ""}`}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          onClick={handleWishlist}
+          onClick={() => toggleWishlist(product.handle)}
         >
           <HeartIcon active={wishlisted} />
         </button>
@@ -623,53 +608,44 @@ export default function ProductOptions({
         )}
       </div>
 
-      {/* =====================================================
-          SIZE
-      ====================================================== */}
+      {sizeOptions.length > 0 && (
+        <div className="pdp-size-section">
+          <div className="pdp-size-header">
+            <span>
+              Select Size: <strong>{selectedSize || "-"}</strong>
+            </span>
 
-      <div className="pdp-size-section">
-        <div className="pdp-size-header">
-          <span>
-            Select Size: <strong>{selectedSize || "-"}</strong>
-          </span>
+            <button
+              type="button"
+              className="size-chart-button"
+              onClick={() => setSizeChartOpen(true)}
+            >
+              Size Chart
+            </button>
+          </div>
 
-          <button
-            type="button"
-            className="size-chart-button"
-            onClick={() => {
-              setSizeChartOpen(true);
-            }}
-          >
-            Size Chart
-          </button>
+          <div className="pdp-sizes">
+            {sizeOptions.map((size) => {
+              const available = isSizeAvailable(size);
+              const active = selectedSize === size;
+
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  className={`pdp-size ${
+                    active ? "active" : ""
+                  } ${!available ? "disabled" : ""}`}
+                  disabled={!available}
+                  onClick={() => handleSizeChange(size)}
+                >
+                  {size}
+                </button>
+              );
+            })}
+          </div>
         </div>
-
-        <div className="pdp-sizes">
-          {sizeOptions.map((size) => {
-            const available = isSizeAvailable(size);
-
-            const active = selectedSize === size;
-
-            return (
-              <button
-                key={size}
-                type="button"
-                className={`pdp-size ${active ? "active" : ""} ${
-                  !available ? "disabled" : ""
-                }`}
-                disabled={!available}
-                onClick={() => handleSizeChange(size)}
-              >
-                {size}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* =====================================================
-          COLOR
-      ====================================================== */}
+      )}
 
       {colorOptions.length > 0 && (
         <div className="pdp-color-section">
@@ -682,16 +658,15 @@ export default function ProductOptions({
           <div className="pdp-colors">
             {colorOptions.map((color) => {
               const available = isColorAvailable(color);
-
               const active = selectedColor === color;
 
               return (
                 <button
                   key={color}
                   type="button"
-                  className={`pdp-color ${active ? "active" : ""} ${
-                    !available ? "disabled" : ""
-                  }`}
+                  className={`pdp-color ${
+                    active ? "active" : ""
+                  } ${!available ? "disabled" : ""}`}
                   disabled={!available}
                   onClick={() => handleColorChange(color)}
                 >
@@ -709,10 +684,6 @@ export default function ProductOptions({
           </div>
         </div>
       )}
-
-      {/* =====================================================
-    QUANTITY
-            ====================================================== */}
 
       <div className="pdp-quantity-section">
         <div>
@@ -742,35 +713,30 @@ export default function ProductOptions({
         </div>
       </div>
 
-      {/* =====================================================
-          DEAL
-      ====================================================== */}
-
-      <div className="pdp-deal">
-        <div className="pdp-deal-title">
-          <span>Deals of the Day</span>
-
-          <span className="pdp-info-icon">i</span>
-        </div>
-
-        <div className="pdp-deal-box">
-          <div className="pdp-deal-content">
-            <strong>OPULENCE10</strong>
-
-            <small>Get 10% Off On First Purchase</small>
+      {hasCoupon && (
+        <div className="pdp-deal">
+          <div className="pdp-deal-title">
+            <span>Deals of the Day</span>
+            <span className="pdp-info-icon">i</span>
           </div>
 
-          <button type="button" className="pdp-copy" onClick={handleCopyCoupon}>
-            <span>{couponCopied ? "✓" : "□"}</span>
+          <div className="pdp-deal-box">
+            <div className="pdp-deal-content">
+              <strong>{couponCode}</strong>
+              {couponText && <small>{couponText}</small>}
+            </div>
 
-            <small>{couponCopied ? "COPIED" : "COPY"}</small>
-          </button>
+            <button
+              type="button"
+              className="pdp-copy"
+              onClick={handleCopyCoupon}
+            >
+              <span>{couponCopied ? "✓" : "□"}</span>
+              <small>{couponCopied ? "COPIED" : "COPY"}</small>
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* =====================================================
-          BUY NOW
-      ====================================================== */}
+      )}
 
       <button
         type="button"
@@ -780,10 +746,6 @@ export default function ProductOptions({
       >
         {buying ? "PLEASE WAIT..." : "BUY NOW"}
       </button>
-
-      {/* =====================================================
-          ADD TO CART
-      ====================================================== */}
 
       <div className="pdp-add-bag">
         <button
@@ -796,17 +758,19 @@ export default function ProductOptions({
         </button>
       </div>
 
-      {/* =====================================================
-          DELIVERY
-      ====================================================== */}
-
       <div className="pdp-delivery">
-        <span className="pdp-delivery-title">Delivery Details</span>
+        <span className="pdp-delivery-title">{deliveryInfo}</span>
 
         <div className="pdp-pincode">
           <input
             type="text"
             placeholder="Enter Delivery Pincode"
+            value={deliveryPincode}
+            onChange={(event) =>
+              setDeliveryPincode(
+                event.target.value.replace(/\D/g, "").slice(0, 6),
+              )
+            }
             maxLength={6}
             inputMode="numeric"
           />
@@ -817,21 +781,32 @@ export default function ProductOptions({
         </div>
       </div>
 
-      {/* =====================================================
-          RETURN
-      ====================================================== */}
+      {returnPolicy && (
+        <div className="pdp-return">
+          <span className="pdp-return-icon">◷</span>
 
-      <div className="pdp-return">
-        <span className="pdp-return-icon">◷</span>
+          <span>{returnPolicy}</span>
 
-        <span>15 days returns / exchange available</span>
+          <button
+            type="button"
+            className="pdp-more-info"
+            onClick={() => {
+              const returnSection = document.getElementById("return-info");
 
-        <a href="#return-info">More Info</a>
-      </div>
+              if (returnSection instanceof HTMLDetailsElement) {
+                returnSection.open = true;
+              }
 
-      {/* =====================================================
-          SIZE CHART MODAL
-      ====================================================== */}
+              returnSection?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }}
+          >
+            More Info
+          </button>
+        </div>
+      )}
 
       {sizeChartOpen && (
         <div
@@ -857,43 +832,7 @@ export default function ProductOptions({
 
             <h3 id="size-chart-title">Size Chart</h3>
 
-            <div className="size-chart-table">
-              <div className="size-chart-row size-chart-head">
-                <span>Size</span>
-                <span>Chest</span>
-                <span>Length</span>
-              </div>
-
-              <div className="size-chart-row">
-                <span>S</span>
-                <span>38"</span>
-                <span>27"</span>
-              </div>
-
-              <div className="size-chart-row">
-                <span>M</span>
-                <span>40"</span>
-                <span>28"</span>
-              </div>
-
-              <div className="size-chart-row">
-                <span>L</span>
-                <span>42"</span>
-                <span>29"</span>
-              </div>
-
-              <div className="size-chart-row">
-                <span>XL</span>
-                <span>44"</span>
-                <span>30"</span>
-              </div>
-
-              <div className="size-chart-row">
-                <span>XXL</span>
-                <span>46"</span>
-                <span>31"</span>
-              </div>
-            </div>
+            {renderSizeChart()}
           </div>
         </div>
       )}

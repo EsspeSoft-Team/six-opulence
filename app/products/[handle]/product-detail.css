@@ -276,7 +276,8 @@
 ======================================================== */
 
 .pdp-deal {
-  margin-top: 45px;
+  /* margin-top: 45px; */
+  margin-bottom: 40px;
 }
 
 .pdp-deal-title {
@@ -381,7 +382,7 @@
   width: 100%;
   height: 48px;
 
-  margin-top: 40px;
+  /* margin-top: 40px; */
 
   border: 1px solid #111;
 
@@ -1495,4 +1496,16 @@
     overflow: visible;
     padding-bottom: 0;
   }
+}
+
+.pdp-more-info {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }

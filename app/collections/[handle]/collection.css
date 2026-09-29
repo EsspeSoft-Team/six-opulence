@@ -761,9 +761,9 @@
     display: none;
   }
 
-  .sidebar-filters {
+  /* .sidebar-filters {
     display: none;
-  }
+  } */
 
   /* -----------------------------------------
      TOP BAR
@@ -829,7 +829,7 @@
     column-gap: 9px;
     row-gap: 32px;
 
-    margin-bottom: 60px;
+    margin-bottom: 0px;
   }
 }
 
@@ -878,6 +878,159 @@
     column-gap: 7px;
     row-gap: 28px;
 
-    margin-bottom: 50px;
+    margin-bottom: 0px;
+  }
+}
+
+/* =========================================================
+   OPULENCE MOBILE FILTER
+   Desktop remains unchanged
+========================================================= */
+
+@media (max-width: 700px) {
+  /* FILTER AREA */
+
+  .opulence-catalog .catalog-sidebar > .sidebar-filters {
+    display: block !important;
+    width: 100%;
+    margin-top: 28px;
+    padding: 0;
+  }
+
+  /* FILTER TITLE */
+
+  .opulence-catalog .catalog-sidebar > .sidebar-filters > .sidebar-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    padding: 16px 0;
+
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+
+    font-size: 16px;
+    letter-spacing: 0.12em;
+  }
+
+  /* FILTER GROUP WRAPPER */
+
+  .opulence-catalog .filter-groups {
+    width: 100%;
+  }
+
+  /* EACH FILTER */
+
+  .opulence-catalog .filter-groups .filter-group {
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  /* FILTER BUTTON */
+
+  .opulence-catalog .filter-groups .filter-group > button {
+    width: 100%;
+    min-height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0;
+
+    background: transparent;
+    border: 0;
+
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-align: left;
+  }
+
+  /* PLUS */
+
+  .opulence-catalog .filter-groups .filter-icon {
+    font-size: 15px;
+    font-weight: 300;
+    transition: transform 0.2s ease;
+  }
+
+  .opulence-catalog .filter-groups .filter-icon.open {
+    transform: rotate(45deg);
+  }
+
+  /* OPTIONS */
+
+  .opulence-catalog .filter-groups .filter-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px 20px;
+
+    padding: 4px 0 18px;
+  }
+
+  /* OPTION */
+
+  .opulence-catalog .filter-groups .filter-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  /* CHECKBOX */
+
+  .opulence-catalog .filter-groups .filter-options input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+
+    margin: 0;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 1px solid #999;
+    background: #fff;
+  }
+
+  .opulence-catalog
+    .filter-groups
+    .filter-options
+    input[type="checkbox"]:checked {
+    background: #111;
+    border-color: #111;
+
+    box-shadow: inset 0 0 0 3px #fff;
+  }
+
+  /* CLEAR FILTER */
+
+  .opulence-catalog .filter-groups .clear-filters {
+    width: 100%;
+
+    margin: 16px 0;
+
+    padding: 12px 0;
+
+    background: #111;
+    color: #fff;
+
+    border: 0;
+
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (max-width: 380px) {
+  .catalog-product-grid,
+  .catalog-product-grid.compact-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 7px;
+    row-gap: 28px;
+    margin-bottom: 0px !important;
   }
 }
