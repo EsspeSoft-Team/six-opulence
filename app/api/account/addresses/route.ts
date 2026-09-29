@@ -43,9 +43,11 @@ type CustomerAddress = {
 type CustomerAddressesResponse = {
   customer: {
     id: string;
+
     defaultAddress?: {
       id: string;
     } | null;
+
     addressesV2: {
       edges: {
         node: CustomerAddress;
@@ -77,8 +79,9 @@ type CustomerAddressDeleteResponse = {
 
 /* ============================================================
    ADMIN GRAPHQL HELPER
+
    IMPORTANT:
-   shopifyAdminFetch accepts ONE object argument.
+   Current shopifyAdminFetch accepts ONE object argument.
 ============================================================ */
 
 async function adminGraphQL<T>(
@@ -92,80 +95,122 @@ async function adminGraphQL<T>(
 }
 
 /* ============================================================
-   GET LOGGED-IN CUSTOMER
-============================================================ */
+   GET CURRENT LOGGED-IN CUSTOMER
 
-async function getLoggedInCustomer() {
-  const request = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/auth/me`,
-    {
-      method: "GET",
-      headers: {
-        cookie: "",
-      },
-      cache: "no-store",
-    },
-  );
-
-  if (!request.ok) {
-    return null;
-  }
-
-  const data = await request.json();
-
-  return data?.customer || data?.user || null;
-}
-
-/* ============================================================
-   BETTER AUTH LOOKUP
-   Forward current request cookies to /api/auth/me
+   IMPORTANT:
+   We forward the exact cookie from the current browser request.
+   This keeps the same login session used by AuthContext.
 ============================================================ */
 
 async function getCustomerFromAuth(request: NextRequest) {
-  const cookie = request.headers.get("cookie") || "";
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    "http://localhost:3000";
-
   try {
-    const response = await fetch(`${siteUrl}/api/auth/me`, {
-      method: "GET",
-      headers: {
-        cookie,
-      },
-      cache: "no-store",
-    });
+    const cookie = request.headers.get("cookie") || "";
 
-    if (!response.ok) {
+    if (!cookie) {
+      console.error("ADDRESS API: No authentication cookie found.");
       return null;
     }
 
-    const data = await response.json();
+    /*
+     * Build /api/auth/me from the current request URL.
+     *
+     * Example:
+     * https://six-opulence.vercel.app/api/auth/me
+     */
+    const authUrl = new URL("/api/auth/me", request.url);
 
-    return data?.customer || data?.user || null;
+    const response = await fetch(authUrl.toString(), {
+      method: "GET",
+
+      headers: {
+        cookie,
+      },
+
+      cache: "no-store",
+    });
+
+    const rawText = await response.text();
+
+    if (!response.ok) {
+      console.error(
+        "ADDRESS API: /api/auth/me failed:",
+        response.status,
+        rawText,
+      );
+
+      return null;
+    }
+
+    let data: any = null;
+
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.error(
+        "ADDRESS API: /api/auth/me returned invalid JSON:",
+        rawText,
+      );
+
+      return null;
+    }
+
+    /*
+     * Your AuthContext expects:
+     *
+     * {
+     *   authenticated: true,
+     *   customer: {...}
+     * }
+     */
+
+    if (data?.authenticated && data?.customer) {
+      return data.customer;
+    }
+
+    /*
+     * Fallback in case /api/auth/me returns customer
+     * without the authenticated flag.
+     */
+    if (data?.customer) {
+      return data.customer;
+    }
+
+    if (data?.user) {
+      return data.user;
+    }
+
+    return null;
   } catch (error) {
-    console.error("AUTH LOOKUP ERROR:", error);
+    console.error("ADDRESS API AUTH ERROR:", error);
+
     return null;
   }
 }
 
 /* ============================================================
-   GET CUSTOMER ID
+   RESOLVE CUSTOMER ID
 ============================================================ */
 
 async function resolveCustomerId(request: NextRequest) {
   const customer = await getCustomerFromAuth(request);
 
-  const customerId =
-    customer?.id || customer?.customer?.id || customer?.customerId || null;
-
-  if (customerId) {
-    return customerId;
+  if (!customer) {
+    return null;
   }
 
-  return null;
+  const customerId =
+    customer?.id || customer?.customerId || customer?.customer?.id || null;
+
+  if (!customerId) {
+    console.error(
+      "ADDRESS API: Logged-in customer found but customer ID missing.",
+      customer,
+    );
+
+    return null;
+  }
+
+  return customerId;
 }
 
 /* ============================================================
@@ -175,15 +220,23 @@ async function resolveCustomerId(request: NextRequest) {
 function normalizeAddress(body: any): AddressInput {
   return {
     firstName: String(body?.firstName || "").trim(),
+
     lastName: String(body?.lastName || "").trim(),
+
     address1: String(body?.address1 || "").trim(),
+
     address2: String(body?.address2 || "").trim(),
+
     city: String(body?.city || "").trim(),
+
     province: String(body?.province || "").trim(),
+
     zip: String(body?.zip || "").trim(),
+
     countryCode: String(body?.countryCode || "IN")
       .trim()
       .toUpperCase(),
+
     phone: String(body?.phone || "").trim(),
   };
 }
@@ -221,17 +274,40 @@ function validateAddress(address: AddressInput) {
 }
 
 /* ============================================================
+   ADDRESS FIELDS
+============================================================ */
+
+const ADDRESS_FIELDS = `
+  id
+  firstName
+  lastName
+  address1
+  address2
+  city
+  province
+  provinceCode
+  zip
+  country
+  countryCode
+  phone
+`;
+
+/* ============================================================
    GET ADDRESSES
 ============================================================ */
 
 export async function GET(request: NextRequest) {
   try {
+    /*
+     * Get the same logged-in customer used by AuthContext.
+     */
     const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
+          authenticated: false,
           error: "You are not logged in.",
         },
         {
@@ -252,18 +328,7 @@ export async function GET(request: NextRequest) {
           addressesV2(first: 50) {
             edges {
               node {
-                id
-                firstName
-                lastName
-                address1
-                address2
-                city
-                province
-                provinceCode
-                zip
-                country
-                countryCode
-                phone
+                ${ADDRESS_FIELDS}
               }
             }
           }
@@ -275,7 +340,7 @@ export async function GET(request: NextRequest) {
       id: customerId,
     });
 
-    if (!data.customer) {
+    if (!data?.customer) {
       return NextResponse.json(
         {
           success: false,
@@ -292,7 +357,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+
+      authenticated: true,
+
       addresses,
+
       defaultAddressId: data.customer.defaultAddress?.id || null,
     });
   } catch (error) {
@@ -301,6 +370,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error ? error.message : "Unable to load addresses.",
       },
@@ -317,12 +387,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    /*
+     * Make sure the customer is actually logged in.
+     */
     const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
+
+          authenticated: false,
+
           error: "You are not logged in.",
         },
         {
@@ -363,18 +439,7 @@ export async function POST(request: NextRequest) {
           setAsDefault: $setAsDefault
         ) {
           address {
-            id
-            firstName
-            lastName
-            address1
-            address2
-            city
-            province
-            provinceCode
-            zip
-            country
-            countryCode
-            phone
+            ${ADDRESS_FIELDS}
           }
 
           userErrors {
@@ -387,17 +452,34 @@ export async function POST(request: NextRequest) {
 
     const data = await adminGraphQL<CustomerAddressCreateResponse>(mutation, {
       address,
+
       customerId,
+
       setAsDefault,
     });
 
-    const result = data.customerAddressCreate;
+    const result = data?.customerAddressCreate;
+
+    if (!result) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          error: "Shopify did not return an address response.",
+        },
+        {
+          status: 500,
+        },
+      );
+    }
 
     if (result.userErrors?.length) {
       return NextResponse.json(
         {
           success: false,
+
           error: result.userErrors.map((item) => item.message).join(", "),
+
           errors: result.userErrors,
         },
         {
@@ -408,7 +490,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+
       message: "Address added successfully.",
+
       address: result.address,
     });
   } catch (error) {
@@ -417,6 +501,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error ? error.message : "Unable to add address.",
       },
@@ -433,12 +518,18 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    /*
+     * Make sure the customer is logged in.
+     */
     const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
+
+          authenticated: false,
+
           error: "You are not logged in.",
         },
         {
@@ -455,6 +546,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+
           error: "Address ID is required.",
         },
         {
@@ -471,6 +563,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+
           error: validationError,
         },
         {
@@ -495,18 +588,7 @@ export async function PATCH(request: NextRequest) {
           setAsDefault: $setAsDefault
         ) {
           address {
-            id
-            firstName
-            lastName
-            address1
-            address2
-            city
-            province
-            provinceCode
-            zip
-            country
-            countryCode
-            phone
+            ${ADDRESS_FIELDS}
           }
 
           userErrors {
@@ -519,18 +601,36 @@ export async function PATCH(request: NextRequest) {
 
     const data = await adminGraphQL<CustomerAddressUpdateResponse>(mutation, {
       address,
+
       addressId,
+
       customerId,
+
       setAsDefault,
     });
 
-    const result = data.customerAddressUpdate;
+    const result = data?.customerAddressUpdate;
+
+    if (!result) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          error: "Shopify did not return an address response.",
+        },
+        {
+          status: 500,
+        },
+      );
+    }
 
     if (result.userErrors?.length) {
       return NextResponse.json(
         {
           success: false,
+
           error: result.userErrors.map((item) => item.message).join(", "),
+
           errors: result.userErrors,
         },
         {
@@ -541,7 +641,9 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+
       message: "Address updated successfully.",
+
       address: result.address,
     });
   } catch (error) {
@@ -550,6 +652,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error ? error.message : "Unable to update address.",
       },
@@ -566,12 +669,18 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    /*
+     * Make sure the customer is logged in.
+     */
     const customerId = await resolveCustomerId(request);
 
     if (!customerId) {
       return NextResponse.json(
         {
           success: false,
+
+          authenticated: false,
+
           error: "You are not logged in.",
         },
         {
@@ -588,6 +697,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+
           error: "Address ID is required.",
         },
         {
@@ -617,16 +727,32 @@ export async function DELETE(request: NextRequest) {
 
     const data = await adminGraphQL<CustomerAddressDeleteResponse>(mutation, {
       addressId,
+
       customerId,
     });
 
-    const result = data.customerAddressDelete;
+    const result = data?.customerAddressDelete;
+
+    if (!result) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          error: "Shopify did not return a delete response.",
+        },
+        {
+          status: 500,
+        },
+      );
+    }
 
     if (result.userErrors?.length) {
       return NextResponse.json(
         {
           success: false,
+
           error: result.userErrors.map((item) => item.message).join(", "),
+
           errors: result.userErrors,
         },
         {
@@ -637,7 +763,9 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+
       message: "Address deleted successfully.",
+
       deletedAddressId: result.deletedAddressId,
     });
   } catch (error) {
@@ -646,6 +774,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error ? error.message : "Unable to delete address.",
       },
