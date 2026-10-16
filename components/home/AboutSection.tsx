@@ -4,7 +4,7 @@ import "./AboutSection.css";
 export default function AboutSection() {
   return (
     <section className="about-section">
-      <div className="about-section__container">
+      <div className="container">
         <div className="about-section__inner">
           {/* =========================
               EYEBROW

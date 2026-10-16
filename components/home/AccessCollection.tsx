@@ -110,6 +110,8 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
     return null;
   }
 
+  const activeIndex = Math.min(Math.round(progress), total - 1);
+
   return (
     <div className="access-root">
       <div ref={wrapRef} className="access-scroll-wrap">
@@ -131,6 +133,26 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
               </div>
             );
           })}
+
+          {/* PROGRESS (mobile only, CSS diye show hoy) */}
+
+          <div className="access-progress" aria-hidden="true">
+            <span className="access-progress-count">
+              {String(activeIndex + 1).padStart(2, "0")}
+              <em> / {String(total).padStart(2, "0")}</em>
+            </span>
+
+            <div className="access-progress-dots">
+              {chapters.map((ch, i) => (
+                <span
+                  key={ch.id}
+                  className={`access-progress-dot ${
+                    i === activeIndex ? "is-active" : ""
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
 
           {/* PRODUCT CARD */}
 

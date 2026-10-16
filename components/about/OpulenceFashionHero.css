@@ -39,10 +39,10 @@
 
   grid-template-columns:
     0.9fr
-    1.05fr
+    1.8fr
     1fr;
 
-  gap: 55px;
+  gap: 40px;
 
   align-items: start;
 }

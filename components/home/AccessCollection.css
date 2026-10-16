@@ -232,3 +232,162 @@
 img.access-bg-image {
   width: 100%;
 }
+
+/* =========================================================
+   PROGRESS (desktop e hidden)
+========================================================= */
+.access-progress {
+  display: none;
+}
+
+/* =========================================================
+   MOBILE LAYOUT (desktop unchanged)
+   Eta file-er ekdom shesh e thakte hobe, noile upor-er
+   max-height: 600px rule override kore dibe.
+========================================================= */
+@media (max-width: 720px) {
+  /* Header (80px) baad diye pura screen */
+  .access-sticky-stage {
+    height: calc(100vh - 80px);
+    height: calc(100dvh - 80px);
+  }
+
+  /* Image full-bleed */
+  .access-bg-layer img.access-bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+
+  /* Niche shade: card ar progress clear dekhar jonno */
+  .access-sticky-stage::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 55%;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.25) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  /* Compact full-width card */
+  .access-card {
+    left: 16px;
+    right: 16px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    max-width: none;
+  }
+
+  .access-card-stack {
+    position: relative;
+    height: 112px;
+    overflow: hidden;
+    background: var(--color-white);
+  }
+
+  .access-card-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px;
+  }
+
+  .access-card-image {
+    width: 92px;
+    height: 92px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .access-card-body {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .access-card-name {
+    font-size: 16px;
+    line-height: 1.25;
+    margin: 0 0 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .access-card-price {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .access-card-body::after {
+    content: "Shop now \2192";
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    opacity: 0.7;
+  }
+
+  /* Progress: card-er thik upore */
+  .access-progress {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: calc(20px + 112px + 14px + env(safe-area-inset-bottom, 0px));
+    z-index: 6;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #fff;
+    pointer-events: none;
+  }
+
+  .access-progress-count {
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+  }
+
+  .access-progress-count em {
+    font-style: normal;
+    opacity: 0.6;
+  }
+
+  .access-progress-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .access-progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transition:
+      width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.35s ease;
+  }
+
+  .access-progress-dot.is-active {
+    width: 20px;
+    border-radius: 3px;
+    background: #fff;
+  }
+}

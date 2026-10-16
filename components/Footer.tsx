@@ -23,7 +23,7 @@ const Footer = () => {
         {/* LOGO */}
         <div className="opulence-footer-logo">
           <img
-            src="/images/opulence white.png"
+            src="/images/opulence white-icon.png"
             alt="OPULENCE"
             className="opulence-logo-img"
           />
@@ -53,9 +53,9 @@ const Footer = () => {
         <div className="opulence-customer-support">
           <div className="opulence-support-title">CUSTOMER SUPPORT</div>
 
-          <div className="opulence-support-text">
+          {/* <div className="opulence-support-text">
             We are happy to help you with your purchase
-          </div>
+          </div> */}
 
           <a
             href="mailto:support@opulence.com"

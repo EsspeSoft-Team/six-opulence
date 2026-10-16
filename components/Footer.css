@@ -39,7 +39,7 @@
 ===================================================== */
 
 .opulence-logo-img {
-  width: 180px;
+  width: 140px;
   height: auto;
   max-width: 100%;
   display: block;
@@ -52,7 +52,7 @@
 ===================================================== */
 
 .opulence-tagline {
-  margin-top: 30px;
+  margin-top: 25px;
   color: #ffffff;
   font-family: var(--font-display);
   font-size: 38px;
@@ -60,6 +60,7 @@
   line-height: 1.2;
   letter-spacing: 5px;
   text-transform: capitalize;
+  margin-bottom: 80px;
 }
 
 /* =====================================================
@@ -195,12 +196,12 @@
   align-items: center;
   justify-content: center;
 
-  background: var(--color-white);
-  color: var(--color-text);
+  /* background: var(--color-white); */
+  color: var(--color-white);
 
   border-radius: 50%;
 
-  font-size: 12px;
+  font-size: 18px;
   flex-shrink: 0;
 }
 

@@ -45,10 +45,10 @@ export default function VideoSection() {
       </div>
 
       {/* Bottom Label */}
-      <div className="opulence-video-bottom">
+      {/* <div className="opulence-video-bottom">
         <span>OPULENCE</span>
         <span>EST. 2026</span>
-      </div>
+      </div> */}
     </section>
   );
 }

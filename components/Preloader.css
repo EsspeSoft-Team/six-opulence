@@ -7,12 +7,15 @@ body.preloader-active {
 }
 
 /* =========================================================
-   PRELOADER
+   PRELOADER ROOT
 ========================================================= */
 
 .op-preloader {
-  position: fixed;
+  /* ---- Timing controls ---- */
+  --op-type-start: 1.1s; /* typing kokhon shuru */
+  --op-type-speed: 90ms; /* protita letter er gap */
 
+  position: fixed;
   inset: 0;
 
   width: 100%;
@@ -22,7 +25,6 @@ body.preloader-active {
   z-index: 999999999;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -32,128 +34,164 @@ body.preloader-active {
   visibility: visible;
 
   transition:
-    opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0.8s ease;
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.7s linear;
 
+  will-change: opacity;
   overflow: hidden;
 }
 
-/* =========================================================
-   CLOSING
-========================================================= */
-
 .op-preloader-closing {
   opacity: 0;
-
   visibility: hidden;
-
   pointer-events: none;
 }
-
-/* =========================================================
-   INNER
-========================================================= */
 
 .op-preloader-inner {
   width: 100%;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
 
   text-align: center;
 }
 
 /* =========================================================
-   OP LOGO
+   OP LOGO (two halves joining) - only transform + opacity
 ========================================================= */
 
 .op-logo-mark {
+  --op-split: 48%; /* kothay kete dui bhag hobe */
+  --op-overlap: 0.4%; /* seam hide korar jonno */
+
   position: relative;
 
   width: 125px;
   height: 125px;
 
   margin-bottom: 25px;
+}
 
-  display: flex;
+/* Glow: alada layer, shudhu opacity animate hoy (GPU) */
+.op-logo-mark::before {
+  content: "";
 
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  inset: -45%;
 
-  color: #ffffff;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.op-logo-piece {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
 
   opacity: 0;
 
-  transform: scale(0.8);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 
-  animation: opLogoReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* O */
-
-.op-letter-o {
-  position: absolute;
-
-  left: 17px;
-  top: 10px;
-
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-
-  font-size: 110px;
-
-  font-weight: 300;
-
-  line-height: 1;
-
-  letter-spacing: -9px;
+.op-logo-left {
+  clip-path: inset(0 calc(100% - var(--op-split) - var(--op-overlap)) 0 0);
 }
 
-/* P */
+.op-logo-right {
+  clip-path: inset(0 0 0 calc(var(--op-split) - var(--op-overlap)));
+}
 
-.op-letter-p {
-  position: absolute;
+/* Animations shuru hobe shudhu .op-ready thakle */
+.op-ready .op-logo-left {
+  animation: opJoinLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
 
-  right: 12px;
-  bottom: 6px;
+.op-ready .op-logo-right {
+  animation: opJoinRight 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
 
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-
-  font-size: 102px;
-
-  font-weight: 400;
-
-  line-height: 1;
-
-  letter-spacing: -8px;
+.op-ready .op-logo-mark::before {
+  animation: opGlow 1.4s ease-in-out 0.9s forwards;
 }
 
 /* =========================================================
-   OPULENCE
+   TYPEWRITER BRAND
 ========================================================= */
 
 .op-preloader-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 28px;
+
   color: #ffffff;
 
   font-family: "Cormorant Garamond", "Times New Roman", serif;
-
   font-size: 20px;
-
   font-weight: 500;
-
   letter-spacing: 7px;
 
   padding-left: 7px;
+}
+
+.op-char {
+  --op-delay: calc(var(--op-type-start) + var(--i) * var(--op-type-speed));
+
+  position: relative;
+  display: inline-block;
 
   opacity: 0;
+  transform: translate3d(0, 5px, 0);
 
-  transform: translateY(15px);
+  will-change: transform, opacity;
+}
 
-  animation: opBrandReveal 0.9s ease 0.55s forwards;
+.op-char::after {
+  content: "";
+
+  position: absolute;
+  right: -5px;
+  top: 12%;
+
+  width: 1px;
+  height: 76%;
+
+  background: #ffffff;
+
+  opacity: 0;
+}
+
+.op-ready .op-char {
+  animation: opCharIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) var(--op-delay)
+    forwards;
+}
+
+.op-ready .op-char::after {
+  animation: opCursorStep var(--op-type-speed) steps(1) var(--op-delay) forwards;
+}
+
+/* Sesh letter er cursor blink korbe */
+.op-ready .op-char:last-child::after {
+  animation: opCaretBlink 0.8s steps(1) var(--op-delay) infinite;
 }
 
 /* =========================================================
@@ -164,7 +202,6 @@ body.preloader-active {
   position: relative;
 
   width: 120px;
-
   height: 1px;
 
   margin-top: 28px;
@@ -174,58 +211,102 @@ body.preloader-active {
   overflow: hidden;
 
   opacity: 0;
-
-  animation: opLineReveal 0.5s ease 0.8s forwards;
 }
 
 .op-preloader-line span {
   position: absolute;
-
-  left: 0;
-  top: 0;
-
-  width: 0;
-
-  height: 1px;
+  inset: 0;
 
   background: #ffffff;
 
-  animation: opLoadingLine 1.25s cubic-bezier(0.65, 0, 0.35, 1) 0.9s forwards;
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  will-change: transform;
+}
+
+.op-ready .op-preloader-line {
+  animation: opLineReveal 0.5s ease 0.9s forwards;
+}
+
+.op-ready .op-preloader-line span {
+  animation: opLoadingLine 1.8s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
 }
 
 /* =========================================================
-   ANIMATIONS
+   KEYFRAMES
 ========================================================= */
 
-@keyframes opLogoReveal {
-  0% {
+@keyframes opJoinLeft {
+  from {
     opacity: 0;
-
-    transform: scale(0.8) translateY(12px);
+    transform: translate3d(-38px, 0, 0) rotate(-5deg);
   }
 
-  100% {
+  to {
     opacity: 1;
-
-    transform: scale(1) translateY(0);
+    transform: translate3d(0, 0, 0) rotate(0);
   }
 }
 
-@keyframes opBrandReveal {
+@keyframes opJoinRight {
+  from {
+    opacity: 0;
+    transform: translate3d(38px, 0, 0) rotate(5deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+}
+
+@keyframes opGlow {
   0% {
     opacity: 0;
+  }
 
-    transform: translateY(15px);
-
-    letter-spacing: 12px;
+  50% {
+    opacity: 1;
   }
 
   100% {
+    opacity: 0;
+  }
+}
+
+@keyframes opCharIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 5px, 0);
+  }
+
+  to {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
 
-    transform: translateY(0);
+@keyframes opCursorStep {
+  0%,
+  99% {
+    opacity: 1;
+  }
 
-    letter-spacing: 7px;
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes opCaretBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  50.01%,
+  100% {
+    opacity: 0;
   }
 }
 
@@ -240,12 +321,28 @@ body.preloader-active {
 }
 
 @keyframes opLoadingLine {
-  0% {
-    width: 0;
+  from {
+    transform: scaleX(0);
   }
 
-  100% {
-    width: 100%;
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .op-ready .op-logo-piece,
+  .op-ready .op-logo-mark::before,
+  .op-ready .op-char,
+  .op-ready .op-char::after,
+  .op-ready .op-preloader-line,
+  .op-ready .op-preloader-line span {
+    animation-duration: 0.01ms;
+    animation-delay: 0s;
   }
 }
 
@@ -261,35 +358,18 @@ body.preloader-active {
     margin-bottom: 20px;
   }
 
-  .op-letter-o {
-    left: 13px;
-    top: 7px;
-
-    font-size: 88px;
-
-    letter-spacing: -7px;
-  }
-
-  .op-letter-p {
-    right: 9px;
-    bottom: 4px;
-
-    font-size: 82px;
-
-    letter-spacing: -6px;
-  }
-
   .op-preloader-brand {
     font-size: 15px;
-
     letter-spacing: 5px;
-
     padding-left: 5px;
+  }
+
+  .op-char::after {
+    right: -4px;
   }
 
   .op-preloader-line {
     width: 90px;
-
     margin-top: 22px;
   }
 }
