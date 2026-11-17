@@ -1,19 +1,16 @@
-/* =========================================================
+/* =========================================
    OPULENCE PRELOADER
-========================================================= */
+========================================= */
 
 body.preloader-active {
   overflow: hidden;
 }
 
-/* =========================================================
-   PRELOADER ROOT
-========================================================= */
+/* PRELOADER ROOT */
 
 .op-preloader {
-  /* ---- Timing controls ---- */
-  --op-type-start: 1.1s; /* typing kokhon shuru */
-  --op-type-speed: 90ms; /* protita letter er gap */
+  --op-type-start: 1.1s;
+  --op-type-speed: 90ms;
 
   position: fixed;
   inset: 0;
@@ -58,13 +55,13 @@ body.preloader-active {
   text-align: center;
 }
 
-/* =========================================================
-   OP LOGO (two halves joining) - only transform + opacity
-========================================================= */
+/* =========================================
+   LOGO ANIMATION
+========================================= */
 
 .op-logo-mark {
-  --op-split: 48%; /* kothay kete dui bhag hobe */
-  --op-overlap: 0.4%; /* seam hide korar jonno */
+  --op-split: 48%;
+  --op-overlap: 0.4%;
 
   position: relative;
 
@@ -74,7 +71,6 @@ body.preloader-active {
   margin-bottom: 25px;
 }
 
-/* Glow: alada layer, shudhu opacity animate hoy (GPU) */
 .op-logo-mark::before {
   content: "";
 
@@ -119,7 +115,8 @@ body.preloader-active {
   clip-path: inset(0 0 0 calc(var(--op-split) - var(--op-overlap)));
 }
 
-/* Animations shuru hobe shudhu .op-ready thakle */
+/* Logo joining */
+
 .op-ready .op-logo-left {
   animation: opJoinLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
 }
@@ -132,9 +129,9 @@ body.preloader-active {
   animation: opGlow 1.4s ease-in-out 0.9s forwards;
 }
 
-/* =========================================================
+/* =========================================
    TYPEWRITER BRAND
-========================================================= */
+========================================= */
 
 .op-preloader-brand {
   display: flex;
@@ -180,23 +177,24 @@ body.preloader-active {
   opacity: 0;
 }
 
+/* Character reveal */
+
 .op-ready .op-char {
   animation: opCharIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) var(--op-delay)
     forwards;
 }
 
+/* Cursor appears during typing only */
+
 .op-ready .op-char::after {
   animation: opCursorStep var(--op-type-speed) steps(1) var(--op-delay) forwards;
 }
 
-/* Sesh letter er cursor blink korbe */
-.op-ready .op-char:last-child::after {
-  animation: opCaretBlink 0.8s steps(1) var(--op-delay) infinite;
-}
+/* No infinite blinking */
 
-/* =========================================================
+/* =========================================
    LOADING LINE
-========================================================= */
+========================================= */
 
 .op-preloader-line {
   position: relative;
@@ -233,9 +231,9 @@ body.preloader-active {
   animation: opLoadingLine 1.8s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
 }
 
-/* =========================================================
+/* =========================================
    KEYFRAMES
-========================================================= */
+========================================= */
 
 @keyframes opJoinLeft {
   from {
@@ -298,18 +296,6 @@ body.preloader-active {
   }
 }
 
-@keyframes opCaretBlink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-
-  50.01%,
-  100% {
-    opacity: 0;
-  }
-}
-
 @keyframes opLineReveal {
   from {
     opacity: 0;
@@ -330,9 +316,9 @@ body.preloader-active {
   }
 }
 
-/* =========================================================
+/* =========================================
    REDUCED MOTION
-========================================================= */
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .op-ready .op-logo-piece,
@@ -346,9 +332,9 @@ body.preloader-active {
   }
 }
 
-/* =========================================================
+/* =========================================
    MOBILE
-========================================================= */
+========================================= */
 
 @media (max-width: 600px) {
   .op-logo-mark {

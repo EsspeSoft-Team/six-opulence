@@ -70,16 +70,11 @@ const testimonials: Testimonial[] = [
 ];
 
 export default function CustomerReviews() {
-  /*
-   * Duplicate the testimonials so the marquee
-   * can loop continuously without a visible gap.
-   */
   const marqueeItems = [...testimonials, ...testimonials];
 
   return (
     <section className="customer-reviews-section">
       <div className="customer-reviews-container">
-        {/* HEADER */}
         <div className="customer-reviews-header">
           <div className="customer-reviews-title">
             <span className="customer-reviews-label">TESTIMONIAL</span>
@@ -95,7 +90,6 @@ export default function CustomerReviews() {
           </div>
         </div>
 
-        {/* MARQUEE */}
         <div className="customer-reviews-window">
           <div className="customer-reviews-track">
             {marqueeItems.map((testimonial, index) => (
@@ -103,7 +97,6 @@ export default function CustomerReviews() {
                 className="customer-review-card"
                 key={`${testimonial.name}-${index}`}
               >
-                {/* IMAGE */}
                 <div className="customer-review-image">
                   <img
                     src={testimonial.image}
@@ -112,7 +105,6 @@ export default function CustomerReviews() {
                   />
                 </div>
 
-                {/* CONTENT */}
                 <div className="customer-review-content">
                   <div>
                     <div className="customer-review-stars">★ ★ ★ ★ ★</div>

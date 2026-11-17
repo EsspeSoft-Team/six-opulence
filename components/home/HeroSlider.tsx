@@ -10,7 +10,6 @@ export default async function HeroSlider() {
 
   return (
     <section className="hero-slider">
-      {/* Desktop Video */}
       {hero.desktopVideo && (
         <video
           className="hero-video hero-video-desktop"
@@ -18,14 +17,16 @@ export default async function HeroSlider() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="none"
           poster={hero.poster || undefined}
+          controls={false}
+          disablePictureInPicture
+          aria-hidden="true"
         >
           <source src={hero.desktopVideo} type="video/mp4" />
         </video>
       )}
 
-      {/* Mobile Video */}
       {hero.mobileVideo && (
         <video
           className="hero-video hero-video-mobile"
@@ -33,8 +34,11 @@ export default async function HeroSlider() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="none"
           poster={hero.poster || undefined}
+          controls={false}
+          disablePictureInPicture
+          aria-hidden="true"
         >
           <source src={hero.mobileVideo} type="video/mp4" />
         </video>

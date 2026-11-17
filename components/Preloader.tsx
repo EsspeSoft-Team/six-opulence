@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties } from "react";
-
 import "./Preloader.css";
 
 const BRAND = "OPULENCE";
 const LOGO_SRC = "/images/opulence white-icon.png";
 
-const MIN_VISIBLE = 3200; // animation shuru howar por minimum koto khon thakbe (ms)
-const FADE_OUT = 700; // CSS transition er sathe match korbe
-const READY_FALLBACK = 1500; // image decode na hole eto khon por zorgor shuru
+const MIN_VISIBLE = 3200;
+const FADE_OUT = 700;
+const READY_FALLBACK = 1500;
 
 export default function Preloader() {
   const [isReady, setIsReady] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
 
-  // 1) Image decode + hydration sesh howar opekha, tarpor animation shuru
+  // Wait for logo decoding before starting animation
   useEffect(() => {
     document.body.classList.add("preloader-active");
 
@@ -25,19 +24,24 @@ export default function Preloader() {
     let raf1 = 0;
     let raf2 = 0;
 
+    let fallback: number;
+
     const start = () => {
       if (cancelled || started) return;
-      started = true;
 
-      // double rAF: browser ekta frame paint korar por start
+      started = true;
+      window.clearTimeout(fallback);
+
       raf1 = requestAnimationFrame(() => {
         raf2 = requestAnimationFrame(() => {
-          if (!cancelled) setIsReady(true);
+          if (!cancelled) {
+            setIsReady(true);
+          }
         });
       });
     };
 
-    const fallback = window.setTimeout(start, READY_FALLBACK);
+    fallback = window.setTimeout(start, READY_FALLBACK);
 
     const img = new Image();
     img.src = LOGO_SRC;
@@ -51,14 +55,16 @@ export default function Preloader() {
 
     return () => {
       cancelled = true;
+
       window.clearTimeout(fallback);
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
+
       document.body.classList.remove("preloader-active");
     };
   }, []);
 
-  // 2) Ready hole timer shuru, page load hole fade-out
+  // Wait for animation and initial page loading
   useEffect(() => {
     if (!isReady) return;
 
@@ -69,6 +75,7 @@ export default function Preloader() {
 
     const tryClose = () => {
       if (closed || !minDone || !pageLoaded) return;
+
       closed = true;
 
       setIsClosing(true);
@@ -89,11 +96,17 @@ export default function Preloader() {
       tryClose();
     };
 
-    if (!pageLoaded) window.addEventListener("load", onLoad);
+    if (!pageLoaded) {
+      window.addEventListener("load", onLoad);
+    }
 
     return () => {
       window.clearTimeout(minTimer);
-      if (closeTimer) window.clearTimeout(closeTimer);
+
+      if (closeTimer !== undefined) {
+        window.clearTimeout(closeTimer);
+      }
+
       window.removeEventListener("load", onLoad);
     };
   }, [isReady]);
@@ -102,14 +115,14 @@ export default function Preloader() {
 
   return (
     <div
-      className={`op-preloader ${isReady ? "op-ready" : ""} ${
-        isClosing ? "op-preloader-closing" : ""
-      }`}
+      className={`op-preloader ${
+        isReady ? "op-ready" : ""
+      } ${isClosing ? "op-preloader-closing" : ""}`}
       role="status"
       aria-label="Loading"
     >
       <div className="op-preloader-inner">
-        {/* OP LOGO - two halves join together */}
+        {/* OPULENCE LOGO */}
         <div className="op-logo-mark" role="img" aria-label="OPULENCE">
           <img
             src={LOGO_SRC}
@@ -118,6 +131,7 @@ export default function Preloader() {
             decoding="async"
             className="op-logo-piece op-logo-left"
           />
+
           <img
             src={LOGO_SRC}
             alt=""

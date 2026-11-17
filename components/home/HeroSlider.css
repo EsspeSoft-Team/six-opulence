@@ -10,21 +10,35 @@
 .hero-video {
   position: absolute;
   inset: 0;
-
   width: 100%;
   height: 100%;
-
   object-fit: cover;
   object-position: center;
-
   display: block;
 }
 
-/* Mobile */
+/* Desktop Video */
+.hero-video-desktop {
+  display: block;
+}
+
+.hero-video-mobile {
+  display: none;
+}
+
+/* Tablet & Mobile */
 @media (max-width: 768px) {
   .hero-slider {
     height: 680px;
     min-height: 600px;
+  }
+
+  .hero-video-desktop {
+    display: none;
+  }
+
+  .hero-video-mobile {
+    display: block;
   }
 }
 

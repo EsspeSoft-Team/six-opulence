@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import Link from "next/link";
-
 import "./AccessCollection.css";
 
 import type { AccessCollectionItem } from "@/lib/content/home/access";
@@ -12,114 +10,162 @@ interface AccessCollectionProps {
   chapters: AccessCollectionItem[];
 }
 
-const HOLD = 0.35;
-
-function applyHold(continuous: number, total: number) {
-  if (total <= 1) {
-    return 0;
-  }
-
-  const index = Math.floor(continuous);
-
-  const frac = continuous - index;
-
-  const adjusted = frac < HOLD ? 0 : (frac - HOLD) / (1 - HOLD);
-
-  return Math.min(index + adjusted, total - 1);
-}
+const SCROLL_PER_CHAPTER = 175;
+const ANIMATION_DURATION = 650;
 
 export default function AccessCollection({ chapters }: AccessCollectionProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const [progress, setProgress] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const targetRef = useRef(0);
-
-  const currentRef = useRef(0);
-
-  const rafRef = useRef<number>(0);
+  const activeRef = useRef(0);
+  const lockedRef = useRef(false);
+  const touchStartY = useRef(0);
+  const unlockTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const total = chapters.length;
 
   useEffect(() => {
-    if (!total) {
-      return;
-    }
+    if (!total) return;
 
-    function computeTarget() {
-      const wrap = wrapRef.current;
+    const wrap = wrapRef.current;
+    if (!wrap) return;
 
-      if (!wrap) {
-        return;
+    const getSectionPosition = (index: number) => {
+      const maxScroll = wrap.offsetHeight - window.innerHeight;
+      const maxIndex = Math.max(total - 1, 1);
+
+      return (
+        wrap.getBoundingClientRect().top +
+        window.scrollY +
+        (maxScroll * index) / maxIndex
+      );
+    };
+
+    const goToChapter = (index: number) => {
+      if (lockedRef.current) return;
+
+      const nextIndex = Math.max(0, Math.min(index, total - 1));
+
+      if (nextIndex === activeRef.current) return;
+
+      lockedRef.current = true;
+      activeRef.current = nextIndex;
+      setActiveIndex(nextIndex);
+
+      window.scrollTo({
+        top: getSectionPosition(nextIndex),
+        behavior: "smooth",
+      });
+
+      if (unlockTimer.current) {
+        clearTimeout(unlockTimer.current);
       }
 
+      unlockTimer.current = setTimeout(() => {
+        lockedRef.current = false;
+      }, ANIMATION_DURATION + 150);
+    };
+
+    const isInsideSection = () => {
       const rect = wrap.getBoundingClientRect();
 
-      const viewportH = window.innerHeight;
+      return rect.top <= 0 && rect.bottom >= window.innerHeight;
+    };
 
-      const maxScroll = wrap.offsetHeight - viewportH;
+    const syncActiveIndex = () => {
+      if (lockedRef.current) return;
 
-      const scrolled = -rect.top;
+      const rect = wrap.getBoundingClientRect();
+      const maxScroll = Math.max(wrap.offsetHeight - window.innerHeight, 1);
 
-      let raw = maxScroll > 0 ? scrolled / maxScroll : 0;
+      const progress = Math.max(0, Math.min(-rect.top / maxScroll, 1));
 
-      raw = Math.min(Math.max(raw, 0), 0.999999);
+      const index = Math.round(progress * (total - 1));
 
-      targetRef.current = applyHold(raw * total, total);
-    }
+      activeRef.current = index;
+      setActiveIndex(index);
+    };
 
-    function loop() {
-      currentRef.current += (targetRef.current - currentRef.current) * 0.12;
+    const onWheel = (event: WheelEvent) => {
+      if (!isInsideSection()) return;
 
-      if (Math.abs(targetRef.current - currentRef.current) < 0.0005) {
-        currentRef.current = targetRef.current;
-      }
+      const direction = Math.sign(event.deltaY);
 
-      setProgress(currentRef.current);
+      if (!direction) return;
 
-      rafRef.current = requestAnimationFrame(loop);
-    }
+      const nextIndex = activeRef.current + direction;
 
-    function onScroll() {
-      computeTarget();
-    }
+      if (nextIndex < 0 || nextIndex >= total) return;
 
-    window.addEventListener("scroll", onScroll, {
+      event.preventDefault();
+      goToChapter(nextIndex);
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      touchStartY.current = event.touches[0].clientY;
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (!isInsideSection()) return;
+
+      const difference = touchStartY.current - event.changedTouches[0].clientY;
+
+      if (Math.abs(difference) < 40) return;
+
+      const direction = difference > 0 ? 1 : -1;
+      const nextIndex = activeRef.current + direction;
+
+      if (nextIndex < 0 || nextIndex >= total) return;
+
+      goToChapter(nextIndex);
+    };
+
+    window.addEventListener("wheel", onWheel, {
+      passive: false,
+    });
+
+    window.addEventListener("touchstart", onTouchStart, {
       passive: true,
     });
 
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("touchend", onTouchEnd, {
+      passive: true,
+    });
 
-    computeTarget();
+    window.addEventListener("scroll", syncActiveIndex, {
+      passive: true,
+    });
 
-    rafRef.current = requestAnimationFrame(loop);
+    syncActiveIndex();
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("scroll", syncActiveIndex);
 
-      window.removeEventListener("scroll", onScroll);
-
-      window.removeEventListener("resize", onScroll);
+      if (unlockTimer.current) {
+        clearTimeout(unlockTimer.current);
+      }
     };
   }, [total]);
 
-  /*
-   * No Shopify data available
-   */
-  if (!chapters.length) {
-    return null;
-  }
-
-  const activeIndex = Math.min(Math.round(progress), total - 1);
+  if (!chapters.length) return null;
 
   return (
     <div className="access-root">
-      <div ref={wrapRef} className="access-scroll-wrap">
+      <div
+        ref={wrapRef}
+        className="access-scroll-wrap"
+        style={{
+          height: `${Math.max(total, 1) * SCROLL_PER_CHAPTER}vh`,
+        }}
+      >
         <div className="access-sticky-stage">
-          {/* BACKGROUND LAYERS */}
-
+          {/* BACKGROUND */}
           {chapters.map((ch, i) => {
-            const offset = i - progress;
+            const offset = i - activeIndex;
 
             return (
               <div
@@ -127,6 +173,7 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
                 className={`access-bg-layer ${ch.bgClass}`}
                 style={{
                   transform: `translate3d(0, ${offset * 100}%, 0)`,
+                  transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`,
                 }}
               >
                 <img src={ch.bgImage} alt="" className="access-bg-image" />
@@ -134,14 +181,8 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
             );
           })}
 
-          {/* PROGRESS (mobile only, CSS diye show hoy) */}
-
+          {/* VERTICAL DOTS */}
           <div className="access-progress" aria-hidden="true">
-            <span className="access-progress-count">
-              {String(activeIndex + 1).padStart(2, "0")}
-              <em> / {String(total).padStart(2, "0")}</em>
-            </span>
-
             <div className="access-progress-dots">
               {chapters.map((ch, i) => (
                 <span
@@ -154,12 +195,11 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
             </div>
           </div>
 
-          {/* PRODUCT CARD */}
-
+          {/* PRODUCT CARDS */}
           <div className="access-card">
             <div className="access-card-stack">
               {chapters.map((ch, i) => {
-                const offset = i - progress;
+                const offset = i - activeIndex;
 
                 return (
                   <div
@@ -167,6 +207,7 @@ export default function AccessCollection({ chapters }: AccessCollectionProps) {
                     className="access-card-panel"
                     style={{
                       transform: `translate3d(0, ${offset * 100}%, 0)`,
+                      transition: `transform ${ANIMATION_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`,
                     }}
                   >
                     <Link href={ch.productHandle} className="access-card-link">
