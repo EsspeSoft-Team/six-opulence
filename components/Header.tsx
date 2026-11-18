@@ -332,21 +332,21 @@ function MobileMenuDrawer({
   onClose: () => void;
 }) {
   const menuItems = [
-    {
-      number: "01",
-      label: "All Products",
-      href: "/collections/all",
-    },
-    {
-      number: "02",
-      label: "Polo",
-      href: "/collections/polo",
-    },
-    {
-      number: "03",
-      label: "T-Shirts",
-      href: "/collections/t-shirts",
-    },
+    // {
+    //   number: "01",
+    //   label: "All Products",
+    //   href: "/collections/all",
+    // },
+    // {
+    //   number: "02",
+    //   label: "Polo",
+    //   href: "/collections/polo",
+    // },
+    // {
+    //   number: "03",
+    //   label: "T-Shirts",
+    //   href: "/collections/t-shirts",
+    // },
     {
       number: "04",
       label: "Exclusive",

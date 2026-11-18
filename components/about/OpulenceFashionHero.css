@@ -575,7 +575,7 @@
   }
 
   .opulence-fashion-left-image img {
-    height: 360px;
+    height: auto;
   }
 
   /* CENTER */
@@ -669,7 +669,7 @@
   }
 
   .opulence-fashion-left-image img {
-    height: 320px;
+    height: auto;
   }
 
   .opulence-brand-closing p {

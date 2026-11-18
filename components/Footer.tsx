@@ -2,7 +2,12 @@
 
 import React from "react";
 import "./Footer.css";
-import { FaInstagram, FaLinkedinIn, FaEnvelope } from "react-icons/fa";
+import {
+  FaInstagram,
+  FaLinkedinIn,
+  FaEnvelope,
+  FaFacebook,
+} from "react-icons/fa";
 
 const Footer = () => {
   const handleBackToTop = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -75,7 +80,7 @@ const Footer = () => {
         <div className="opulence-social">
           {/* INSTAGRAM */}
           <a
-            href="#"
+            href="https://www.instagram.com/sixopulence?fqnt=MXczOW16Zjc5ZmVidg%3D%3D&utm_source=qr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -86,13 +91,13 @@ const Footer = () => {
 
           {/* LINKEDIN */}
           <a
-            href="#"
+            href="https://www.facebook.com/share/1R1Y79JvYA/?mibextid=wwXIfr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
             className="opulence-social-link"
           >
-            <FaLinkedinIn />
+            <FaFacebook />
           </a>
         </div>
       </div>
